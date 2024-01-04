@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Gym CRM - main</title>
+    <script th:replace="~{../templates/bootstrap-head.html}"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{../templates/header}"></div>
+<div th:replace="~{../templates/mainmenu}"></div>
+<div class="container">
+    <div class="row justify-content-md-left">
+        <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+            <h2>Gym CRM Spring MVC project</h2>
+            <p>This is the main page of the Gym CRM Java Spring MVC project.</p>
+            <p>Technologies used:
+                <ul>
+                    <li>Spring Framework</li>
+                    <li>Logback for logging</li>
+                    <li>Thymeleaf, HTML for front-end</li>
+                    <li>Gradle</li>
+                    <li>JaCoCo plugin for code coverage analysis</li>
+                </ul>
+            </p>
+        </div>
+    </div>
+</div>
+<div th:insert="~{../templates/footer}"></div>
+</body>
+</html>
