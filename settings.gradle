@@ -1,0 +1,5 @@
+rootProject.name = 'epam-lab-gym-crm'
+
+include 'application'
+include 'application'
+

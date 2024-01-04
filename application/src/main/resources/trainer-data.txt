@@ -1,0 +1,10 @@
+Kylian;Garcia;Kylian.Garcia;tuFRGpXIiA;true;1
+Ezrah;Jackson;Ezrah.Jackson;RRFqJnBunA;true;2
+Eren;Miller;Eren.Miller;YjvlyVRagP;true;3
+Amiri;Davis;Amiri.Davis;ecqlcDhXvG;true;4
+Jrue;Gonzalez;Jrue.Gonzalez;tGAKgOSYdV;true;5
+Kolson;Martin;Kolson.Martin;VCtkyQtuHV;true;6
+Kanan;Martinez;Kanan.Martinez;oIBEkhmTrZ;true;7
+Colter;Moore;Colter.Moore;AphJOjtFvA;true;8
+Teo;Thompson;Teo.Thompson;jnVOcOoMUV;true;9
+Koa;King;Koa.King;tcsCLkwaSa;true;10
