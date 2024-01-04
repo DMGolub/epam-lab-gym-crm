@@ -47,7 +47,7 @@
                     <td th:text="${trainee.getAddress()}" id="address">VALUE</td>
                 </tr>
             </table>
-            <form th:method="GET" th:action="@{../traineees/{id}/edit(id=${trainee.getId()})}">
+            <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
                 <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
             </form>

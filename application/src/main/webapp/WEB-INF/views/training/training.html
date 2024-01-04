@@ -49,7 +49,7 @@
                     <td th:text="${training.getDuration()}" id="duration">VALUE</td>
                 </tr>
             </table>
-            <form th:method="GET" th:action="@{../traininges/{id}/edit(id=${training.getId()})}">
+            <form th:method="GET" th:action="@{../trainings/{id}/edit(id=${training.getId()})}">
                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
             </form>
         </div>
