@@ -1,10 +1,23 @@
 package com.epam.dmgolub.gym.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import java.util.Objects;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity
+@Table
 public class TrainingType implements BaseEntity<Long> {
 
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
+	@Column(nullable = false)
 	private String name;
 
 	public TrainingType() {

@@ -1,16 +1,33 @@
 package com.epam.dmgolub.gym.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
 import java.util.Date;
 import java.util.Objects;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity
 public class Training implements BaseEntity<Long> {
 
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
+	@ManyToOne
 	private Trainee trainee;
+	@ManyToOne
 	private Trainer trainer;
+	@Column(nullable = false)
 	private String name;
+	@ManyToOne
 	private TrainingType type;
+	@Column(nullable = false)
 	private Date date;
+	@Column(nullable = false)
 	private int duration;
 
 	public Training() {

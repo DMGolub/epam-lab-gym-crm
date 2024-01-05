@@ -1,9 +1,8 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dao.TraineeDAO;
-import com.epam.dmgolub.gym.dao.TrainerDAO;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Trainee;
+import com.epam.dmgolub.gym.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,54 +22,49 @@ class UserCredentialsGeneratorImplTest {
 	@Value("${password.generated.length}")
 	private static int passwordLength;
 	@Mock
-	private TraineeDAO traineeDAO;
-	@Mock
-	private TrainerDAO trainerDAO;
+	private UserRepository userRepository;
 	@InjectMocks
 	private UserCredentialsGeneratorImpl generator;
 
 	@Test
 	void generateUserName_shouldNotAddSuffix_whenThereAreNoOtherUsers() {
 		final Trainee trainee = new Trainee();
-		trainee.setFirstName("First");
-		trainee.setLastName("Last");
-		when(trainerDAO.findAll()).thenReturn(Collections.emptyList());
-		when(traineeDAO.findAll()).thenReturn(Collections.emptyList());
+		trainee.getUser().setFirstName("First");
+		trainee.getUser().setLastName("Last");
+		when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
-		assertEquals("First.Last", generator.generateUserName(trainee));
+		assertEquals("First.Last", generator.generateUserName(trainee.getUser()));
 	}
 
 	@Test
 	void generateUserName_shouldAddSuffixTwo_whenThereIsOneUserWithEqualUserName() {
 		final Trainee trainee = new Trainee();
-		trainee.setFirstName("First");
-		trainee.setLastName("Last");
-		trainee.setUserName("First.Last");
+		trainee.getUser().setFirstName("First");
+		trainee.getUser().setLastName("Last");
+		trainee.getUser().setUserName("First.Last");
 		final Trainer trainer = new Trainer();
-		trainer.setFirstName("First");
-		trainer.setLastName("Last");
-		when(trainerDAO.findAll()).thenReturn(Collections.emptyList());
-		when(traineeDAO.findAll()).thenReturn(List.of(trainee));
+		trainer.getUser().setFirstName("First");
+		trainer.getUser().setLastName("Last");
+		when(userRepository.findAll()).thenReturn(List.of(trainee.getUser()));
 
-		assertEquals("First.Last2", generator.generateUserName(trainee));
-		assertEquals("First.Last2", generator.generateUserName(trainer));
+		assertEquals("First.Last2", generator.generateUserName(trainee.getUser()));
+		assertEquals("First.Last2", generator.generateUserName(trainer.getUser()));
 	}
 
 	@Test
 	void generateUserName_shouldAddNextSuffix_whenThereAreSeveralUsersWithEqualUserName() {
 		final Trainee trainee = new Trainee();
-		trainee.setFirstName("First");
-		trainee.setLastName("Last");
-		trainee.setUserName("First.Last");
+		trainee.getUser().setFirstName("First");
+		trainee.getUser().setLastName("Last");
+		trainee.getUser().setUserName("First.Last");
 		final Trainer trainer = new Trainer();
-		trainer.setFirstName("First");
-		trainer.setLastName("Last");
-		trainer.setUserName("First.Last3");
-		when(trainerDAO.findAll()).thenReturn(List.of(trainer));
-		when(traineeDAO.findAll()).thenReturn(List.of(trainee));
+		trainer.getUser().setFirstName("First");
+		trainer.getUser().setLastName("Last");
+		trainer.getUser().setUserName("First.Last3");
+		when(userRepository.findAll()).thenReturn(List.of(trainer.getUser(), trainee.getUser()));
 
-		assertEquals("First.Last4", generator.generateUserName(trainee));
-		assertEquals("First.Last4", generator.generateUserName(trainer));
+		assertEquals("First.Last4", generator.generateUserName(trainee.getUser()));
+		assertEquals("First.Last4", generator.generateUserName(trainer.getUser()));
 	}
 
 	@Test
@@ -78,8 +72,8 @@ class UserCredentialsGeneratorImplTest {
 		final Trainee trainee = new Trainee();
 		final Trainer trainer = new Trainer();
 
-		final String traineePassword = generator.generatePassword(trainee);
-		final String trainerPassword = generator.generatePassword(trainer);
+		final String traineePassword = generator.generatePassword(trainee.getUser());
+		final String trainerPassword = generator.generatePassword(trainer.getUser());
 
 		assertEquals(passwordLength, traineePassword.length());
 		assertEquals(passwordLength, trainerPassword.length());

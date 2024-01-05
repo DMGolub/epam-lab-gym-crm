@@ -1,14 +1,30 @@
 package com.epam.dmgolub.gym.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
 import java.util.Objects;
 
-public class Trainer extends User {
+import static javax.persistence.GenerationType.IDENTITY;
 
+@Entity
+public class Trainer implements BaseEntity<Long> {
+
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
+	@ManyToOne
 	private TrainingType specialization;
+	@OneToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	public Trainer() {
-		super();
+		user = new User();
 	}
 
 	public Trainer(
@@ -21,7 +37,7 @@ public class Trainer extends User {
 		final Long userId,
 		final TrainingType specialization
 	) {
-		super(userId, firstName, lastName, userName, password, isActive);
+		user = new User(userId, firstName, lastName, userName, password, isActive);
 		this.id = id;
 		this.specialization = specialization;
 	}
@@ -36,12 +52,16 @@ public class Trainer extends User {
 		this.id = id;
 	}
 
-	public Long getUserId() {
-		return super.getId();
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(final User user) {
+		this.user = user;
 	}
 
 	public void setUserId(final Long id) {
-		super.setId(id);
+		user.setId(id);
 	}
 
 	public TrainingType getSpecialization() {
@@ -54,8 +74,8 @@ public class Trainer extends User {
 
 	@Override
 	public String toString() {
-		return "Trainer{id=" + id + ", firstName='" + getFirstName() + '\'' + ", lastName='" + getLastName() + '\'' +
-			", userName='" + getUserName() + '\'' + ", isActive=" + isActive() + ", userId=" + getUserId() +
+		return "Trainer{id=" + id + ", firstName='" + user.getFirstName() + '\'' + ", lastName='" + user.getLastName() + '\'' +
+			", userName='" + user.getUserName() + '\'' + ", isActive=" + user.isActive() + ", userId=" + user.getId() +
 			", specialization=" + specialization + "}";
 	}
 

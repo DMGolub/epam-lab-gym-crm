@@ -1,10 +1,10 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dao.TrainingDAO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class TrainingServiceImplTest {
 
 	@Mock
-	private TrainingDAO trainingDAO;
+	private TrainingRepository trainingRepository;
 	@Mock
 	private MapStructMapper mapper;
 	@InjectMocks
@@ -36,7 +36,7 @@ class TrainingServiceImplTest {
 		final TrainingRequestDTO request = new TrainingRequestDTO();
 		final Training training = new Training();
 		when(mapper.trainingRequestDTOToTraining(request)).thenReturn(training);
-		when(trainingDAO.save(training)).thenReturn(training);
+		when(trainingRepository.saveAndFlush(training)).thenReturn(training);
 		final TrainingResponseDTO expected = new TrainingResponseDTO();
 		when(mapper.trainingToTrainingResponseDTO(training)).thenReturn(expected);
 
@@ -44,7 +44,7 @@ class TrainingServiceImplTest {
 
 		assertEquals(expected, result);
 		verify(mapper).trainingRequestDTOToTraining(request);
-		verify(trainingDAO).save(training);
+		verify(trainingRepository).saveAndFlush(training);
 		verify(mapper).trainingToTrainingResponseDTO(training);
 	}
 
@@ -56,35 +56,35 @@ class TrainingServiceImplTest {
 			final Training training = new Training();
 			final Long id = 1L;
 			training.setId(id);
-			when(trainingDAO.findById(id)).thenReturn(Optional.of(training));
+			when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
 			final TrainingResponseDTO expectedResponse = new TrainingResponseDTO();
 			when(mapper.trainingToTrainingResponseDTO(training)).thenReturn(expectedResponse);
 
 			final TrainingResponseDTO response = trainingService.findById(id);
 			assertEquals(expectedResponse, response);
-			verify(trainingDAO).findById(id);
+			verify(trainingRepository).findById(id);
 			verify(mapper).trainingToTrainingResponseDTO(training);
 		}
 
 		@Test
 		void findById_shouldThrowEntityNotFoundException_whenTrainingNotFound() {
 			final Long id = 99L;
-			when(trainingDAO.findById(id)).thenReturn(Optional.empty());
+			when(trainingRepository.findById(id)).thenReturn(Optional.empty());
 
 			assertThrows(EntityNotFoundException.class, () -> trainingService.findById(id));
-			verify(trainingDAO).findById(id);
+			verify(trainingRepository).findById(id);
 		}
 	}
 
 	@Test
 	void findAll_shouldReturnTwoTrainingResponseDTOs_whenThereAreTwoTrainings() {
 		final List<Training> trainings = List.of(new Training(), new Training());
-		when(trainingDAO.findAll()).thenReturn(trainings);
+		when(trainingRepository.findAll()).thenReturn(trainings);
 		final List<TrainingResponseDTO> response = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
 		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(response);
 
 		assertEquals(response, trainingService.findAll());
-		verify(trainingDAO).findAll();
+		verify(trainingRepository).findAll();
 		verify(mapper).trainingListToTrainingResponseDTOList(trainings);
 	}
 }

@@ -1,13 +1,11 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dao.TraineeDAO;
-import com.epam.dmgolub.gym.dao.TrainerDAO;
 import com.epam.dmgolub.gym.entity.User;
+import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +26,10 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 	@Value("${password.generated.length}")
 	private static int passwordLength;
 
-	private TraineeDAO traineeDAO;
-	private TrainerDAO trainerDAO;
+	private final UserRepository userRepository;
 
-	@Autowired
-	public void setTraineeDAO(final TraineeDAO traineeDAO) {
-		this.traineeDAO = traineeDAO;
-	}
-
-	@Autowired
-	public void setTrainerDAO(final TrainerDAO trainerDAO) {
-		this.trainerDAO = trainerDAO;
+	public UserCredentialsGeneratorImpl(final UserRepository userRepository) {
+		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -59,18 +50,17 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 	}
 
 	private List<String> findSimilarUserNames(final String userNameRegEx) {
-		final List<User> users = new ArrayList<>(trainerDAO.findAll());
-		users.addAll(traineeDAO.findAll());
+		final List<User> users = new ArrayList<>(userRepository.findAll());
 		return users.stream()
-				.map(User::getUserName)
-				.filter(userName -> Pattern.matches(userNameRegEx, userName))
-				.toList();
+			.map(User::getUserName)
+			.filter(userName -> Pattern.matches(userNameRegEx, userName))
+			.toList();
 	}
 
 	private Optional<Long> calculateUserNameSuffixMaxValue(final String userNameRegEx, final List<String> userNames) {
 		return userNames.stream().map(userName -> {
 			final Matcher matcher = Pattern.compile(userNameRegEx).matcher(userName);
-			return matcher.find() && !matcher.group(1).isEmpty() ? Long.parseLong(matcher.group(1)) : 1;
+			return (matcher.find() && !matcher.group(1).isEmpty()) ? Long.parseLong(matcher.group(1)) : 1;
 		}).max(Long::compare);
 	}
 

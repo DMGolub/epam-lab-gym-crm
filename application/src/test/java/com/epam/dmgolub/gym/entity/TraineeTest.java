@@ -26,10 +26,12 @@ class TraineeTest {
 	}
 
 	@Test
-	void userIdGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		final Long userId = 2L;
-		trainee.setUserId(userId);
-		assertEquals(userId, trainee.getUserId());
+	void userGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
+		final User user = new User();
+		user.setId(2L);
+		trainee.setUser(user);
+
+		assertEquals(user, trainee.getUser());
 	}
 
 	@Test
