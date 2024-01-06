@@ -14,11 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINING_NOT_FOUND_BY_ID_MESSAGE;
+
 @Service
 @Transactional
 public class TrainingServiceImpl implements TrainingService {
 
-	private static final String TRAINING_NOT_FOUND_MESSAGE = "Can not find training by id=";
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
 	private final TrainingRepository trainingRepository;
@@ -43,7 +44,7 @@ public class TrainingServiceImpl implements TrainingService {
 	public TrainingResponseDTO findById(final Long id) {
 		LOGGER.debug("In findById - Fetching training by id={} from repository", id);
 		final var training = trainingRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINING_NOT_FOUND_MESSAGE + id));
+			.orElseThrow(() -> new EntityNotFoundException(TRAINING_NOT_FOUND_BY_ID_MESSAGE + id));
 		return mapper.trainingToTrainingResponseDTO(training);
 	}
 

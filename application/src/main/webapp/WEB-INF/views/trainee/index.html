@@ -19,9 +19,27 @@
                     To view detailed information about the trainee, click on the link by the id of the trainee.<br/>
                     You can also edit, delete, and add new trainees.
                 </p>
-                <form th:method="GET" th:action="@{/trainees/new}">
-                    <button type="submit" class="btn btn-outline-dark">Add new trainee</button>
-                </form>
+                <div style="display: flex; justify-content: left; margin-bottom: 10px">
+                    <form th:method="GET" th:action="@{/trainees/new}">
+                        <button type="submit" class="btn btn-outline-dark" style="margin-right: 10px">Add new trainee</button>
+                    </form>
+                    <form th:method="POST" th:action="@{/trainees/action}" >
+                        <label for="action"> or choose an action:</label>
+                        <select id="action" name="action">
+                            <option value="find">find</option>
+                            <option value="delete">delete</option>
+                        </select>
+                        <label for="userName"> by user name:</label>
+                        <input type="text" id="userName" name="userName"/>
+                        <button type="submit" class="btn btn-outline-dark">Apply!</button>
+                    </form>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
                 <div th:if=${#lists.isEmpty(trainees)}>There are no trainees yet.</div>
                 <table class = "table table-hover" th:if="${not #lists.isEmpty(trainees)}" border="1">
                     <caption>All gym trainees</caption>

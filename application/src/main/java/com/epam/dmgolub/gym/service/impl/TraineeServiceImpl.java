@@ -18,11 +18,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_ID_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE;
+
 @Service
 @Transactional
 public class TraineeServiceImpl implements TraineeService {
 
-	private static final String TRAINEE_NOT_FOUND_MESSAGE = "Can not find trainee by id=";
 	private static final Logger LOGGER = LoggerFactory.getLogger(TraineeServiceImpl.class);
 
 	private final UserRepository userRepository;
@@ -69,6 +71,13 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
+	public TraineeResponseDTO findByUserName(final String userName) {
+		LOGGER.debug("In userName - Fetching trainee by userName={} from repository", userName);
+		final var trainee = getByUserName(userName);
+		return mapper.traineeToTraineeResponseDTO(trainee);
+	}
+
+	@Override
 	public TraineeResponseDTO update(final TraineeRequestDTO request) {
 		LOGGER.debug("In update - Updating trainee from request {}", request);
 		final var trainee = getById(request.getId());
@@ -90,13 +99,29 @@ public class TraineeServiceImpl implements TraineeService {
 			.filter(t -> id.equals(t.getTrainee().getId()))
 			.toList();
 		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In delete - removed {} trainings, removing trainee", trainings.size());
+		LOGGER.debug("In delete - removed {} trainings, removing trainee by id", trainings.size());
 		traineeRepository.deleteById(id);
 	}
 
+	@Override
+	public void delete(final String userName) {
+		LOGGER.debug("In delete - fetching trainings before removing trainee by id={}", userName);
+		final List<Training> trainings = trainingRepository.findAll().stream()
+			.filter(t -> userName.equals(t.getTrainee().getUser().getUserName()))
+			.toList();
+		trainingRepository.deleteAll(trainings);
+		LOGGER.debug("In delete - removed {} trainings, removing trainee by userName", trainings.size());
+		traineeRepository.deleteByUserUserName(userName);
+	}
+
 	private Trainee getById(final Long id) {
-		return traineeRepository
-			.findById(id).orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_MESSAGE + id));
+		return traineeRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_BY_ID_MESSAGE + id));
+	}
+
+	private Trainee getByUserName(final String userName) {
+		return traineeRepository.findByUserUserName(userName)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
 	}
 
 	private boolean namesAreNotEqual(final TraineeRequestDTO request, final Trainee trainee) {
