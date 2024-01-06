@@ -1,5 +1,6 @@
 package com.epam.dmgolub.gym.dto;
 
+import com.epam.dmgolub.gym.validation.annotation.MinimumAgeLimit;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
@@ -7,24 +8,21 @@ import javax.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_NOT_BLANK_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_PATTERN_MESSAGE;
 import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_PATTERN_REGEXP;
-import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_NOT_BLANK_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_MESSAGE;
 import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_REGEXP;
 
 public class TraineeRequestDTO {
 
 	private Long userId;
-	@NotBlank(message = FIRST_NAME_NOT_BLANK_MESSAGE)
-	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = FIRST_NAME_PATTERN_MESSAGE)
+	@NotBlank(message = "{firstName.not.blank.violation}")
+	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = "{firstName.pattern.violation}")
 	private String firstName;
-	@NotBlank(message = LAST_NAME_NOT_BLANK_MESSAGE)
-	@Pattern(regexp = LAST_NAME_PATTERN_REGEXP, message = LAST_NAME_PATTERN_MESSAGE)
+	@NotBlank(message = "{lastName.not.blank.violation}")
+	@Pattern(regexp = LAST_NAME_PATTERN_REGEXP, message = "{lastName.pattern.violation}")
 	private String lastName;
 	private boolean isActive;
 	private Long id;
+	@MinimumAgeLimit(value = 7, message = "{trainee.minimum.age.violation}")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private Date dateOfBirth;
 	private String address;
