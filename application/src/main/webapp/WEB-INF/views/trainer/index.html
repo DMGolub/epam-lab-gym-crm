@@ -4,55 +4,59 @@
     <meta charset ="UTF-8"/>
     <title>Gym CRM - trainers</title>
     <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
 </head>
-<body class="d-flex flex-column min-vh-100">
-<div th:replace="~{../templates/header}"></div>
-<div th:replace="~{../templates/mainmenu}"></div>
-<div class="container">
-    <div class="row justify-content-md-center">
-        <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
-            <h2>Gym trainers</h2>
-            <p>
-                Allows to view all the trainers of the Gym.
-                To view detailed information about the trainer, click on the link by the id of the trainer.<br/>
-                You can also edit and add new trainers.
-            </p>
-            <form th:method="GET" th:action="@{/trainers/new}">
-                <button type="submit" class="btn btn-outline-dark">Add new trainer</button>
-            </form>
-            <div th:if=${#lists.isEmpty(trainers)}>There are no trainers yet.</div>
-            <table class = "table table-hover" th:if="${not #lists.isEmpty(trainers)}" border="1">
-                <caption>All gym trainers</caption>
-                <thead class="thead-dark">
-                <tr>
-                    <th>Id</th>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th>User name</th>
-                    <th>Is active</th>
-                    <th>Specialization</th>
-                    <th>Edit</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="trainer, iterStat : ${trainers}">
-                    <td><a th:href="@{/trainers/{id}(id=${trainer.getId()})}" th:text="${trainer.getId()}">VALUE</a></td>
-                    <td th:text="${trainer.getFirstName()}">VALUE</td>
-                    <td th:text="${trainer.getLastName()}">VALUE</td>
-                    <td th:text="${trainer.getUserName()}">VALUE</td>
-                    <td th:text="${trainer.isActive()}">VALUE</td>
-                    <td th:text="${trainer.getSpecialization().getName()}">VALUE</td>
-                    <td>
-                        <form th:method="GET" th:action="@{/trainers/{id}/edit(id=${trainer.getId()})}">
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <h2>Gym trainers</h2>
+                <p>
+                    Allows to view all the trainers of the Gym.
+                    To view detailed information about the trainer, click on the link by the id of the trainer.<br/>
+                    You can also edit and add new trainers.
+                </p>
+                <form th:method="GET" th:action="@{/trainers/new}">
+                    <button type="submit" class="btn btn-outline-dark">Add new trainer</button>
+                </form>
+                <div th:if=${#lists.isEmpty(trainers)}>There are no trainers yet.</div>
+                <table class = "table table-hover" th:if="${not #lists.isEmpty(trainers)}" border="1">
+                    <caption>All gym trainers</caption>
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>User name</th>
+                        <th>Is active</th>
+                        <th>Specialization</th>
+                        <th>Edit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="trainer, iterStat : ${trainers}">
+                        <td><a th:href="@{/trainers/{id}(id=${trainer.getId()})}" th:text="${trainer.getId()}">VALUE</a></td>
+                        <td th:text="${trainer.getFirstName()}">VALUE</td>
+                        <td th:text="${trainer.getLastName()}">VALUE</td>
+                        <td th:text="${trainer.getUserName()}">VALUE</td>
+                        <td th:text="${trainer.isActive()}">VALUE</td>
+                        <td th:text="${trainer.getSpecialization().getName()}">VALUE</td>
+                        <td>
+                            <form th:method="GET" th:action="@{/trainers/{id}/edit(id=${trainer.getId()})}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    <div th:replace="~{../templates/footer}"></div>
 </div>
-<div th:replace="~{../templates/footer}"></div>
 </body>
 </html>
