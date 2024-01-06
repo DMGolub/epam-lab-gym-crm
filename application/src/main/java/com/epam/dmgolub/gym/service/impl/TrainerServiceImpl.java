@@ -16,11 +16,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_ID_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE;
+
 @Service
 @Transactional
 public class TrainerServiceImpl implements TrainerService {
 
-	private static final String TRAINER_NOT_FOUND_MESSAGE = "Can not find trainer by id=";
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
 	private final UserRepository userRepository;
@@ -64,6 +66,14 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
+	public TrainerResponseDTO findByUserName(final String userName) {
+		LOGGER.debug("In findByUserName - Fetching trainer by userName={} from repository", userName);
+		final var trainer = trainerRepository.findByUserUserName(userName)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
+		return mapper.trainerToTrainerResponseDTO(trainer);
+	}
+
+	@Override
 	public TrainerResponseDTO update(final TrainerRequestDTO request) {
 		LOGGER.debug("In update - Updating trainer from request {}", request);
 		final var trainer = getById(request.getId());
@@ -78,8 +88,8 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	private Trainer getById(final Long id) {
-		return trainerRepository
-			.findById(id).orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_MESSAGE + id));
+		return trainerRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + id));
 	}
 
 	private boolean namesAreNotEqual(final TrainerRequestDTO request, final Trainer trainer) {

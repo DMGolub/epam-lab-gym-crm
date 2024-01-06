@@ -20,9 +20,26 @@
                     To view detailed information about the trainer, click on the link by the id of the trainer.<br/>
                     You can also edit and add new trainers.
                 </p>
-                <form th:method="GET" th:action="@{/trainers/new}">
-                    <button type="submit" class="btn btn-outline-dark">Add new trainer</button>
-                </form>
+                <div style="display: flex; justify-content: left; margin-bottom: 10px">
+                    <form th:method="GET" th:action="@{/trainers/new}">
+                        <button type="submit" class="btn btn-outline-dark" style="margin-right: 10px">Add new trainer</button>
+                    </form>
+                    <form th:method="POST" th:action="@{/trainers/action}" >
+                        <label for="action"> or choose an action:</label>
+                        <select id="action" name="action">
+                            <option value="find">find</option>
+                        </select>
+                        <label for="userName"> by user name:</label>
+                        <input type="text" id="userName" name="userName"/>
+                        <button type="submit" class="btn btn-outline-dark">Apply!</button>
+                    </form>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
                 <div th:if=${#lists.isEmpty(trainers)}>There are no trainers yet.</div>
                 <table class = "table table-hover" th:if="${not #lists.isEmpty(trainers)}" border="1">
                     <caption>All gym trainers</caption>

@@ -34,6 +34,9 @@ public class Constants {
 	public static final String REQUEST_ID_INVALID_EXCEPTION_MESSAGE = "Request id=%d is not equal to path id=%d";
 	public static final String BINDING_RESULT_ERROR_MESSAGE = "Validation failed. Returning {} view name";
 
+	public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+	public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+
 	private Constants() {
 		// empty
 	}
