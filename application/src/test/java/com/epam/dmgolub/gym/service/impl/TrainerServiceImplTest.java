@@ -31,7 +31,7 @@ class TrainerServiceImplTest {
 	@Mock
 	private MapStructMapper mapper;
 	@Mock
-	private UserCredentialsGenerator userCredentialsGenerator;
+	private UserCredentialsGenerator generator;
 	@InjectMocks
 	private TrainerServiceImpl trainerService;
 
@@ -41,8 +41,8 @@ class TrainerServiceImplTest {
 		final Trainer trainer = new Trainer();
 		when(mapper.trainerRequestDTOToTrainer(request)).thenReturn(trainer);
 		final String userName = "username";
-		when(userCredentialsGenerator.generateUserName(trainer.getUser())).thenReturn(userName);
-		when(userCredentialsGenerator.generatePassword(trainer.getUser())).thenReturn("password");
+		when(generator.generateUserName(trainer.getUser())).thenReturn(userName);
+		when(generator.generatePassword(trainer.getUser())).thenReturn("password");
 		when(userRepository.saveAndFlush(trainer.getUser())).thenReturn(trainer.getUser());
 		when(trainerRepository.saveAndFlush(trainer)).thenReturn(trainer);
 		final TrainerResponseDTO expected = new TrainerResponseDTO();
@@ -51,8 +51,8 @@ class TrainerServiceImplTest {
 
 		assertEquals(expected, trainerService.save(request));
 		verify(mapper, times(1)).trainerRequestDTOToTrainer(request);
-		verify(userCredentialsGenerator, times(1)).generateUserName(trainer.getUser());
-		verify(userCredentialsGenerator, times(1)).generatePassword(trainer.getUser());
+		verify(generator, times(1)).generateUserName(trainer.getUser());
+		verify(generator, times(1)).generatePassword(trainer.getUser());
 		verify(userRepository, times(1)).saveAndFlush(trainer.getUser());
 		verify(trainerRepository, times(1)).saveAndFlush(trainer);
 		verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
@@ -104,16 +104,32 @@ class TrainerServiceImplTest {
 			final TrainerRequestDTO request =
 				new TrainerRequestDTO(1L, "firstName", "lastName", true, 1L, null);
 			final Trainer trainer =
-				new Trainer(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, null);
+				new Trainer(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, null, null);
 			when(trainerRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainer));
 			final String userName = "username";
-			when(userCredentialsGenerator.generateUserName(trainer.getUser())).thenReturn(userName);
+			when(generator.generateUserName(trainer.getUser())).thenReturn(userName);
 			when(trainerRepository.saveAndFlush(trainer)).thenReturn(trainer);
 			final TrainerResponseDTO expected = new TrainerResponseDTO();
 			when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(expected);
 
 			assertEquals(expected, trainerService.update(request));
-			verify(userCredentialsGenerator, times(1)).generateUserName(trainer.getUser());
+			verify(generator, times(1)).generateUserName(trainer.getUser());
+			verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
+		}
+
+		@Test
+		void update_shouldNotUpdateUserNameAndReturnTrainerResponseDTO_whenInvokedWithSameNames() {
+			final TrainerRequestDTO request =
+				new TrainerRequestDTO(1L, "firstName", "lastName", true, 1L, null);
+			final Trainer trainer =
+				new Trainer(1L, "firstName", "lastName", "firstName.lastName", "password", false, 1L, null, null);
+			when(trainerRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainer));
+			when(trainerRepository.saveAndFlush(trainer)).thenReturn(trainer);
+			final TrainerResponseDTO expected = new TrainerResponseDTO();
+			when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(expected);
+
+			assertEquals(expected, trainerService.update(request));
+			verifyNoInteractions(generator);
 			verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
 		}
 

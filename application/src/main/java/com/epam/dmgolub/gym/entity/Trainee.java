@@ -4,11 +4,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -22,9 +27,15 @@ public class Trainee implements BaseEntity<Long> {
 	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User user;
+	@ManyToMany(fetch = EAGER)
+	@JoinTable(name = "trainer_to_trainee",
+		joinColumns = @JoinColumn(name = "trainee_id"),
+		inverseJoinColumns = @JoinColumn(name = "trainer_id"))
+	private List<Trainer> trainers;
 
 	public Trainee() {
 		user = new User();
+		trainers = new ArrayList<>();
 	}
 
 	public Trainee(
@@ -36,12 +47,14 @@ public class Trainee implements BaseEntity<Long> {
 		final boolean isActive,
 		final Long userId,
 		final Date dateOfBirth,
-		final String address
+		final String address,
+		final List<Trainer> trainers
 	) {
 		user = new User(userId, firstName, lastName, userName, password, isActive);
 		this.id = id;
 		this.dateOfBirth = dateOfBirth;
 		this.address = address;
+		this.trainers = trainers;
 	}
 
 	@Override
@@ -76,6 +89,14 @@ public class Trainee implements BaseEntity<Long> {
 
 	public void setAddress(final String address) {
 		this.address = address;
+	}
+
+	public List<Trainer> getTrainers() {
+		return trainers;
+	}
+
+	public void setTrainers(final List<Trainer> trainers) {
+		this.trainers = trainers;
 	}
 
 	@Override

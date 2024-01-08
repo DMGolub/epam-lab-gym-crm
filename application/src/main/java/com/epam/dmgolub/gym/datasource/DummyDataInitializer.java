@@ -39,6 +39,8 @@ public class DummyDataInitializer {
 	private String traineeDataFilePath;
 	@Value("${trainer.data.filePath}")
 	private String trainerDataFilePath;
+	@Value("${trainersToTrainees.data.filePath}")
+	private String trainersToTraineesFilePath;
 	@Value("${training.data.filePath}")
 	private String trainingDataFilePath;
 	@Value("${training-type.data.filePath}")
@@ -70,6 +72,7 @@ public class DummyDataInitializer {
 		initializeTrainerData();
 		initializeTraineeData();
 		initializeTrainingData();
+		initializeAdminData();
 	}
 
 	private void initializeTrainingTypeData() {
@@ -85,7 +88,7 @@ public class DummyDataInitializer {
 			final String[] values = line.split(VALUE_DELIMITER);
 			final Trainer trainer = new Trainer();
 			setUserProperties(trainer.getUser(), values);
-			trainer.setSpecialization(trainingTypeRepository.findById(Long.valueOf(values[5])).orElse(null));
+			trainer.setSpecialization(trainingTypeRepository.findById(Long.valueOf(values[5])).get());
 			trainer.setUser(userRepository.saveAndFlush(trainer.getUser()));
 			trainerRepository.saveAndFlush(trainer);
 		}
@@ -102,21 +105,40 @@ public class DummyDataInitializer {
 			trainee.setUser(userRepository.saveAndFlush(trainee.getUser()));
 			traineeRepository.saveAndFlush(trainee);
 		}
+		addTrainersToTrainees();
+	}
+
+	private void addTrainersToTrainees() {
+		final List<String> lines = readLinesFromFile(trainersToTraineesFilePath);
+		for (String line : lines) {
+			final String[] values = line.split(VALUE_DELIMITER);
+			final long traineeId = Long.parseLong(values[0]);
+			final long trainerId = Long.parseLong(values[1]);
+			final Trainee trainee = traineeRepository.findById(traineeId).get();
+			final Trainer trainer = trainerRepository.findById(trainerId).get();
+			trainee.getTrainers().add(trainer);
+			traineeRepository.saveAndFlush(trainee);
+		}
 	}
 
 	private void initializeTrainingData() {
 		final List<String> lines = readLinesFromFile(trainingDataFilePath);
 		for (String line : lines) {
 			final String[] values = line.split(VALUE_DELIMITER);
-			final var trainee = traineeRepository.findById(Long.valueOf(values[0])).orElse(null);
-			final var trainer = trainerRepository.findById(Long.valueOf(values[1])).orElse(null);
+			final var trainee = traineeRepository.findById(Long.valueOf(values[0])).get();
+			final var trainer = trainerRepository.findById(Long.valueOf(values[1])).get();
 			final String name = values[2];
-			final var type = trainingTypeRepository.findById(Long.valueOf(values[3])).orElse(null);
+			final var type = trainingTypeRepository.findById(Long.valueOf(values[3])).get();
 			final Date date = parseDate(values[4]);
 			final int duration = Integer.parseInt(values[5]);
 			final Training training = new Training(null, trainee, trainer, name, type, date, duration);
 			trainingRepository.saveAndFlush(training);
 		}
+	}
+
+	private void initializeAdminData() {
+		final User admin = new User(null, "admin", "admin", "admin.admin", "Password12", true);
+		userRepository.saveAndFlush(admin);
 	}
 
 	private List<String> readLinesFromFile(final String filePath) {

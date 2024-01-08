@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.dto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,9 +69,9 @@ class TraineeResponseDTOTest {
 	@Test
 	void toString_shouldReturnExpectedValue_whenInvoked() {
 		final TraineeResponseDTO trainee =
-			new TraineeResponseDTO(1L, "firstName", "lastName", "userName",true, 2L, null, "address");
+			new TraineeResponseDTO(1L, "firstName", "lastName", "userName",true, 2L, null, "address", new ArrayList<>());
 		final String expected = "TraineeResponseDTO{userId=1, firstName='firstName', lastName='lastName', " +
-			"userName='userName', isActive=true, id=2, dateOfBirth=null, address='address'}";
+			"userName='userName', isActive=true, id=2, dateOfBirth=null, address='address', trainers=[]}";
 
 		assertEquals(expected, trainee.toString());
 	}
@@ -78,8 +79,7 @@ class TraineeResponseDTOTest {
 	@Test
 	void testEqualsAndHashCode() {
 		final TraineeResponseDTO responseDTO2 =
-			new TraineeResponseDTO(1L, "FirstName", "LastName", "UserName", true, 2L, new Date(), "Address"
-		);
+			new TraineeResponseDTO(1L, "FirstName", "LastName", "UserName", true, 2L, new Date(), "Address", new ArrayList<>());
 
 		assertEquals(responseDTO2, responseDTO2);
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());

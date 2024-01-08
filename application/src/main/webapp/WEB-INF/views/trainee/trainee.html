@@ -48,6 +48,16 @@
                         <td>Address: </td>
                         <td th:text="${trainee.getAddress()}" id="address">VALUE</td>
                     </tr>
+                    <tr>
+                        <td>Trainers: </td>
+                        <td id="trainers">
+                            <span th:if="${#lists.isEmpty(trainee.getTrainers())}">No trainers have been added yet</span>
+                                <span th:each="trainer, iterStat : ${trainee.getTrainers()}">
+                                    <a th:text="${trainer.getFirstName() + ' ' + trainer.getLastName() + ' (' + trainer.getSpecialization().getName() + ')'}">VALUE</a>
+                                <span th:text="${!iterStat.last ? ', ' : ''}"></span>
+                            </span>
+                        </td>
+                    </tr>
                 </table>
                 <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>

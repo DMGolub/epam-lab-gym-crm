@@ -4,9 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -22,9 +25,12 @@ public class Trainer implements BaseEntity<Long> {
 	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User user;
+	@ManyToMany(mappedBy = "trainers")
+	private List<Trainee> trainees;
 
 	public Trainer() {
 		user = new User();
+		trainees = new ArrayList<>();
 	}
 
 	public Trainer(
@@ -35,11 +41,13 @@ public class Trainer implements BaseEntity<Long> {
 		final String password,
 		final boolean isActive,
 		final Long userId,
-		final TrainingType specialization
+		final TrainingType specialization,
+		final List<Trainee> trainees
 	) {
 		user = new User(userId, firstName, lastName, userName, password, isActive);
 		this.id = id;
 		this.specialization = specialization;
+		this.trainees = trainees;
 	}
 
 	@Override
@@ -70,6 +78,14 @@ public class Trainer implements BaseEntity<Long> {
 
 	public void setSpecialization(final TrainingType specialization) {
 		this.specialization = specialization;
+	}
+
+	public List<Trainee> getTrainees() {
+		return trainees;
+	}
+
+	public void setTrainees(final List<Trainee> trainees) {
+		this.trainees = trainees;
 	}
 
 	@Override

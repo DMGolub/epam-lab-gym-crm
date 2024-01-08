@@ -112,7 +112,7 @@ class TraineeServiceImplTest {
 			final TraineeRequestDTO request =
 				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
 			final Trainee trainee =
-				new Trainee(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, new Date(), "addr");
+				new Trainee(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, new Date(), "addr", null);
 			trainee.setId(request.getId());
 			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
 			final String userName = "firstName.lastName";
@@ -124,6 +124,23 @@ class TraineeServiceImplTest {
 
 			assertEquals(expectedOutput, traineeService.update(request));
 			verify(generator, times(1)).generateUserName(trainee.getUser());
+			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+		}
+
+		@Test
+		void update_shouldNotUpdateUserNameAndReturnTraineeResponseDTO_whenInvokedWithSameNames() {
+			final TraineeRequestDTO request =
+				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
+			final Trainee trainee =
+				new Trainee(1L, "firstName", "lastName", "firstName.lastName", "password", false, 1L, new Date(), "addr", null);
+			trainee.setId(request.getId());
+			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
+			when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
+			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
+			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+
+			assertEquals(expectedOutput, traineeService.update(request));
+			verifyNoInteractions(generator);
 			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
 		}
 

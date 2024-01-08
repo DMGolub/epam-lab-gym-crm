@@ -3,6 +3,8 @@ package com.epam.dmgolub.gym.entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrainerTest {
@@ -47,7 +49,8 @@ class TrainerTest {
 			"password",
 			true,
 			2L,
-			new TrainingType(1L, "Bodybuilding")
+			new TrainingType(1L, "Bodybuilding"),
+			new ArrayList<>()
 		);
 		final Trainer trainerTwo = new Trainer(
 			2L,
@@ -57,7 +60,8 @@ class TrainerTest {
 			"password",
 			true,
 			4L,
-			new TrainingType(1L, "Bodybuilding")
+			new TrainingType(1L, "Bodybuilding"),
+			new ArrayList<>()
 		);
 		final Trainer trainerThree = new Trainer(
 			2L,
@@ -67,7 +71,8 @@ class TrainerTest {
 			"password",
 			true,
 			4L,
-			new TrainingType(1L, "Martial arts")
+			new TrainingType(1L, "Martial arts"),
+			new ArrayList<>()
 		);
 
 		assertEquals(trainerTwo, trainerTwo);
@@ -86,7 +91,8 @@ class TrainerTest {
 			"password",
 			true,
 			2L,
-			new TrainingType(1L, "Bodybuilding")
+			new TrainingType(1L, "Bodybuilding"),
+			new ArrayList<>()
 		);
 		final Trainer trainerTwo = new Trainer(
 			2L,
@@ -96,7 +102,8 @@ class TrainerTest {
 			"password",
 			true,
 			4L,
-			new TrainingType(1L, "Bodybuilding")
+			new TrainingType(1L, "Bodybuilding"),
+			new ArrayList<>()
 		);
 		final Trainer trainerThree = new Trainer();
 
