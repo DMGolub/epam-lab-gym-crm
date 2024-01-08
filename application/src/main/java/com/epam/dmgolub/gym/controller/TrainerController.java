@@ -108,7 +108,7 @@ public class TrainerController {
 	@PutMapping("/{id:\\d+}")
 	public String update(
 		@PathVariable("id") final Long id,
-		@ModelAttribute(TRAINER) final @Valid TrainerRequestDTO trainer,
+		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
 		final BindingResult bindingResult
 	) {
 		LOGGER.debug("In update - validating updated trainer");

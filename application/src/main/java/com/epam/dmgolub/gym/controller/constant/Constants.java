@@ -28,7 +28,7 @@ public class Constants {
 
 	public static final String TRAINING_TYPES = "trainingTypes";
 
-	public static final String ENTITY_NOT_FOUND_VIEW = "exception/entity_not_found_exception.html";
+	public static final String ENTITY_NOT_FOUND_VIEW = "exception/entity_not_found_exception";
 	public static final String EXCEPTION_VIEW = "exception/exception";
 	public static final String CONTROLLER_EXCEPTION_LOG_MESSAGE = "Request: {} caused an exception: {}";
 	public static final String REQUEST_ID_INVALID_EXCEPTION_MESSAGE = "Request id=%d is not equal to path id=%d";
