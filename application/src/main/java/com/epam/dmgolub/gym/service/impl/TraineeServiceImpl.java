@@ -6,6 +6,7 @@ import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.MapStructMapper;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
+import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.TraineeService;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_ID_MESSAGE;
 import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_ID_MESSAGE;
 
 @Service
 @Transactional
@@ -30,6 +32,7 @@ public class TraineeServiceImpl implements TraineeService {
 	private final UserRepository userRepository;
 	private final TraineeRepository traineeRepository;
 	private final TrainingRepository trainingRepository;
+	private final TrainerRepository trainerRepository;
 	private final MapStructMapper mapper;
 	private final UserCredentialsGenerator userCredentialsGenerator;
 
@@ -37,12 +40,14 @@ public class TraineeServiceImpl implements TraineeService {
 		final UserRepository userRepository,
 		final TraineeRepository traineeRepository,
 		final TrainingRepository trainingRepository,
+		final TrainerRepository trainerRepository,
 		final MapStructMapper mapper,
 		final UserCredentialsGenerator userCredentialsGenerator
 	) {
 		this.userRepository = userRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainingRepository = trainingRepository;
+		this.trainerRepository = trainerRepository;
 		this.mapper = mapper;
 		this.userCredentialsGenerator = userCredentialsGenerator;
 	}
@@ -112,6 +117,15 @@ public class TraineeServiceImpl implements TraineeService {
 		trainingRepository.deleteAll(trainings);
 		LOGGER.debug("In delete - removed {} trainings, removing trainee by userName", trainings.size());
 		traineeRepository.deleteByUserUserName(userName);
+	}
+
+	@Override
+	public void addTrainer(final Long traineeId, final Long trainerId) {
+		LOGGER.debug("In addTrainer - Fetching trainer by id={} from repository", trainerId);
+		final var trainer = trainerRepository.findById(trainerId)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + trainerId));
+		LOGGER.debug("In addTrainer - Fetching trainee by id={} from repository and adding trainer", traineeId);
+		getById(traineeId).getTrainers().add(trainer);
 	}
 
 	private Trainee getById(final Long id) {

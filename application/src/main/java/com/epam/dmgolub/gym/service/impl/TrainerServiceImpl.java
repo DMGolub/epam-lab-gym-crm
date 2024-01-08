@@ -87,6 +87,13 @@ public class TrainerServiceImpl implements TrainerService {
 		return mapper.trainerToTrainerResponseDTO(trainerRepository.saveAndFlush(trainer));
 	}
 
+	@Override
+	public List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(final Long traineeId) {
+		LOGGER.debug("In findActiveTrainersNotAssignedToUserName - Fetching trainers for traineeId={}", traineeId);
+		final var trainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeId);
+		return mapper.trainerListToTrainerResponseDTOList(trainers);
+	}
+
 	private Trainer getById(final Long id) {
 		return trainerRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + id));

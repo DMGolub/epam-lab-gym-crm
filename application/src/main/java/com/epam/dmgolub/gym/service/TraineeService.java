@@ -14,4 +14,6 @@ public interface TraineeService extends BaseService<Long, TraineeRequestDTO, Tra
 	void delete(Long id);
 
 	void delete(String userName);
+
+	void addTrainer(Long traineeId, Long trainerIds);
 }

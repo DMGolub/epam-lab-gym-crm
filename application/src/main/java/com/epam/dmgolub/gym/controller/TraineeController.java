@@ -2,6 +2,7 @@ package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.service.TraineeService;
+import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+import static com.epam.dmgolub.gym.controller.constant.Constants.AVAILABLE_TRAINERS;
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
@@ -37,9 +39,11 @@ public class TraineeController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TraineeController.class);
 
 	private final TraineeService traineeService;
+	private final TrainerService trainerService;
 
-	public TraineeController(final TraineeService traineeService) {
+	public TraineeController(final TraineeService traineeService, final TrainerService trainerService) {
 		this.traineeService = traineeService;
+		this.trainerService = trainerService;
 	}
 
 	@GetMapping("/new")
@@ -119,6 +123,19 @@ public class TraineeController {
 		return REDIRECT_TO_TRAINEE_INDEX;
 	}
 
+	@PutMapping("/{id:\\d+}/add-trainer")
+	public String addTrainer(
+		@PathVariable("id") final Long traineeId,
+		@RequestParam("trainerId") final Long trainerId,
+		final Model model
+	) {
+		LOGGER.debug("In addTrainer - Received request to add trainer={} to trainee={}", trainerId, traineeId);
+		traineeService.addTrainer(traineeId, trainerId);
+		model.addAttribute(TRAINEE, traineeService.findById(traineeId));
+		model.addAttribute(AVAILABLE_TRAINERS, trainerService.findActiveTrainersNotAssignedToTrainee(traineeId));
+		return REDIRECT_TO_TRAINEE_INDEX + traineeId;
+	}
+
 	@DeleteMapping("/{id:\\d+}")
 	public String delete(@PathVariable("id") final Long id) {
 		LOGGER.debug("In delete - removing trainee with id={}", id);
@@ -130,6 +147,7 @@ public class TraineeController {
 	public String findById(@PathVariable("id") final Long id, final Model model) {
 		model.addAttribute(TRAINEE, traineeService.findById(id));
 		LOGGER.debug("In findById - Trainee with id={} fetched successfully. Returning trainee view name", id);
+		model.addAttribute(AVAILABLE_TRAINERS, trainerService.findActiveTrainersNotAssignedToTrainee(id));
 		return TRAINEE_VIEW_NAME;
 	}
 

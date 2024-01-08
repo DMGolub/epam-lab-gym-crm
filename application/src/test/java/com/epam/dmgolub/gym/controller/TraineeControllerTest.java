@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.controller;
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.service.TraineeService;
+import com.epam.dmgolub.gym.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,12 +41,14 @@ class TraineeControllerTest {
 	private BindingResult bindingResult;
 	@Mock
 	private TraineeService traineeService;
+	@Mock
+	private TrainerService trainerService;
 	@InjectMocks
 	private TraineeController traineeController;
 
 	@BeforeEach
 	void setUp() {
-		traineeController = new TraineeController(traineeService);
+		traineeController = new TraineeController(traineeService, trainerService);
 	}
 
 	@Test

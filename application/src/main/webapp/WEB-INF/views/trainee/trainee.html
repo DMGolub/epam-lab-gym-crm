@@ -59,10 +59,21 @@
                         </td>
                     </tr>
                 </table>
-                <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
-                </form>
+                <div style="display: flex; justify-content: left;">
+                    <form th:method="PUT" th:action="@{/trainees/{id}/add-trainer(id=${trainee.getId()})}">
+                        <label for="trainerId">Select a trainer to add: </label>
+                        <select th:object="${availableTrainers}" id="trainerId" name="trainerId">
+                            <option th:if="${availableTrainers != null}" disabled="disabled" selected="selected" value="">Please select...</option>
+                            <option th:if="${availableTrainers != null}" th:each="trainer : ${availableTrainers}" th:value="${trainer.getId()}"
+                                    th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName()}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;">Add trainer</button>
+                    </form>
+                    <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Edit profile</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -9,6 +9,7 @@ public class Constants {
 	public static final String TRAINEE_INDEX_VIEW_NAME = "trainee/index";
 	public static final String REDIRECT_TO_TRAINEE_INDEX = "redirect:/trainees/";
 	public static final String TRAINEE_VIEW_NAME = "trainee/trainee";
+	public static final String AVAILABLE_TRAINERS = "availableTrainers";
 
 	public static final String TRAINER = "trainer";
 	public static final String TRAINERS = "trainers";
@@ -36,6 +37,9 @@ public class Constants {
 
 	public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
 	public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+
+	public static final String LOGIN = "login";
+	public static final String LOGIN_INDEX_VIEW_NAME = "login/index";
 
 	private Constants() {
 		// empty
