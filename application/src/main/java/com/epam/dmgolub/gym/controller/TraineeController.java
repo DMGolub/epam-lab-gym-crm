@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 import static com.epam.dmgolub.gym.controller.constant.Constants.AVAILABLE_TRAINERS;
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE;
@@ -31,6 +33,8 @@ import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEES;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_EDIT_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_INDEX_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINERS;
+import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINING;
 
 @Controller
 @RequestMapping("trainees")
@@ -81,7 +85,7 @@ public class TraineeController {
 			switch (action.toLowerCase()) {
 				case "find":
 					model.addAttribute(TRAINEE, trainee);
-					return TRAINEE_VIEW_NAME;
+					return REDIRECT_TO_TRAINEE_INDEX + trainee.getId();
 				case "delete":
 					traineeService.delete(userName);
 					redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE,
@@ -134,6 +138,15 @@ public class TraineeController {
 		model.addAttribute(TRAINEE, traineeService.findById(traineeId));
 		model.addAttribute(AVAILABLE_TRAINERS, trainerService.findActiveTrainersNotAssignedToTrainee(traineeId));
 		return REDIRECT_TO_TRAINEE_INDEX + traineeId;
+	}
+
+	@GetMapping("/{id:\\d+}/add-training")
+	public String addTraining(@PathVariable("id") final Long traineeId, final Model model) {
+		model.addAttribute(TRAINING, new TrainingRequestDTO());
+		model.addAttribute(TRAINEE, traineeService.findById(traineeId));
+		model.addAttribute(TRAINERS, trainerService.findActiveTrainersAssignedToTrainee(traineeId));
+		LOGGER.debug("In newTraining - All data fetched successfully. Returning new training view name");
+		return NEW_TRAINING_VIEW_NAME;
 	}
 
 	@DeleteMapping("/{id:\\d+}")

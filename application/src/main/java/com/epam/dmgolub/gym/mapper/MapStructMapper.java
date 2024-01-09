@@ -2,8 +2,10 @@ package com.epam.dmgolub.gym.mapper;
 
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
+import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
+import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
@@ -13,6 +15,9 @@ import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.entity.TrainingType;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
+import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
+import com.epam.dmgolub.gym.repository.searchcriteria.TraineeTrainingsSearchCriteria;
+import com.epam.dmgolub.gym.repository.searchcriteria.TrainerTrainingsSearchCriteria;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ public abstract class MapStructMapper {
 
 	protected TraineeRepository traineeRepository;
 	protected TrainerRepository trainerRepository;
+	protected TrainingTypeRepository trainingTypeRepository;
 
 	@Autowired
 	public void setTraineeRepository(final TraineeRepository traineeRepository) {
@@ -33,6 +39,11 @@ public abstract class MapStructMapper {
 	@Autowired
 	public void setTrainerRepository(final TrainerRepository trainerRepository) {
 		this.trainerRepository = trainerRepository;
+	}
+
+	@Autowired
+	public void setTrainingTypeRepository(final TrainingTypeRepository trainingTypeRepository) {
+		this.trainingTypeRepository = trainingTypeRepository;
 	}
 
 	@Mapping(target = "userId", source = "trainee.user.id")
@@ -69,6 +80,7 @@ public abstract class MapStructMapper {
 	public abstract TrainerResponseDTO trainerToTrainerResponseDTO(Trainer trainer);
 
 	public abstract List<TrainerResponseDTO> trainerListToTrainerResponseDTOList(List<Trainer> trainerList);
+
 	@Mapping(source = "userId", target = "user.id")
 	@Mapping(source = "firstName", target = "user.firstName")
 	@Mapping(source = "lastName", target = "user.lastName")
@@ -82,5 +94,12 @@ public abstract class MapStructMapper {
 
 	@Mapping(target = "trainee", expression = "java(traineeRepository.findById(trainingRequestDTO.getTraineeId()).get())")
 	@Mapping(target = "trainer", expression = "java(trainerRepository.findById(trainingRequestDTO.getTrainerId()).get())")
+	@Mapping(target = "type", expression = "java(trainingTypeRepository.findById(" +
+			"trainerRepository.findById(trainingRequestDTO.getTrainerId()).get().getSpecialization().getId()" +
+		").get())")
 	public abstract Training trainingRequestDTOToTraining(TrainingRequestDTO trainingRequestDTO);
+
+	public abstract TraineeTrainingsSearchCriteria searchRequestToSearchCriteria(TraineeTrainingsSearchRequestDTO request);
+
+	public abstract TrainerTrainingsSearchCriteria searchRequestToSearchCriteria(TrainerTrainingsSearchRequestDTO request);
 }

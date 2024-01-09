@@ -2,6 +2,7 @@ package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
+import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.epam.dmgolub.gym.service.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,15 +16,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEES;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_EDIT_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_INDEX_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINERS;
+import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,6 +62,20 @@ class TraineeControllerTest {
 
 		assertEquals(NEW_TRAINEE_VIEW_NAME, view);
 		verify(model).addAttribute(eq(TRAINEE), any(TraineeRequestDTO.class));
+	}
+
+	@Test
+	void addTraining_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
+		final Long id = 1L;
+		when(traineeService.findById(id)).thenReturn(new TraineeResponseDTO());
+		when(trainerService.findActiveTrainersAssignedToTrainee(id)).thenReturn(Collections.emptyList());
+
+		assertEquals(NEW_TRAINING_VIEW_NAME, traineeController.addTraining(id, model));
+		verify(traineeService, times(1)).findById(id);
+		verify(trainerService, times(1)).findActiveTrainersAssignedToTrainee(id);
+		verify(model).addAttribute(eq(TRAINING), any(TrainingRequestDTO.class));
+		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
+		verify(model).addAttribute(eq(TRAINERS), any(List.class));
 	}
 
 	@Nested

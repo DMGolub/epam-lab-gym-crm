@@ -20,9 +20,61 @@
                     To view detailed information about the training, click on the link by the id of the training.<br/>
                     You can also add new trainings.
                 </p>
-                <form th:method="GET" th:action="@{/trainings/new}">
-                    <button type="submit" class="btn btn-outline-dark">Add new training</button>
-                </form>
+                <!-- Tab navigation -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="trainee-tab" data-toggle="tab" href="#trainee" role="tab">Trainee Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="trainer-tab" data-toggle="tab" href="#trainer" role="tab">Trainer Search</a>
+                    </li>
+                </ul>
+                <!-- Tab form content -->
+                <div class="tab-content" id="myTabContent" style="margin-bottom: 10px">
+                    <div class="tab-pane fade show active" id="trainee" role="tabpanel">
+                        <!-- Trainee search form -->
+                        <form th:action="@{/trainings/search-by-trainee}" method="GET">
+                            <label for="traineeUserName1">Trainee username: </label>
+                            <input id="traineeUserName1" name="traineeUserName" type="text"/>
+                            <br/>
+                            <label for="periodFrom1">Period from: </label>
+                            <input id="periodFrom1" name="periodFrom" type="date"/>
+                            <br/>
+                            <label for="periodTo1">Period to: </label>
+                            <input id="periodTo1" name="periodTo" type="date"/>
+                            <br/>
+                            <label for="trainerUserName1">Trainer username: </label>
+                            <input id="trainerUserName1" name="trainerUserName" type="text"/>
+                            <br/>
+                            <label for="trainingType">Type: </label>
+                            <select id="trainingType" name="trainingType">
+                                <option th:if="${trainingTypes != null}" disabled="disabled" selected="selected" value="">Please select...</option>
+                                <option th:if="${trainingTypes != null}" th:each="type : ${trainingTypes}" th:value="${type.getId()}"
+                                        th:text="${type.getName()}"></option>
+                            </select>
+                            <br/>
+                            <button type="submit" class="btn btn-outline-dark">Search</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="trainer" role="tabpanel">
+                        <!-- Trainer search form -->
+                        <form th:action="@{/trainings/search-by-trainer}" method="GET">
+                            <label for="trainerUserName2">Trainer username: </label>
+                            <input id="trainerUserName2" name="trainerUserName" type="text"/>
+                            <br/>
+                            <label for="periodFrom2">Period from: </label>
+                            <input id="periodFrom2" name="periodFrom" type="date"/>
+                            <br/>
+                            <label for="periodTo2">Period to: </label>
+                            <input id="periodTo2" name="periodTo" type="date"/>
+                            <br/>
+                            <label for="traineeUserName2">Trainee username: </label>
+                            <input id="traineeUserName2" name="traineeUserName" type="text"/>
+                            <br/>
+                            <button type="submit" class="btn btn-outline-dark">Search</button>
+                        </form>
+                    </div>
+                </div>
                 <div th:if=${#lists.isEmpty(trainings)}>There are no trainings yet.</div>
                 <table class = "table table-hover" th:if="${not #lists.isEmpty(trainings)}" border="1">
                     <caption>All gym trainings</caption>
@@ -56,5 +108,7 @@
     </div>
     <div th:replace="~{../templates/footer}"></div>
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

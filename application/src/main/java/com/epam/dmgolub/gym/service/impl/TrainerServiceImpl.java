@@ -88,9 +88,16 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(final Long traineeId) {
-		LOGGER.debug("In findActiveTrainersNotAssignedToUserName - Fetching trainers for traineeId={}", traineeId);
-		final var trainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeId);
+	public List<TrainerResponseDTO> findActiveTrainersAssignedToTrainee(final Long id) {
+		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for id={}", id);
+		final var trainers = trainerRepository.findActiveTrainersAssignedToTrainee(id);
+		return mapper.trainerListToTrainerResponseDTOList(trainers);
+	}
+
+	@Override
+	public List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(final Long id) {
+		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for id={}", id);
+		final var trainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(id);
 		return mapper.trainerListToTrainerResponseDTOList(trainers);
 	}
 

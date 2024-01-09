@@ -13,5 +13,7 @@ public interface TrainerService extends BaseService<Long, TrainerRequestDTO, Tra
 
 	TrainerResponseDTO update(TrainerRequestDTO trainer);
 
-	List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(Long traineeId);
+	List<TrainerResponseDTO> findActiveTrainersAssignedToTrainee(Long id);
+
+	List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(Long id);
 }

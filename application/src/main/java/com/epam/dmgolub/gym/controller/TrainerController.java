@@ -83,7 +83,7 @@ public class TrainerController {
 			switch (action.toLowerCase()) {
 				case "find":
 					model.addAttribute(TRAINER, trainer);
-					return TRAINER_VIEW_NAME;
+					return REDIRECT_TO_TRAINER_INDEX + trainer.getId();
 				default:
 					redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE, "Invalid action");
 					return REDIRECT_TO_TRAINER_INDEX;

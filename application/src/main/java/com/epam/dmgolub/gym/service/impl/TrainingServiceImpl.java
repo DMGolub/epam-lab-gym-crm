@@ -1,9 +1,13 @@
 package com.epam.dmgolub.gym.service.impl;
 
+import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.repository.specification.TraineeTrainingSpecification;
+import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecification;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.service.TrainingService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
@@ -52,5 +56,23 @@ public class TrainingServiceImpl implements TrainingService {
 	public List<TrainingResponseDTO> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainings from repository");
 		return mapper.trainingListToTrainingResponseDTOList(trainingRepository.findAll());
+	}
+
+	@Override
+	public List<TrainingResponseDTO> searchByTrainee(TraineeTrainingsSearchRequestDTO request) {
+		LOGGER.debug("In searchByTrainee - Received search request={}", request);
+		final var criteria = mapper.searchRequestToSearchCriteria(request);
+		final List<Training> trainings = trainingRepository.findAll(new TraineeTrainingSpecification(criteria));
+		LOGGER.debug("In searchByTrainee - found {} trainings", trainings.size());
+		return mapper.trainingListToTrainingResponseDTOList(trainings);
+	}
+
+	@Override
+	public List<TrainingResponseDTO> searchByTrainer(TrainerTrainingsSearchRequestDTO request) {
+		LOGGER.debug("In searchByTrainer - Received search request={}", request);
+		final var criteria = mapper.searchRequestToSearchCriteria(request);
+		final List<Training> trainings = trainingRepository.findAll(new TrainerTrainingSpecification(criteria));
+		LOGGER.debug("In searchByTrainer - found {} trainings", trainings.size());
+		return mapper.trainingListToTrainingResponseDTOList(trainings);
 	}
 }

@@ -26,8 +26,6 @@ public class TrainingRequestDTO {
 	@NotBlank(message = "{training.name.notBlank.violation}")
 	@Pattern(regexp = TRAINING_NAME_PATTERN_REGEXP, message = "{training.name.pattern.violation}")
 	private String name;
-	@NotNull(message = "{training.type.notNull.violation}")
-	private TrainingTypeDTO type;
 	@NotNull(message = "{training.date.notNull.violation}")
 	@Future(message = "{training.date.future.violation}")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -45,7 +43,6 @@ public class TrainingRequestDTO {
 		final Long traineeId,
 		final Long trainerId,
 		final String name,
-		final TrainingTypeDTO type,
 		final Date date,
 		final int duration
 	) {
@@ -53,7 +50,6 @@ public class TrainingRequestDTO {
 		this.traineeId = traineeId;
 		this.trainerId = trainerId;
 		this.name = name;
-		this.type = type;
 		this.date = date;
 		this.duration = duration;
 	}
@@ -90,14 +86,6 @@ public class TrainingRequestDTO {
 		this.name = name;
 	}
 
-	public TrainingTypeDTO getType() {
-		return type;
-	}
-
-	public void setType(final TrainingTypeDTO type) {
-		this.type = type;
-	}
-
 	public Date getDate() {
 		return date;
 	}
@@ -117,7 +105,7 @@ public class TrainingRequestDTO {
 	@Override
 	public String toString() {
 		return "TrainingRequestDTO{id=" + id + ", traineeId=" + traineeId + ", trainerId=" + trainerId +
-			", name='" + name + '\'' + ", type=" + type + ", date=" + date + ", duration=" + duration + '}';
+			", name='" + name + '\'' + ", date=" + date + ", duration=" + duration + '}';
 	}
 
 	@Override
@@ -142,9 +130,6 @@ public class TrainingRequestDTO {
 			return false;
 		}
 		if (!Objects.equals(name, that.name)) {
-			return false;
-		}
-		if (!Objects.equals(type, that.type)) {
 			return false;
 		}
 		return Objects.equals(date, that.date);

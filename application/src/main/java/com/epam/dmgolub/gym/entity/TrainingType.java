@@ -6,13 +6,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table
-public class TrainingType implements BaseEntity<Long> {
+public class TrainingType implements BaseEntity<Long>, Serializable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)

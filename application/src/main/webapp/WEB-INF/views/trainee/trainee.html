@@ -65,9 +65,12 @@
                         <select th:object="${availableTrainers}" id="trainerId" name="trainerId">
                             <option th:if="${availableTrainers != null}" disabled="disabled" selected="selected" value="">Please select...</option>
                             <option th:if="${availableTrainers != null}" th:each="trainer : ${availableTrainers}" th:value="${trainer.getId()}"
-                                    th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName()}"></option>
+                                    th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName() + ' (' + trainer.getSpecialization().getName() + ')'}"></option>
                         </select>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;">Add trainer</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;" th:disabled="${!trainee.isActive()}">Add trainer</button>
+                    </form>
+                    <form th:method="GET" th:action="@{../trainees/{id}/add-training(id=${trainee.getId()})}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;" th:disabled="${!trainee.isActive()}">Add training</button>
                     </form>
                     <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
                         <button type="submit" class="btn btn-outline-secondary btn-sm">Edit profile</button>
