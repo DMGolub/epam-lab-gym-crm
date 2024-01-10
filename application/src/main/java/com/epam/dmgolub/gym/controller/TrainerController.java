@@ -22,7 +22,9 @@ import javax.validation.Valid;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINER_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
+import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINERS;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINER_EDIT_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINER_INDEX_VIEW_NAME;
@@ -58,7 +60,8 @@ public class TrainerController {
 	@PostMapping()
 	public String save(
 		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
-		final BindingResult bindingResult
+		final BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes
 	) {
 		LOGGER.debug("In save - validating new trainer");
 		if (bindingResult.hasErrors()) {
@@ -66,8 +69,9 @@ public class TrainerController {
 			return NEW_TRAINER_VIEW_NAME;
 		}
 		trainerService.save(trainer);
-		LOGGER.debug("In save - trainer saved successfully. Redirecting to trainer index view");
-		return REDIRECT_TO_TRAINER_INDEX;
+		LOGGER.debug("In save - trainer saved successfully. Redirecting to new trainer view");
+		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE, "Trainer added successfully");
+		return REDIRECT_TO_NEW_TRAINER;
 	}
 
 	@PostMapping("/action")

@@ -26,6 +26,7 @@ import static com.epam.dmgolub.gym.controller.constant.Constants.AVAILABLE_TRAIN
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINING_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE;
@@ -60,7 +61,8 @@ public class TraineeController {
 	@PostMapping()
 	public String save(
 		@ModelAttribute(TRAINEE) @Valid final TraineeRequestDTO trainee,
-		final BindingResult bindingResult
+		final BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes
 	) {
 		LOGGER.debug("In save - validating new trainee");
 		if (bindingResult.hasErrors()) {
@@ -68,8 +70,9 @@ public class TraineeController {
 			return NEW_TRAINEE_VIEW_NAME;
 		}
 		traineeService.save(trainee);
-		LOGGER.debug("In save - trainee saved successfully. Redirecting to trainee index view");
-		return REDIRECT_TO_TRAINEE_INDEX;
+		LOGGER.debug("In save - trainee saved successfully. Redirecting to new trainee view");
+		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE, "Trainee added successfully");
+		return REDIRECT_TO_NEW_TRAINEE;
 	}
 
 	@PostMapping("/action")

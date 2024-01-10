@@ -54,7 +54,7 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public TraineeResponseDTO save(final TraineeRequestDTO request) {
-		LOGGER.debug("In save - saving trainee from request {}", request);
+		LOGGER.debug("In save - Saving trainee from request {}", request);
 		final var trainee = mapper.traineeRequestDTOToTrainee(request);
 		trainee.getUser().setUserName(userCredentialsGenerator.generateUserName(trainee.getUser()));
 		trainee.getUser().setPassword(userCredentialsGenerator.generatePassword(trainee.getUser()));
@@ -99,23 +99,23 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public void delete(final Long id) {
-		LOGGER.debug("In delete - fetching trainings before removing trainee by id={}", id);
+		LOGGER.debug("In delete - Fetching trainings before removing trainee by id={}", id);
 		final List<Training> trainings = trainingRepository.findAll().stream()
 			.filter(t -> id.equals(t.getTrainee().getId()))
 			.toList();
 		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In delete - removed {} trainings, removing trainee by id", trainings.size());
+		LOGGER.debug("In delete - Removed {} trainings, removing trainee by id", trainings.size());
 		traineeRepository.deleteById(id);
 	}
 
 	@Override
 	public void delete(final String userName) {
-		LOGGER.debug("In delete - fetching trainings before removing trainee by id={}", userName);
+		LOGGER.debug("In delete - Fetching trainings before removing trainee by id={}", userName);
 		final List<Training> trainings = trainingRepository.findAll().stream()
 			.filter(t -> userName.equals(t.getTrainee().getUser().getUserName()))
 			.toList();
 		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In delete - removed {} trainings, removing trainee by userName", trainings.size());
+		LOGGER.debug("In delete - Removed {} trainings, removing trainee by userName", trainings.size());
 		traineeRepository.deleteByUserUserName(userName);
 	}
 

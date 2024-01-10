@@ -44,7 +44,7 @@ public class TrainerServiceImpl implements TrainerService {
 
 	@Override
 	public TrainerResponseDTO save(final TrainerRequestDTO request) {
-		LOGGER.debug("In save - saving trainer from request {}", request);
+		LOGGER.debug("In save - Saving trainer from request {}", request);
 		final var trainer = mapper.trainerRequestDTOToTrainer(request);
 		trainer.getUser().setUserName(userCredentialsGenerator.generateUserName(trainer.getUser()));
 		trainer.getUser().setPassword(userCredentialsGenerator.generatePassword(trainer.getUser()));

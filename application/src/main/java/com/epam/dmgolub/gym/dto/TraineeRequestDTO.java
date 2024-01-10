@@ -14,10 +14,10 @@ import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_REGE
 public class TraineeRequestDTO {
 
 	private Long userId;
-	@NotBlank(message = "{firstName.not.blank.violation}")
+	@NotBlank(message = "{firstName.notBlank.violation}")
 	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = "{firstName.pattern.violation}")
 	private String firstName;
-	@NotBlank(message = "{lastName.not.blank.violation}")
+	@NotBlank(message = "{lastName.notBlank.violation}")
 	@Pattern(regexp = LAST_NAME_PATTERN_REGEXP, message = "{lastName.pattern.violation}")
 	private String lastName;
 	private boolean isActive;

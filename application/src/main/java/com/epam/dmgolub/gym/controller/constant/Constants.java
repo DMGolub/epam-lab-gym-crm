@@ -8,6 +8,7 @@ public class Constants {
 	public static final String TRAINEE_EDIT_VIEW_NAME = "trainee/edit";
 	public static final String TRAINEE_INDEX_VIEW_NAME = "trainee/index";
 	public static final String REDIRECT_TO_TRAINEE_INDEX = "redirect:/trainees/";
+	public static final String REDIRECT_TO_NEW_TRAINEE = "redirect:/trainees/new";
 	public static final String TRAINEE_VIEW_NAME = "trainee/trainee";
 	public static final String AVAILABLE_TRAINERS = "availableTrainers";
 
@@ -17,6 +18,7 @@ public class Constants {
 	public static final String TRAINER_EDIT_VIEW_NAME = "trainer/edit";
 	public static final String TRAINER_INDEX_VIEW_NAME = "trainer/index";
 	public static final String REDIRECT_TO_TRAINER_INDEX = "redirect:/trainers/";
+	public static final String REDIRECT_TO_NEW_TRAINER = "redirect:/trainers/new";
 	public static final String TRAINER_VIEW_NAME = "trainer/trainer";
 
 	public static final String TRAINING = "training";
@@ -40,6 +42,10 @@ public class Constants {
 
 	public static final String LOGIN = "login";
 	public static final String LOGIN_INDEX_VIEW_NAME = "login/index";
+	public static final String REDIRECT_TO_LOGIN_INDEX = "redirect:/login";
+
+	public static final String PROFILE_INDEX_VIEW_NAME = "profile/index";
+	public static final String REDIRECT_TO_PROFILE_INDEX = "redirect:/profile/";
 
 	private Constants() {
 		// empty

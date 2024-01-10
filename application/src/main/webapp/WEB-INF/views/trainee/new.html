@@ -15,6 +15,12 @@
         <div class="row justify-content-md-center">
             <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
                 <p>Fill in all the fields to add a new trainee. Please note that all values are mandatory.</p>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
                 <form th:method="POST" th:action="@{/trainees}" th:object="${trainee}" id="newTrainee">
                     <h2>New trainee</h2>
                     <label for="firstName">First name: </label>

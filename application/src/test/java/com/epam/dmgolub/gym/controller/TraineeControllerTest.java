@@ -15,12 +15,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINING_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEES;
@@ -44,6 +46,8 @@ class TraineeControllerTest {
 	private Model model;
 	@Mock
 	private BindingResult bindingResult;
+	@Mock
+	private RedirectAttributes redirectAttributes;
 	@Mock
 	private TraineeService traineeService;
 	@Mock
@@ -85,20 +89,20 @@ class TraineeControllerTest {
 		void save_shouldReturnNewTraineePage_whenBingingResultHasErrors() {
 			when(bindingResult.hasErrors()).thenReturn(true);
 
-			final String result = traineeController.save(new TraineeRequestDTO(), bindingResult);
+			final String result = traineeController.save(new TraineeRequestDTO(), bindingResult, redirectAttributes);
 
 			assertEquals(NEW_TRAINEE_VIEW_NAME, result);
 			verifyNoInteractions(traineeService);
 		}
 
 		@Test
-		void save_shouldSaveTraineeAndRedirectToIndexPage_whenThereAreNoErrors() {
+		void save_shouldSaveTraineeAndRedirectToNewTraineePage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			final TraineeRequestDTO trainee = new TraineeRequestDTO();
 
-			final String result = traineeController.save(trainee, bindingResult);
+			final String result = traineeController.save(trainee, bindingResult, redirectAttributes);
 
-			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
+			assertEquals(REDIRECT_TO_NEW_TRAINEE, result);
 			verify(traineeService, times(1)).save(trainee);
 		}
 	}

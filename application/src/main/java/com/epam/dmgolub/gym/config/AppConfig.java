@@ -1,5 +1,6 @@
 package com.epam.dmgolub.gym.config;
 
+import com.epam.dmgolub.gym.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -46,6 +48,7 @@ public class AppConfig implements WebMvcConfigurer {
 	private final ApplicationContext applicationContext;
 	private final Environment environment;
 	private List<Converter<String, ?>> converters;
+	private LoginInterceptor loginInterceptor;
 
 	public AppConfig(final ApplicationContext applicationContext, final Environment environment) {
 		this.applicationContext = applicationContext;
@@ -55,6 +58,11 @@ public class AppConfig implements WebMvcConfigurer {
 	@Autowired
 	public void setConverters(final List<Converter<String, ?>> converters) {
 		this.converters = converters;
+	}
+
+	@Autowired
+	void setLoggingInterceptor(final LoginInterceptor loginInterceptor) {
+		this.loginInterceptor = loginInterceptor;
 	}
 
 	@Bean
@@ -101,6 +109,13 @@ public class AppConfig implements WebMvcConfigurer {
 	@Override
 	public Validator getValidator() {
 		return validator();
+	}
+
+	@Override
+	public void addInterceptors(final InterceptorRegistry registry) {
+		registry.addInterceptor(loginInterceptor)
+			.addPathPatterns("/**")
+			.excludePathPatterns("/*", "/trainers/new", "/trainees/new", "/login/*");
 	}
 
 	@Bean
