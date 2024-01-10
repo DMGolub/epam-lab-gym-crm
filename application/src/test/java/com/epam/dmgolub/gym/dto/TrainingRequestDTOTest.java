@@ -10,12 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class TrainingRequestDTOTest {
 
 	private TrainingRequestDTO requestDTO;
-	private TrainingTypeDTO type;
 
 	@BeforeEach
 	void setUp() {
 		requestDTO = new TrainingRequestDTO();
-		type = new TrainingTypeDTO(1L, "Bodybuilding");
 	}
 
 	@Test
@@ -43,12 +41,6 @@ class TrainingRequestDTOTest {
 	}
 
 	@Test
-	void typeGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		requestDTO.setType(type);
-		assertEquals(type, requestDTO.getType());
-	}
-
-	@Test
 	void dateGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
 		Date date = new Date();
 		requestDTO.setDate(date);
@@ -65,21 +57,40 @@ class TrainingRequestDTOTest {
 	void toString_shouldReturnExpectedValue_whenInvoked() {
 		final TrainingTypeDTO type = new TrainingTypeDTO(1L, "Karate");
 		final TrainingRequestDTO training =
-			new TrainingRequestDTO(1L, 2L, 3L, "name", type, null, 60);
-		final String expected = "TrainingRequestDTO{id=1, traineeId=2, trainerId=3, name='name', " +
-			"type=" + type + ", date=null, duration=60}";
+			new TrainingRequestDTO(1L, 2L, 3L, "name", null, 60);
+		final String expected = "TrainingRequestDTO{id=1, traineeId=2, trainerId=3, name='name', date=null, duration=60}";
 
 		assertEquals(expected, training.toString());
 	}
 
 	@Test
-	void testEqualsAndHashCode() {
+	void testEquals() {
 		final TrainingRequestDTO requestDTO2 =
-			new TrainingRequestDTO(1L, 2L, 3L, "Training1", type, new Date(), 60);
+			new TrainingRequestDTO(1L, 2L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO3 =
+			new TrainingRequestDTO(2L, 2L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO4 =
+			new TrainingRequestDTO(1L, 3L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO5 =
+			new TrainingRequestDTO(1L, 2L, 4L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO6 =
+			new TrainingRequestDTO(1L, 2L, 3L, "Training2", new Date(), 60);
 
 		assertEquals(requestDTO2, requestDTO2);
-		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
 		assertNotEquals(requestDTO, requestDTO2);
+		assertNotEquals(null, requestDTO);
+		assertNotEquals(requestDTO2, requestDTO3);
+		assertNotEquals(requestDTO2, requestDTO4);
+		assertNotEquals(requestDTO2, requestDTO5);
+		assertNotEquals(requestDTO2, requestDTO6);
+	}
+
+	@Test
+	void testHashCode() {
+		final TrainingRequestDTO requestDTO2 =
+			new TrainingRequestDTO(1L, 2L, 3L, "Training1", new Date(), 60);
+
+		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
 		assertNotEquals(requestDTO.hashCode(), requestDTO2.hashCode());
 	}
 }

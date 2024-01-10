@@ -2,38 +2,36 @@ package com.epam.dmgolub.gym.dto;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINEE_ID_NOT_NULL_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINEE_ID_POSITIVE_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINER_ID_NOT_NULL_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINER_ID_POSITIVE_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINING_DATE_NOT_NULL_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINING_DURATION_POSITIVE_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINING_NAME_NOT_BLANK_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINING_TYPE_NOT_NULL_MESSAGE;
+import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINING_NAME_PATTERN_REGEXP;
 
 public class TrainingRequestDTO {
 
 	private Long id;
-	@NotNull(message = TRAINEE_ID_NOT_NULL_MESSAGE)
-	@Positive(message = TRAINEE_ID_POSITIVE_MESSAGE)
+	@NotNull(message = "{trainee.id.notNull.violation}")
+	@Positive(message = "{trainee.id.positive.violation}")
 	private Long traineeId;
-	@NotNull(message = TRAINER_ID_NOT_NULL_MESSAGE)
-	@Positive(message = TRAINER_ID_POSITIVE_MESSAGE)
+	@NotNull(message = "{trainer.id.notNull.violation}")
+	@Positive(message = "{trainer.id.positive.violation}")
 	private Long trainerId;
-	@NotBlank(message = TRAINING_NAME_NOT_BLANK_MESSAGE)
+	@NotBlank(message = "{training.name.notBlank.violation}")
+	@Pattern(regexp = TRAINING_NAME_PATTERN_REGEXP, message = "{training.name.pattern.violation}")
 	private String name;
-	@NotNull(message = TRAINING_TYPE_NOT_NULL_MESSAGE)
-	private TrainingTypeDTO type;
-	@NotNull(message = TRAINING_DATE_NOT_NULL_MESSAGE)
+	@NotNull(message = "{training.date.notNull.violation}")
+	@Future(message = "{training.date.future.violation}")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private Date date;
-	@Positive(message = TRAINING_DURATION_POSITIVE_MESSAGE)
+	@Min(value = 30, message = "{training.date.duration.violation}")
+	@Max(value = 480, message = "{training.date.duration.violation}")
 	private int duration;
 
 	public TrainingRequestDTO() {
@@ -45,7 +43,6 @@ public class TrainingRequestDTO {
 		final Long traineeId,
 		final Long trainerId,
 		final String name,
-		final TrainingTypeDTO type,
 		final Date date,
 		final int duration
 	) {
@@ -53,7 +50,6 @@ public class TrainingRequestDTO {
 		this.traineeId = traineeId;
 		this.trainerId = trainerId;
 		this.name = name;
-		this.type = type;
 		this.date = date;
 		this.duration = duration;
 	}
@@ -90,14 +86,6 @@ public class TrainingRequestDTO {
 		this.name = name;
 	}
 
-	public TrainingTypeDTO getType() {
-		return type;
-	}
-
-	public void setType(final TrainingTypeDTO type) {
-		this.type = type;
-	}
-
 	public Date getDate() {
 		return date;
 	}
@@ -117,7 +105,7 @@ public class TrainingRequestDTO {
 	@Override
 	public String toString() {
 		return "TrainingRequestDTO{id=" + id + ", traineeId=" + traineeId + ", trainerId=" + trainerId +
-			", name='" + name + '\'' + ", type=" + type + ", date=" + date + ", duration=" + duration + '}';
+			", name='" + name + '\'' + ", date=" + date + ", duration=" + duration + '}';
 	}
 
 	@Override
@@ -142,9 +130,6 @@ public class TrainingRequestDTO {
 			return false;
 		}
 		if (!Objects.equals(name, that.name)) {
-			return false;
-		}
-		if (!Objects.equals(type, that.type)) {
 			return false;
 		}
 		return Objects.equals(date, that.date);

@@ -4,53 +4,111 @@
     <meta charset ="UTF-8"/>
     <title>Gym CRM - trainings</title>
     <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
 </head>
-<body class="d-flex flex-column min-vh-100">
-<div th:replace="~{../templates/header}"></div>
-<div th:replace="~{../templates/mainmenu}"></div>
-<div class="container">
-    <div class="row justify-content-md-center">
-        <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
-            <h2>Gym trainings</h2>
-            <p>
-                Allows to view all the trainings of the Gym.
-                To view detailed information about the training, click on the link by the id of the training.<br/>
-                You can also add new trainings.
-            </p>
-            <form th:method="GET" th:action="@{/trainings/new}">
-                <button type="submit" class="btn btn-outline-dark">Add new training</button>
-            </form>
-            <div th:if=${#lists.isEmpty(trainings)}>There are no trainings yet.</div>
-            <table class = "table table-hover" th:if="${not #lists.isEmpty(trainings)}" border="1">
-                <caption>All gym trainings</caption>
-                <thead class="thead-dark">
-                <tr>
-                    <th>Id</th>
-                    <th>Trainee</th>
-                    <th>Trainer</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                    <th>Duration</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="training, iterStat : ${trainings}">
-                    <td><a th:href="@{/trainings/{id}(id=${training.getId()})}" th:text="${training.getId()}">VALUE</a></td>
-                    <td><a th:href="@{/trainees/{id}(id=${training.getTrainee().getId()})}"
-                           th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}">VALUE</a></td>
-                    <td><a th:href="@{/trainers/{id}(id=${training.getTrainer().getId()})}"
-                           th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}">VALUE</a></td>
-                    <td th:text="${training.getName()}">VALUE</td>
-                    <td th:text="${training.getType().getName()}">VALUE</td>
-                    <td th:text="${#dates.format(training.getDate(), 'dd-MM-yyyy')}">VALUE</td>
-                    <td th:text="${training.getDuration()}">VALUE</td>
-                </tr>
-                </tbody>
-            </table>
+
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <h2>Gym trainings</h2>
+                <p>
+                    Allows to view all the trainings of the Gym.
+                    To view detailed information about the training, click on the link by the id of the training.<br/>
+                    You can also add new trainings.
+                </p>
+                <!-- Tab navigation -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="trainee-tab" data-toggle="tab" href="#trainee" role="tab">Trainee Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="trainer-tab" data-toggle="tab" href="#trainer" role="tab">Trainer Search</a>
+                    </li>
+                </ul>
+                <!-- Tab form content -->
+                <div class="tab-content" id="myTabContent" style="margin-bottom: 10px">
+                    <div class="tab-pane fade show active" id="trainee" role="tabpanel">
+                        <!-- Trainee search form -->
+                        <form th:action="@{/trainings/search-by-trainee}" method="GET">
+                            <label for="traineeUserName1">Trainee username: </label>
+                            <input id="traineeUserName1" name="traineeUserName" type="text"/>
+                            <br/>
+                            <label for="periodFrom1">Period from: </label>
+                            <input id="periodFrom1" name="periodFrom" type="date"/>
+                            <br/>
+                            <label for="periodTo1">Period to: </label>
+                            <input id="periodTo1" name="periodTo" type="date"/>
+                            <br/>
+                            <label for="trainerUserName1">Trainer username: </label>
+                            <input id="trainerUserName1" name="trainerUserName" type="text"/>
+                            <br/>
+                            <label for="trainingType">Type: </label>
+                            <select id="trainingType" name="trainingType">
+                                <option th:if="${trainingTypes != null}" disabled="disabled" selected="selected" value="">Please select...</option>
+                                <option th:if="${trainingTypes != null}" th:each="type : ${trainingTypes}" th:value="${type.getId()}"
+                                        th:text="${type.getName()}"></option>
+                            </select>
+                            <br/>
+                            <button type="submit" class="btn btn-outline-dark">Search</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="trainer" role="tabpanel">
+                        <!-- Trainer search form -->
+                        <form th:action="@{/trainings/search-by-trainer}" method="GET">
+                            <label for="trainerUserName2">Trainer username: </label>
+                            <input id="trainerUserName2" name="trainerUserName" type="text"/>
+                            <br/>
+                            <label for="periodFrom2">Period from: </label>
+                            <input id="periodFrom2" name="periodFrom" type="date"/>
+                            <br/>
+                            <label for="periodTo2">Period to: </label>
+                            <input id="periodTo2" name="periodTo" type="date"/>
+                            <br/>
+                            <label for="traineeUserName2">Trainee username: </label>
+                            <input id="traineeUserName2" name="traineeUserName" type="text"/>
+                            <br/>
+                            <button type="submit" class="btn btn-outline-dark">Search</button>
+                        </form>
+                    </div>
+                </div>
+                <div th:if=${#lists.isEmpty(trainings)}>There are no trainings yet.</div>
+                <table class = "table table-hover" th:if="${not #lists.isEmpty(trainings)}" border="1">
+                    <caption>All gym trainings</caption>
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Trainee</th>
+                        <th>Trainer</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="training, iterStat : ${trainings}">
+                        <td><a th:href="@{/trainings/{id}(id=${training.getId()})}" th:text="${training.getId()}">VALUE</a></td>
+                        <td><a th:href="@{/trainees/{id}(id=${training.getTrainee().getId()})}"
+                               th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}">VALUE</a></td>
+                        <td><a th:href="@{/trainers/{id}(id=${training.getTrainer().getId()})}"
+                               th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}">VALUE</a></td>
+                        <td th:text="${training.getName()}">VALUE</td>
+                        <td th:text="${training.getType().getName()}">VALUE</td>
+                        <td th:text="${#dates.format(training.getDate(), 'dd-MM-yyyy')}">VALUE</td>
+                        <td th:text="${training.getDuration()}">VALUE</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    <div th:replace="~{../templates/footer}"></div>
 </div>
-<div th:replace="~{../templates/footer}"></div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

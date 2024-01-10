@@ -5,26 +5,21 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
-import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_NOT_BLANK_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_PATTERN_MESSAGE;
 import static com.epam.dmgolub.gym.dto.constant.Constants.FIRST_NAME_PATTERN_REGEXP;
-import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_NOT_BLANK_MESSAGE;
-import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_MESSAGE;
 import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_REGEXP;
-import static com.epam.dmgolub.gym.dto.constant.Constants.TRAINER_SPECIALIZATION_NOT_NULL_MESSAGE;
 
 public class TrainerRequestDTO {
 
 	private Long userId;
-	@NotBlank(message = FIRST_NAME_NOT_BLANK_MESSAGE)
-	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = FIRST_NAME_PATTERN_MESSAGE)
+	@NotBlank(message = "{firstName.notBlank.violation}")
+	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = "{firstName.pattern.violation}")
 	private String firstName;
-	@NotBlank(message = LAST_NAME_NOT_BLANK_MESSAGE)
-	@Pattern(regexp = LAST_NAME_PATTERN_REGEXP, message = LAST_NAME_PATTERN_MESSAGE)
+	@NotBlank(message = "{lastName.notBlank.violation}")
+	@Pattern(regexp = LAST_NAME_PATTERN_REGEXP, message = "{lastName.pattern.violation}")
 	private String lastName;
 	private boolean isActive;
 	private Long id;
-	@NotNull(message = TRAINER_SPECIALIZATION_NOT_NULL_MESSAGE)
+	@NotNull(message = "{trainer.specialization.notNull.violation}")
 	private TrainingTypeDTO specialization;
 
 	public TrainerRequestDTO() {

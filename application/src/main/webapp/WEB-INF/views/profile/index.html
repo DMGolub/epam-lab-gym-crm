@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Gym CRM - main</title>
+    <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
+</head>
+
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-left">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <h2 th:text="${'User ' + userName + ' profile'}">User profile</h2>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
+                <p>To change your password: please enter old and new passwords.</p>
+                <form th:method="PUT" th:action="@{/profile}" th:object="${changePasswordRequest}" id="changePassword">
+                    <input type="hidden" id="userName" name="userName" th:value="${userName}">
+                    <label for="oldPassword">Old password: </label>
+                    <input id="oldPassword" name="oldPassword" type="password"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}">Old password error</div>
+                    <br/>
+                    <label for="newPassword">New password: </label>
+                    <input id="newPassword" name="newPassword" type="password"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}">New password error</div>
+                    <br/>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Change password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{../templates/footer}"></div>
+</div>
+</body>
+</html>

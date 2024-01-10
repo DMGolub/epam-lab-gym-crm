@@ -4,57 +4,60 @@
     <meta charset="UTF-8"/>
     <title>Gym - view training</title>
     <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
 </head>
 
-<body class="d-flex flex-column min-vh-100">
-<div th:replace="~{../templates/header}"></div>
-<div th:replace="~{../templates/mainmenu}"></div>
-<div class="container">
-    <div class="row justify-content-md-left">
-        <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
-            <table class = "table table-hover">
-                <caption th:text="'Training #' + ${training.getId()} + ' info'">Training info</caption>
-                <tr>
-                    <th>Attribute</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <td>Id: </td>
-                    <td th:text="${training.getId()}" id="id">VALUE</td>
-                </tr>
-                <tr>
-                    <td>Trainee: </td>
-                    <td id="trainee"><a th:href="@{/trainees/{id}(id=${training.getTrainee().getId()})}"
-                           th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}">VALUE</a></td>
-                </tr>
-                <tr>
-                    <td>Trainer: </td>
-                    <td id="trainer"><a th:href="@{/trainers/{id}(id=${training.getTrainer().getId()})}"
-                           th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}">VALUE</a></td>
-                </tr>
-                <tr>
-                    <td>Name: </td>
-                    <td th:text="${training.getName()}" id="name">VALUE</td>
-                </tr>
-                <tr>
-                    <td>Type: </td>
-                    <td th:text="${training.getType().getName()}" id="type">VALUE</td>
-                </tr>
-                <tr>
-                    <td>Date: </td>
-                    <td th:text="${#dates.format(training.getDate(), 'dd-MM-yyyy')}" id="date">VALUE</td>
-                </tr>
-                <tr>
-                    <td>Duration: </td>
-                    <td th:text="${training.getDuration()}" id="duration">VALUE</td>
-                </tr>
-            </table>
-            <form th:method="GET" th:action="@{../trainings/{id}/edit(id=${training.getId()})}">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
-            </form>
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-left">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <table class = "table table-hover">
+                    <caption th:text="'Training #' + ${training.getId()} + ' info'">Training info</caption>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Id: </td>
+                        <td th:text="${training.getId()}" id="id">VALUE</td>
+                    </tr>
+                    <tr>
+                        <td>Trainee: </td>
+                        <td id="trainee"><a th:href="@{/trainees/{id}(id=${training.getTrainee().getId()})}"
+                               th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}">VALUE</a></td>
+                    </tr>
+                    <tr>
+                        <td>Trainer: </td>
+                        <td id="trainer"><a th:href="@{/trainers/{id}(id=${training.getTrainer().getId()})}"
+                               th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}">VALUE</a></td>
+                    </tr>
+                    <tr>
+                        <td>Name: </td>
+                        <td th:text="${training.getName()}" id="name">VALUE</td>
+                    </tr>
+                    <tr>
+                        <td>Type: </td>
+                        <td th:text="${training.getType().getName()}" id="type">VALUE</td>
+                    </tr>
+                    <tr>
+                        <td>Date: </td>
+                        <td th:text="${#dates.format(training.getDate(), 'dd-MM-yyyy')}" id="date">VALUE</td>
+                    </tr>
+                    <tr>
+                        <td>Duration: </td>
+                        <td th:text="${training.getDuration()}" id="duration">VALUE</td>
+                    </tr>
+                </table>
+                <form th:method="GET" th:action="@{../trainings/{id}/edit(id=${training.getId()})}">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
+                </form>
+            </div>
         </div>
     </div>
+    <div th:insert="~{../templates/footer}"></div>
 </div>
-<div th:insert="~{../templates/footer}"></div>
 </body>
 </html>

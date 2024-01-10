@@ -26,10 +26,12 @@ class TraineeTest {
 	}
 
 	@Test
-	void userIdGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		final Long userId = 2L;
-		trainee.setUserId(userId);
-		assertEquals(userId, trainee.getUserId());
+	void userGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
+		final User user = new User();
+		user.setId(2L);
+		trainee.setUser(user);
+
+		assertEquals(user, trainee.getUser());
 	}
 
 	@Test
@@ -49,13 +51,13 @@ class TraineeTest {
 	@Test
 	void testEquals() {
 		final Trainee traineeOne =
-			new Trainee(1L, "John", "Doe", "John.Doe", "password", true, 2L, new Date(), "New York");
+			new Trainee(1L, "John", "Doe", "John.Doe", "password", true, 2L, new Date(), "New York", null);
 		final Trainee traineeTwo =
-			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "New York");
+			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "New York", null);
 		final Trainee traineeThree =
-			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, Date.from(Instant.ofEpochMilli(1000)), "New York");
+			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, Date.from(Instant.ofEpochMilli(1000)), "New York", null);
 		final Trainee traineeFour =
-			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "Old York");
+			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "Old York", null);
 
 		assertEquals(traineeTwo, traineeTwo);
 		assertNotEquals(traineeOne, traineeTwo);
@@ -66,9 +68,9 @@ class TraineeTest {
 	@Test
 	void testHashCode() {
 		final Trainee traineeOne =
-			new Trainee(1L, "John", "Doe", "John.Doe", "password", true, 2L, new Date(), "New York");
+			new Trainee(1L, "John", "Doe", "John.Doe", "password", true, 2L, new Date(), "New York", null);
 		final Trainee traineeTwo =
-			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "New York");
+			new Trainee(2L, "Jane", "Doe", "Jane.Doe", "password", true, 4L, new Date(), "New York", null);
 		final Trainee traineeThree =
 			new Trainee();
 
