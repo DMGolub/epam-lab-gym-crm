@@ -1,6 +1,8 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
+import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
@@ -96,5 +98,71 @@ class TrainingControllerTest {
 		verify(trainingTypeService, times(1)).findAll();
 		verify(model).addAttribute(eq(TRAININGS), any(List.class));
 		verify(model).addAttribute(eq(TRAINING_TYPES), any(List.class));
+	}
+
+	@Nested
+	class testSearchByTrainee {
+
+		@Test
+		void searchByTrainee_shouldReturnTrainingIndexPage_whenRequestIsValid() {
+			final TraineeTrainingsSearchRequestDTO request =
+				new TraineeTrainingsSearchRequestDTO("TraineeName", null, null, null, null);
+			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
+			when(bindingResult.hasErrors()).thenReturn(false);
+
+			final var result = trainingController.searchByTrainee(request, bindingResult, model);
+
+			assertEquals(TRAINING_INDEX_VIEW_NAME, result);
+			verify(bindingResult, times(1)).hasErrors();
+			model.addAttribute(eq(TRAINING_TYPES), any(List.class));
+			model.addAttribute(eq(TRAININGS), any(List.class));
+		}
+
+		@Test
+		void searchByTrainee_shouldReturnTrainingIndexPage_whenBingingResultHasErrors() {
+			final TraineeTrainingsSearchRequestDTO request =
+				new TraineeTrainingsSearchRequestDTO("TraineeName", null, null, null, null);
+			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			final var result = trainingController.searchByTrainee(request, bindingResult, model);
+
+			assertEquals(TRAINING_INDEX_VIEW_NAME, result);
+			model.addAttribute(eq(TRAINING_TYPES), any(List.class));
+			verify(bindingResult, times(1)).hasErrors();
+		}
+	}
+
+	@Nested
+	class testSearchByTrainer {
+
+		@Test
+		void searchByTrainer_shouldReturnTrainingIndexPage_whenRequestIsValid() {
+			final TrainerTrainingsSearchRequestDTO request =
+				new TrainerTrainingsSearchRequestDTO("TrainerName", null, null, null);
+			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
+			when(bindingResult.hasErrors()).thenReturn(false);
+
+			final var result = trainingController.searchByTrainer(request, bindingResult, model);
+
+			assertEquals(TRAINING_INDEX_VIEW_NAME, result);
+			verify(bindingResult, times(1)).hasErrors();
+			model.addAttribute(eq(TRAINING_TYPES), any(List.class));
+			model.addAttribute(eq(TRAININGS), any(List.class));
+		}
+
+		@Test
+		void searchByTrainer_shouldReturnTrainingIndexPage_whenBingingResultHasErrors() {
+			final TrainerTrainingsSearchRequestDTO request =
+				new TrainerTrainingsSearchRequestDTO("TrainerName", null, null, null);
+			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			final var result = trainingController.searchByTrainer(request, bindingResult, model);
+
+			assertEquals(TRAINING_INDEX_VIEW_NAME, result);
+			model.addAttribute(eq(TRAINING_TYPES), any(List.class));
+			verify(bindingResult, times(1)).hasErrors();
+		}
 	}
 }

@@ -11,6 +11,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TraineeTrainingSpecification implements Specification<Training> {
 
@@ -56,5 +57,22 @@ public class TraineeTrainingSpecification implements Specification<Training> {
 			));
 		}
 		return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		final TraineeTrainingSpecification that = (TraineeTrainingSpecification) o;
+		return Objects.equals(searchCriteria, that.searchCriteria);
+	}
+
+	@Override
+	public int hashCode() {
+		return searchCriteria != null ? searchCriteria.hashCode() : 0;
 	}
 }

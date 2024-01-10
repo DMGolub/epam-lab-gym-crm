@@ -40,6 +40,17 @@ class TrainerTest {
 	}
 
 	@Test
+	void toString_shouldReturnExpectedValue_whenInvoked() {
+		final TrainingType type = new TrainingType(1L, "Bodybuilding");
+		final Trainer trainerOne =
+			new Trainer(1L, "John", "Doe", "John.Doe", "password", true, 2L, type, new ArrayList<>());
+		final String expected = "Trainer{id=1, firstName='John', lastName='Doe', userName='John.Doe', isActive=true, " +
+			"userId=2, specialization=" + type + "}";
+
+		assertEquals(expected, trainerOne.toString());
+	}
+
+	@Test
 	void testEquals() {
 		final Trainer trainerOne = new Trainer(
 			1L,

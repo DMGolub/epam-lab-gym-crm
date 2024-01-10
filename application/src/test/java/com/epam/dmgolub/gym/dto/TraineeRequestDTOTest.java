@@ -70,13 +70,36 @@ class TraineeRequestDTOTest {
 	}
 
 	@Test
-	void testEqualsAndHashCode() {
+	void testEquals() {
+		final TraineeRequestDTO requestDTO2 =
+			new TraineeRequestDTO(1L, "FirstName", "LastName", true, 2L, new Date(), "Address");
+		final TraineeRequestDTO requestDTO3 =
+			new TraineeRequestDTO(2L, "FirstName", "LastName", true, 2L, new Date(), "Address");
+		final TraineeRequestDTO requestDTO4 =
+			new TraineeRequestDTO(1L, "FirstName2", "LastName", true, 2L, new Date(), "Address");
+		final TraineeRequestDTO requestDTO5 =
+			new TraineeRequestDTO(1L, "FirstName", "LastName3", true, 2L, new Date(), "Address");
+		final TraineeRequestDTO requestDTO6 =
+			new TraineeRequestDTO(1L, "FirstName", "LastName", true, 3L, new Date(), "Address");
+		final TraineeRequestDTO requestDTO7 =
+			new TraineeRequestDTO(1L, "FirstName", "LastName", true, 2L, new Date(), "Address2");
+
+		assertEquals(requestDTO2, requestDTO2);
+		assertNotEquals(requestDTO, requestDTO2);
+		assertNotEquals(null, requestDTO2);
+		assertNotEquals(requestDTO2, requestDTO3);
+		assertNotEquals(requestDTO2, requestDTO4);
+		assertNotEquals(requestDTO2, requestDTO5);
+		assertNotEquals(requestDTO2, requestDTO6);
+		assertNotEquals(requestDTO2, requestDTO7);
+	}
+
+	@Test
+	void testHashCode() {
 		final TraineeRequestDTO requestDTO2 =
 			new TraineeRequestDTO(1L, "FirstName", "LastName", true, 2L, new Date(), "Address");
 
-		assertEquals(requestDTO2, requestDTO2);
 		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
-		assertNotEquals(requestDTO, requestDTO2);
 		assertNotEquals(requestDTO.hashCode(), requestDTO2.hashCode());
 	}
 }

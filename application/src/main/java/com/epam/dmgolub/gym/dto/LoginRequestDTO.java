@@ -11,6 +11,15 @@ public class LoginRequestDTO implements Serializable {
 	@NotBlank(message = "{password.notBlank.violation}")
 	private String password;
 
+	public LoginRequestDTO() {
+		// Empty
+	}
+
+	public LoginRequestDTO(final String userName, final String password) {
+		this.userName = userName;
+		this.password = password;
+	}
+
 	public String getUserName() {
 		return userName;
 	}

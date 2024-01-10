@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
+import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINER_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
@@ -87,6 +89,52 @@ class TrainerControllerTest {
 
 			assertEquals(REDIRECT_TO_NEW_TRAINER, result);
 			verify(trainerService, times(1)).save(trainer);
+		}
+	}
+
+	@Nested
+	class TestHandleActionByUserName {
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTrainerPage_whenActionIsFindAndTrainerExists() {
+			final String userName = "UserName";
+			final var trainer = new TrainerResponseDTO();
+			final Long trainerId = 2L;
+			trainer.setId(trainerId);
+			when(trainerService.findByUserName(userName)).thenReturn(trainer);
+
+			final String result =
+				trainerController.handleActionByUserName("find", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINER_INDEX + trainerId, result);
+			verify(trainerService, times(1)).findByUserName(userName);
+			verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
+		}
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTrainerIndexPage_whenTrainerNotFound() {
+			final String userName = "UserName";
+			when(trainerService.findByUserName(userName)).thenThrow(new EntityNotFoundException("Not found"));
+
+			final String result =
+				trainerController.handleActionByUserName("find", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINER_INDEX, result);
+			verify(trainerService, times(1)).findByUserName(userName);
+			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
+		}
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTrainerIndexPage_whenActionUnknown() {
+			final String userName = "UserName";
+			when(trainerService.findByUserName(userName)).thenReturn(new TrainerResponseDTO());
+
+			final String result =
+				trainerController.handleActionByUserName("unknown", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINER_INDEX, result);
+			verify(trainerService, times(1)).findByUserName(userName);
+			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
 		}
 	}
 

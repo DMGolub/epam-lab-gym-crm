@@ -3,8 +3,10 @@ package com.epam.dmgolub.gym.controller;
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.epam.dmgolub.gym.service.TrainerService;
+import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,10 +22,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Collections;
 import java.util.List;
 
+import static com.epam.dmgolub.gym.controller.constant.Constants.AVAILABLE_TRAINERS;
+import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINEE_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
+import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEES;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINEE_EDIT_VIEW_NAME;
@@ -107,6 +112,66 @@ class TraineeControllerTest {
 		}
 	}
 
+	@Nested
+	class TestHandleActionByUserName {
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTraineePage_whenActionIsFindAndTraineeExists() {
+			final String userName = "UserName";
+			final var trainee = new TraineeResponseDTO();
+			final Long traineeId = 2L;
+			trainee.setId(traineeId);
+			when(traineeService.findByUserName(userName)).thenReturn(trainee);
+
+			final String result =
+				traineeController.handleActionByUserName("find", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINEE_INDEX + traineeId, result);
+			verify(traineeService, times(1)).findByUserName(userName);
+			verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
+		}
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTraineePage_whenActionIsDeleteAndTraineeExists() {
+			final String userName = "UserName";
+			when(traineeService.findByUserName(userName)).thenReturn(new TraineeResponseDTO());
+
+			final String result =
+				traineeController.handleActionByUserName("delete", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
+			verify(traineeService, times(1)).findByUserName(userName);
+			verify(traineeService, times(1)).delete(userName);
+			verify(redirectAttributes).addFlashAttribute(eq(SUCCESS_MESSAGE_ATTRIBUTE), any(String.class));
+		}
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTraineeIndex_whenTraineeNotFound() {
+			final String userName = "UserName";
+			when(traineeService.findByUserName(userName)).thenThrow(new EntityNotFoundException("Not found"));
+
+			final String result =
+				traineeController.handleActionByUserName("find", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
+			verify(traineeService, times(1)).findByUserName(userName);
+			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
+		}
+
+		@Test
+		void handleActionByUserName_shouldRedirectToTraineeIndex_whenActionUnknown() {
+			final String userName = "UserName";
+			when(traineeService.findByUserName(userName)).thenReturn(new TraineeResponseDTO());
+
+			final String result =
+				traineeController.handleActionByUserName("unknown", userName, model, redirectAttributes);
+
+			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
+			verify(traineeService, times(1)).findByUserName(userName);
+			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
+		}
+	}
+
 	@Test
 	void edit_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
 		final Long id = 1L;
@@ -146,6 +211,23 @@ class TraineeControllerTest {
 			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
 			verify(traineeService, times(1)).update(trainee);
 		}
+	}
+
+	@Test
+	void addTrainer_shouldAddTrainerAndRedirectToTraineePage_whenInvokedWithParams() {
+		final Long traineeId = 1L;
+		final Long trainerId = 2L;
+		when(traineeService.findById(traineeId)).thenReturn(new TraineeResponseDTO());
+		when(trainerService.findActiveTrainersNotAssignedToTrainee(traineeId)).thenReturn(Collections.emptyList());
+
+		final String result = traineeController.addTrainer(traineeId, trainerId, model);
+
+		assertEquals(REDIRECT_TO_TRAINEE_INDEX + traineeId, result);
+		verify(traineeService, times(1)).addTrainer(traineeId, trainerId);
+		verify(traineeService, times(1)).findById(traineeId);
+		verify(trainerService, times(1)).findActiveTrainersNotAssignedToTrainee(traineeId);
+		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
+		verify(model).addAttribute(eq(AVAILABLE_TRAINERS), any(List.class));
 	}
 
 	@Test

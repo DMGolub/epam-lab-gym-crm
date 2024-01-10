@@ -1,10 +1,16 @@
 package com.epam.dmgolub.gym.service.impl;
 
+import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.MapStructMapper;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
+import com.epam.dmgolub.gym.repository.searchcriteria.TraineeTrainingsSearchCriteria;
+import com.epam.dmgolub.gym.repository.searchcriteria.TrainerTrainingsSearchCriteria;
+import com.epam.dmgolub.gym.repository.specification.TraineeTrainingSpecification;
+import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecification;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -86,5 +92,41 @@ class TrainingServiceImplTest {
 		assertEquals(response, trainingService.findAll());
 		verify(trainingRepository).findAll();
 		verify(mapper).trainingListToTrainingResponseDTOList(trainings);
+	}
+
+	@Test
+	void searchByTrainee_shouldReturnTraineeResponseDTOs_whenTrainingsExist() {
+		final var request =
+			new TraineeTrainingsSearchRequestDTO("Trainee", null, null, null, null);
+		final var criteria =
+			new TraineeTrainingsSearchCriteria("Trainee", null, null, null, null);
+		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
+		final var trainings = List.of(new Training(), new Training());
+		when(trainingRepository.findAll(new TraineeTrainingSpecification(criteria))).thenReturn(trainings);
+		final var expected = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
+		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(expected);
+
+		assertEquals(expected, trainingService.searchByTrainee(request));
+		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
+		verify(trainingRepository, times(1)).findAll(new TraineeTrainingSpecification(criteria));
+		verify(mapper, times(1)).trainingListToTrainingResponseDTOList(trainings);
+	}
+
+	@Test
+	void searchByTrainer_shouldReturnTrainerResponseDTOs_whenTrainingsExist() {
+		final var request =
+			new TrainerTrainingsSearchRequestDTO("Trainee", null, null, null);
+		final var criteria =
+			new TrainerTrainingsSearchCriteria("Trainee", null, null, null);
+		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
+		final var trainings = List.of(new Training(), new Training());
+		when(trainingRepository.findAll(new TrainerTrainingSpecification(criteria))).thenReturn(trainings);
+		final var expected = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
+		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(expected);
+
+		assertEquals(expected, trainingService.searchByTrainer(request));
+		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
+		verify(trainingRepository, times(1)).findAll(new TrainerTrainingSpecification(criteria));
+		verify(mapper, times(1)).trainingListToTrainingResponseDTOList(trainings);
 	}
 }

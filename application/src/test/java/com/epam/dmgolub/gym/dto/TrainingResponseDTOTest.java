@@ -1,5 +1,8 @@
 package com.epam.dmgolub.gym.dto;
 
+import com.epam.dmgolub.gym.entity.Trainee;
+import com.epam.dmgolub.gym.entity.Trainer;
+import com.epam.dmgolub.gym.entity.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -77,13 +80,37 @@ class TrainingResponseDTOTest {
 	}
 
 	@Test
-	void testEqualsAndHashcode() {
+	void testEquals() {
+		final TrainingTypeDTO type2 = new TrainingTypeDTO(2L, "SomeName");
+		final TrainingResponseDTO responseDTO2 =
+			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
+		final TrainingResponseDTO responseDTO3 =
+			new TrainingResponseDTO(2L, trainee, trainer, "TestName", type, new Date(), 60);
+		final TrainingResponseDTO responseDTO4 =
+			new TrainingResponseDTO(1L, null, trainer, "TestName", type, new Date(), 60);
+		final TrainingResponseDTO responseDTO5 =
+			new TrainingResponseDTO(1L, trainee, null, "TestName", type, new Date(), 60);
+		final TrainingResponseDTO responseDTO6 =
+			new TrainingResponseDTO(1L, trainee, trainer, "TestName2", type, new Date(), 60);
+		final TrainingResponseDTO responseDTO7 =
+			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type2, new Date(), 60);
+
+		assertEquals(responseDTO2, responseDTO2);
+		assertNotEquals(responseDTO, responseDTO2);
+		assertNotEquals(null, responseDTO2);
+		assertNotEquals(responseDTO2, responseDTO3);
+		assertNotEquals(responseDTO2, responseDTO4);
+		assertNotEquals(responseDTO2, responseDTO5);
+		assertNotEquals(responseDTO2, responseDTO6);
+		assertNotEquals(responseDTO2, responseDTO7);
+	}
+
+	@Test
+	void testHashcode() {
 		final TrainingResponseDTO responseDTO2 =
 			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
 
-		assertEquals(responseDTO2, responseDTO2);
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
-		assertNotEquals(responseDTO, responseDTO2);
 		assertNotEquals(responseDTO.hashCode(), responseDTO2.hashCode());
 	}
 }

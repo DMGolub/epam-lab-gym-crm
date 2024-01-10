@@ -24,7 +24,7 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserCredentialsGeneratorImpl.class);
 
 	@Value("${password.generated.length}")
-	private static int passwordLength;
+	private int passwordLength;
 
 	private final UserRepository userRepository;
 
@@ -34,7 +34,7 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 
 	@Override
 	public String generateUserName(final User user) {
-		LOGGER.debug("In generateUserName - generating user name for {}", user);
+		LOGGER.debug("In generateUserName - Generating user name for {}", user);
 		final String userNameRegEx = getUserNameRegEx(user);
 		final var similarUserNames = findSimilarUserNames(userNameRegEx);
 		final Optional<Long> suffixMaxValue = calculateUserNameSuffixMaxValue(userNameRegEx, similarUserNames);
@@ -44,9 +44,9 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 
 	@Override
 	public String generatePassword(final User user) {
-		LOGGER.debug("In generateUserName - generating password for {}", user);
+		LOGGER.debug("In generatePassword - Generating password for {}", user);
 		char[] chars = POSSIBLE_PASSWORD_CHARACTERS.toCharArray();
-		return RandomStringUtils.random(passwordLength, 0, chars.length - 1, false, false, chars, new SecureRandom());
+		return RandomStringUtils.random(passwordLength, 0, chars.length - 1, true, true, chars, new SecureRandom());
 	}
 
 	private List<String> findSimilarUserNames(final String userNameRegEx) {

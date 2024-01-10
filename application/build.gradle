@@ -30,7 +30,7 @@ dependencies {
     implementation "javax.annotation:javax.annotation-api:$javaxAnnotationApi"
 
     // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
-    compileOnly "javax.servlet:javax.servlet-api:$javaxServletApi"
+    implementation "javax.servlet:javax.servlet-api:$javaxServletApi"
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"

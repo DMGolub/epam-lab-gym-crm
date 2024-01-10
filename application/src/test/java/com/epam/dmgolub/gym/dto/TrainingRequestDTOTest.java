@@ -64,13 +64,33 @@ class TrainingRequestDTOTest {
 	}
 
 	@Test
-	void testEqualsAndHashCode() {
+	void testEquals() {
+		final TrainingRequestDTO requestDTO2 =
+			new TrainingRequestDTO(1L, 2L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO3 =
+			new TrainingRequestDTO(2L, 2L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO4 =
+			new TrainingRequestDTO(1L, 3L, 3L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO5 =
+			new TrainingRequestDTO(1L, 2L, 4L, "Training1", new Date(), 60);
+		final TrainingRequestDTO requestDTO6 =
+			new TrainingRequestDTO(1L, 2L, 3L, "Training2", new Date(), 60);
+
+		assertEquals(requestDTO2, requestDTO2);
+		assertNotEquals(requestDTO, requestDTO2);
+		assertNotEquals(null, requestDTO);
+		assertNotEquals(requestDTO2, requestDTO3);
+		assertNotEquals(requestDTO2, requestDTO4);
+		assertNotEquals(requestDTO2, requestDTO5);
+		assertNotEquals(requestDTO2, requestDTO6);
+	}
+
+	@Test
+	void testHashCode() {
 		final TrainingRequestDTO requestDTO2 =
 			new TrainingRequestDTO(1L, 2L, 3L, "Training1", new Date(), 60);
 
-		assertEquals(requestDTO2, requestDTO2);
 		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
-		assertNotEquals(requestDTO, requestDTO2);
 		assertNotEquals(requestDTO.hashCode(), requestDTO2.hashCode());
 	}
 }

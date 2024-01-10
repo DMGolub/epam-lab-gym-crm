@@ -12,6 +12,16 @@ public class ChangePasswordRequestDTO {
 	@NotBlank(message = "{password.notBlank.violation}")
 	private String newPassword;
 
+	public ChangePasswordRequestDTO() {
+		// Empty
+	}
+
+	public ChangePasswordRequestDTO(final String userName, final String oldPassword, final String newPassword) {
+		this.userName = userName;
+		this.oldPassword = oldPassword;
+		this.newPassword = newPassword;
+	}
+
 	public String getUserName() {
 		return userName;
 	}

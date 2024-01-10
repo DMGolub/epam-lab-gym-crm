@@ -44,6 +44,8 @@ public class Constants {
 	public static final String LOGIN_INDEX_VIEW_NAME = "login/index";
 	public static final String REDIRECT_TO_LOGIN_INDEX = "redirect:/login";
 
+	public static final String CHANGE_PASSWORD_REQUEST = "changePasswordRequest";
+	public static final String USER_NAME = "userName";
 	public static final String PROFILE_INDEX_VIEW_NAME = "profile/index";
 	public static final String REDIRECT_TO_PROFILE_INDEX = "redirect:/profile/";
 

@@ -16,13 +16,16 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
+import static com.epam.dmgolub.gym.controller.constant.Constants.CHANGE_PASSWORD_REQUEST;
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.LOGIN;
 import static com.epam.dmgolub.gym.controller.constant.Constants.PROFILE_INDEX_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_LOGIN_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_PROFILE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
+import static com.epam.dmgolub.gym.controller.constant.Constants.USER_NAME;
 
 @Controller
 @RequestMapping("/profile")
@@ -38,18 +41,18 @@ public class ProfileController {
 
 	@GetMapping("/")
 	public String getProfilePage(
-		@SessionAttribute(LOGIN) final LoginRequestDTO login,
+		@SessionAttribute(LOGIN) @NotNull final LoginRequestDTO login,
 		final Model model
 	) {
-		model.addAttribute("changePasswordRequest", new ChangePasswordRequestDTO());
-		model.addAttribute("userName", login.getUserName());
+		model.addAttribute(CHANGE_PASSWORD_REQUEST, new ChangePasswordRequestDTO());
+		model.addAttribute(USER_NAME, login.getUserName());
 		LOGGER.debug("In getProfilePage - Returning profile index view name");
 		return PROFILE_INDEX_VIEW_NAME;
 	}
 
 	@PutMapping
 	public String changePassword(
-		@ModelAttribute("changePasswordRequest") @Valid final ChangePasswordRequestDTO request,
+		@ModelAttribute(CHANGE_PASSWORD_REQUEST) @Valid final ChangePasswordRequestDTO request,
 		final BindingResult bindingResult,
 		final RedirectAttributes redirectAttributes
 	) {

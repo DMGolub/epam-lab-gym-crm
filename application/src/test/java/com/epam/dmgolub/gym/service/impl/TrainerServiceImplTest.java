@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,6 +98,32 @@ class TrainerServiceImplTest {
 	}
 
 	@Nested
+	class TestFindByUserName {
+
+		@Test
+		void findByUserName_shouldReturnTrainerResponseDTO_whenTrainerExists() {
+			final String userName = "UserName";
+			final Trainer trainer = new Trainer();
+			when(trainerRepository.findByUserUserName(userName)).thenReturn(java.util.Optional.of(trainer));
+			final TrainerResponseDTO trainerResponseDTO = new TrainerResponseDTO();
+			when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(trainerResponseDTO);
+
+			assertEquals(trainerResponseDTO, trainerService.findByUserName(userName));
+			verify(trainerRepository, times(1)).findByUserUserName(userName);
+			verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
+		}
+
+		@Test
+		void findByUserName_shouldThrowEntityNotFoundException_whenTrainerNotFound() {
+			final String userName = "UserName";
+			when(trainerRepository.findByUserUserName(userName)).thenReturn(java.util.Optional.empty());
+
+			assertThrows(EntityNotFoundException.class, () -> trainerService.findByUserName(userName));
+			verify(trainerRepository, times(1)).findByUserUserName(userName);
+		}
+	}
+
+	@Nested
 	class TestUpdate {
 
 		@Test
@@ -142,6 +169,74 @@ class TrainerServiceImplTest {
 
 			assertThrows(EntityNotFoundException.class, () -> trainerService.update(request));
 			verify(trainerRepository, times(1)).findById(id);
+		}
+	}
+
+	@Nested
+	class TestFindActiveTrainersAssignedToTrainee {
+
+		@Test
+		void findActiveTrainersAssignedToTrainee_shouldReturnTrainerResponseDTOList_whenThereAreActiveTrainers() {
+			final Long traineeId = 1L;
+			final var trainers = List.of(new Trainer(), new Trainer());
+			when(trainerRepository.findActiveTrainersAssignedToTrainee(traineeId)).thenReturn(trainers);
+			final var expected = List.of(new TrainerResponseDTO(), new TrainerResponseDTO());
+			when(mapper.trainerListToTrainerResponseDTOList(trainers)).thenReturn(expected);
+
+			final var result = trainerService.findActiveTrainersAssignedToTrainee(traineeId);
+
+			assertEquals(expected, result);
+			verify(trainerRepository, times(1)).findActiveTrainersAssignedToTrainee(traineeId);
+			verify(mapper, times(1)).trainerListToTrainerResponseDTOList(trainers);
+		}
+
+		@Test
+		void findActiveTrainersAssignedToTrainee_shouldReturnEmptyList_whenThereAreNoTrainers() {
+			final Long traineeId = 1L;
+			final var trainers = new ArrayList<Trainer>();
+			when(trainerRepository.findActiveTrainersAssignedToTrainee(traineeId)).thenReturn(trainers);
+			final var expected = new ArrayList<TrainerResponseDTO>();
+			when(mapper.trainerListToTrainerResponseDTOList(trainers)).thenReturn(expected);
+
+			final var result = trainerService.findActiveTrainersAssignedToTrainee(traineeId);
+
+			assertEquals(expected, result);
+			verify(trainerRepository, times(1)).findActiveTrainersAssignedToTrainee(traineeId);
+			verify(mapper, times(1)).trainerListToTrainerResponseDTOList(trainers);
+		}
+	}
+
+	@Nested
+	class TestFindActiveTrainersNotAssignedToTrainee {
+
+		@Test
+		void findActiveTrainersNotAssignedToTrainee_shouldReturnTrainerResponseDTOList_whenThereAreActiveTrainers() {
+			final Long traineeId = 1L;
+			final var trainers = List.of(new Trainer(), new Trainer());
+			when(trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeId)).thenReturn(trainers);
+			final var expected = List.of(new TrainerResponseDTO(), new TrainerResponseDTO());
+			when(mapper.trainerListToTrainerResponseDTOList(trainers)).thenReturn(expected);
+
+			final var result = trainerService.findActiveTrainersNotAssignedToTrainee(traineeId);
+
+			assertEquals(expected, result);
+			verify(trainerRepository, times(1)).findActiveTrainersNotAssignedToTrainee(traineeId);
+			verify(mapper, times(1)).trainerListToTrainerResponseDTOList(trainers);
+		}
+
+		@Test
+		void findActiveTrainersNotAssignedToTrainee_shouldReturnEmptyList_whenThereAreNoTrainers() {
+			final Long traineeId = 1L;
+			final var trainers = new ArrayList<Trainer>();
+			when(trainerRepository.findActiveTrainersNotAssignedToTrainee(traineeId)).thenReturn(trainers);
+			final var expected = new ArrayList<TrainerResponseDTO>();
+			when(mapper.trainerListToTrainerResponseDTOList(trainers)).thenReturn(expected);
+
+			final var result = trainerService.findActiveTrainersNotAssignedToTrainee(traineeId);
+
+			assertEquals(expected, result);
+			verify(trainerRepository, times(1)).findActiveTrainersNotAssignedToTrainee(traineeId);
+			verify(mapper, times(1)).trainerListToTrainerResponseDTOList(trainers);
 		}
 	}
 }
