@@ -1,7 +1,9 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
+import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
+import com.epam.dmgolub.gym.model.ChangePasswordRequest;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -44,17 +46,19 @@ class ProfileControllerTest {
 	private HttpSession session;
 	@Mock
 	private LoginService loginService;
+	@Mock
+	private ModelToDtoMapper mapper;
 	@InjectMocks
 	private ProfileController profileController;
 
 	@BeforeEach
 	public void setUp() {
-		profileController = new ProfileController(loginService);
+		profileController = new ProfileController(loginService, mapper);
 	}
 
 	@Test
 	void getProfilePage_shouldReturnProfileIndexPageName_whenInvoked() {
-		final LoginRequestDTO request = new LoginRequestDTO("UserName", "Password");
+		final CredentialsDTO request = new CredentialsDTO("UserName", "Password");
 
 		assertEquals(PROFILE_INDEX_VIEW_NAME, profileController.getProfilePage(request, model));
 		verify(model).addAttribute(eq(CHANGE_PASSWORD_REQUEST), any(ChangePasswordRequestDTO.class));
@@ -79,28 +83,36 @@ class ProfileControllerTest {
 
 		@Test
 		void changePassword_shouldRedirectToLoginIndex_whenPasswordChangedSuccessfully() {
-			final var request =
+			final var requestDTO =
 				new ChangePasswordRequestDTO("UserName", "OldPassword", "NewPassword");
+			final var request =
+				new ChangePasswordRequest("UserName", "OldPassword", "NewPassword");
 			when(bindingResult.hasErrors()).thenReturn(false);
+			when(mapper.changePasswordRequestDTOToRequest(requestDTO)).thenReturn(request);
 			when(loginService.changePassword(request)).thenReturn(true);
 
-			final var result = profileController.changePassword(request, bindingResult, redirectAttributes);
+			final var result = profileController.changePassword(requestDTO, bindingResult, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_LOGIN_INDEX, result);
+			verify(mapper, times(1)).changePasswordRequestDTOToRequest(requestDTO);
 			verify(loginService, times(1)).changePassword(request);
 			verify(redirectAttributes).addFlashAttribute(eq(SUCCESS_MESSAGE_ATTRIBUTE), any(String.class));
 		}
 
 		@Test
 		void changePassword_shouldRedirectToProfileIndex_whenPasswordChangeFailed() {
-			final var request =
+			final var requestDTO =
 				new ChangePasswordRequestDTO("WrongUserName", "WrongOldPassword", "WrongNewPassword");
+			final var request =
+				new ChangePasswordRequest("WrongUserName", "WrongOldPassword", "WrongNewPassword");
 			when(bindingResult.hasErrors()).thenReturn(false);
+			when(mapper.changePasswordRequestDTOToRequest(requestDTO)).thenReturn(request);
 			when(loginService.changePassword(request)).thenReturn(false);
 
-			final var result = profileController.changePassword(request, bindingResult, redirectAttributes);
+			final var result = profileController.changePassword(requestDTO, bindingResult, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_PROFILE_INDEX, result);
+			verify(mapper, times(1)).changePasswordRequestDTOToRequest(requestDTO);
 			verify(loginService, times(1)).changePassword(request);
 			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
 		}

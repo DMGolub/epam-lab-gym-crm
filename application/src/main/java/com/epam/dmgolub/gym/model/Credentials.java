@@ -1,21 +1,17 @@
-package com.epam.dmgolub.gym.dto;
+package com.epam.dmgolub.gym.model;
 
-import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Objects;
 
-public class LoginRequestDTO implements Serializable {
+public class Credentials {
 
-	@NotBlank(message = "{userName.notBlank.violation}")
 	private String userName;
-	@NotBlank(message = "{password.notBlank.violation}")
 	private String password;
 
-	public LoginRequestDTO() {
+	public Credentials() {
 		// Empty
 	}
 
-	public LoginRequestDTO(final String userName, final String password) {
+	public Credentials(final String userName, final String password) {
 		this.userName = userName;
 		this.password = password;
 	}
@@ -38,7 +34,7 @@ public class LoginRequestDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "LoginRequestDTO{" + "userName='" + userName + '\'' + '}';
+		return "Credentials{" + "userName='" + userName + '\'' + '}';
 	}
 
 	@Override
@@ -49,7 +45,7 @@ public class LoginRequestDTO implements Serializable {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		final LoginRequestDTO that = (LoginRequestDTO) o;
+		final Credentials that = (Credentials) o;
 		if (!Objects.equals(userName, that.userName)) {
 			return false;
 		}

@@ -1,4 +1,4 @@
-package com.epam.dmgolub.gym.dto;
+package com.epam.dmgolub.gym.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class LoginRequestDTOTest {
+class CredentialsTest {
 
-	private LoginRequestDTO requestDTO;
+	private Credentials requestDTO;
 
 	@BeforeEach
 	public void setUp() {
-		requestDTO = new LoginRequestDTO();
+		requestDTO = new Credentials();
 	}
 
 	@Test
@@ -31,16 +31,16 @@ class LoginRequestDTOTest {
 
 	@Test
 	void toString_shouldReturnExpectedValue_whenInvoked() {
-		final LoginRequestDTO requestDTO2 = new LoginRequestDTO("UserName2", "Word");
-		final String expected = "LoginRequestDTO{userName='UserName2'}";
+		final Credentials requestDTO2 = new Credentials("UserName2", "Word");
+		final String expected = "Credentials{userName='UserName2'}";
 
 		assertEquals(expected, requestDTO2.toString());
 	}
 
 	@Test
 	void testEqualsAndHashCode() {
-		final LoginRequestDTO requestDTO2 = new LoginRequestDTO("UserName2", "Word");
-		final LoginRequestDTO requestDTO3 = new LoginRequestDTO("UserName2", "Password");
+		final Credentials requestDTO2 = new Credentials("UserName2", "Word");
+		final Credentials requestDTO3 = new Credentials("UserName2", "Password");
 
 		assertEquals(requestDTO, requestDTO);
 		assertEquals(requestDTO.hashCode(), requestDTO.hashCode());

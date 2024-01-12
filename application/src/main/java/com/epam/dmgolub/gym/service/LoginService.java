@@ -1,11 +1,11 @@
 package com.epam.dmgolub.gym.service;
 
-import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
+import com.epam.dmgolub.gym.model.ChangePasswordRequest;
+import com.epam.dmgolub.gym.model.Credentials;
 
 public interface LoginService {
 
-	boolean isValidLoginRequest(LoginRequestDTO request);
+	boolean isValidLoginRequest(Credentials request);
 
-	boolean changePassword(ChangePasswordRequestDTO request);
+	boolean changePassword(ChangePasswordRequest request);
 }

@@ -1,7 +1,8 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
+import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +35,16 @@ public class ProfileController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProfileController.class);
 
 	private final LoginService loginService;
+	private final ModelToDtoMapper mapper;
 
-	public ProfileController(final LoginService loginService) {
+	public ProfileController(final LoginService loginService, final ModelToDtoMapper mapper) {
 		this.loginService = loginService;
+		this.mapper = mapper;
 	}
 
 	@GetMapping("/")
 	public String getProfilePage(
-		@SessionAttribute(LOGIN) @NotNull final LoginRequestDTO login,
+		@SessionAttribute(LOGIN) @NotNull final CredentialsDTO login,
 		final Model model
 	) {
 		model.addAttribute(CHANGE_PASSWORD_REQUEST, new ChangePasswordRequestDTO());
@@ -61,7 +64,7 @@ public class ProfileController {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, PROFILE_INDEX_VIEW_NAME);
 			return PROFILE_INDEX_VIEW_NAME;
 		}
-		if (loginService.changePassword(request)) {
+		if (loginService.changePassword(mapper.changePasswordRequestDTOToRequest(request))) {
 			redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE,
 				"Your password was changed successfully. Please log in with new password");
 			return REDIRECT_TO_LOGIN_INDEX;

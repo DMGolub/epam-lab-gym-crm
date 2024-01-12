@@ -1,11 +1,13 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
+import com.epam.dmgolub.gym.model.TraineeModel;
+import com.epam.dmgolub.gym.model.TrainingModel;
+import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.TrainingService;
@@ -42,6 +44,8 @@ class TrainingControllerTest {
 	private TrainingService trainingService;
 	@Mock
 	private TrainingTypeService trainingTypeService;
+	@Mock
+	private ModelToDtoMapper mapper;
 	@InjectMocks
 	private TrainingController trainingController;
 
@@ -50,12 +54,14 @@ class TrainingControllerTest {
 
 		@Test
 		void save_shouldReturnNewTrainingPage_whenBingingResultHasErrors() {
-			final TrainingRequestDTO request = new TrainingRequestDTO();
+			final var request = new TrainingRequestDTO();
 			final Long traineeId = 1L;
 			request.setTraineeId(traineeId);
 			when(bindingResult.hasErrors()).thenReturn(true);
-			when(traineeService.findById(traineeId)).thenReturn(new TraineeResponseDTO());
+			final var trainee = (new TraineeModel());
+			when(traineeService.findById(traineeId)).thenReturn(trainee);
 			when(trainerService.findActiveTrainersAssignedToTrainee(traineeId)).thenReturn(Collections.emptyList());
+
 			final String result = trainingController.save(request, bindingResult, model);
 
 			assertEquals(NEW_TRAINING_VIEW_NAME, result);
@@ -65,11 +71,14 @@ class TrainingControllerTest {
 		@Test
 		void save_shouldSaveTrainingAndRedirectToIndexPage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
-			final TrainingRequestDTO training = new TrainingRequestDTO();
+			final var request = new TrainingRequestDTO();
+			final var training = new TrainingModel();
+			when(mapper.trainingRequestDTOToTraining(request)).thenReturn(training);
 
-			final String result = trainingController.save(training, bindingResult, model);
+			final String result = trainingController.save(request, bindingResult, model);
 
 			assertEquals(REDIRECT_TO_TRAINING_INDEX, result);
+			verify(mapper, times(1)).trainingRequestDTOToTraining(request);
 			verify(trainingService, times(1)).save(training);
 		}
 	}
@@ -77,19 +86,23 @@ class TrainingControllerTest {
 	@Test
 	void findById_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainingExists() {
 		long id = 1L;
-		when(trainingService.findById(id)).thenReturn(new TrainingResponseDTO());
+		final var training = new TrainingModel();
+		when(trainingService.findById(id)).thenReturn(training);
+		final var response = new TrainingResponseDTO();
+		when(mapper.trainingToTrainingResponseDTO(training)).thenReturn(response);
 
 		final String result = trainingController.findById(id, model);
 
 		assertEquals(TRAINING_VIEW_NAME, result);
-		verify(trainingService).findById(id);
+		verify(trainingService, times(1)).findById(id);
+		verify(mapper, times(1)).trainingToTrainingResponseDTO(training);
 		verify(model).addAttribute(eq(TRAINING), any(TrainingResponseDTO.class));
 	}
 
 	@Test
 	void findAll_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainingsExist() {
-		when(trainingService.findAll()).thenReturn(List.of(new TrainingResponseDTO()));
-		when(trainingTypeService.findAll()).thenReturn(List.of(new TrainingTypeDTO()));
+		when(trainingService.findAll()).thenReturn(List.of(new TrainingModel()));
+		when(trainingTypeService.findAll()).thenReturn(List.of(new TrainingTypeModel()));
 
 		final String result = trainingController.findAll(model);
 
@@ -105,7 +118,7 @@ class TrainingControllerTest {
 
 		@Test
 		void searchByTrainee_shouldReturnTrainingIndexPage_whenRequestIsValid() {
-			final TraineeTrainingsSearchRequestDTO request =
+			final var request =
 				new TraineeTrainingsSearchRequestDTO("TraineeName", null, null, null, null);
 			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
 			when(bindingResult.hasErrors()).thenReturn(false);
@@ -120,7 +133,7 @@ class TrainingControllerTest {
 
 		@Test
 		void searchByTrainee_shouldReturnTrainingIndexPage_whenBingingResultHasErrors() {
-			final TraineeTrainingsSearchRequestDTO request =
+			final var request =
 				new TraineeTrainingsSearchRequestDTO("TraineeName", null, null, null, null);
 			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
 			when(bindingResult.hasErrors()).thenReturn(true);
@@ -138,7 +151,7 @@ class TrainingControllerTest {
 
 		@Test
 		void searchByTrainer_shouldReturnTrainingIndexPage_whenRequestIsValid() {
-			final TrainerTrainingsSearchRequestDTO request =
+			final var request =
 				new TrainerTrainingsSearchRequestDTO("TrainerName", null, null, null);
 			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
 			when(bindingResult.hasErrors()).thenReturn(false);
@@ -153,7 +166,7 @@ class TrainingControllerTest {
 
 		@Test
 		void searchByTrainer_shouldReturnTrainingIndexPage_whenBingingResultHasErrors() {
-			final TrainerTrainingsSearchRequestDTO request =
+			final var request =
 				new TrainerTrainingsSearchRequestDTO("TrainerName", null, null, null);
 			when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
 			when(bindingResult.hasErrors()).thenReturn(true);

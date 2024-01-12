@@ -1,18 +1,15 @@
 package com.epam.dmgolub.gym.mapper;
 
-import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
-import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
-import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
-import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.entity.TrainingType;
+import com.epam.dmgolub.gym.model.TraineeModel;
+import com.epam.dmgolub.gym.model.TraineeTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainerModel;
+import com.epam.dmgolub.gym.model.TrainerTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainingModel;
+import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
@@ -25,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public abstract class MapStructMapper {
+public abstract class EntityToModelMapper {
 
 	protected TraineeRepository traineeRepository;
 	protected TrainerRepository trainerRepository;
@@ -51,55 +48,55 @@ public abstract class MapStructMapper {
 	@Mapping(target = "lastName", source = "trainee.user.lastName")
 	@Mapping(target = "userName", source = "trainee.user.userName")
 	@Mapping(target = "active", source = "trainee.user.active")
-	public abstract TraineeResponseDTO traineeToTraineeResponseDTO(Trainee trainee);
+	public abstract TraineeModel traineeToTraineeModel(Trainee trainee);
 
 	@Mapping(target = "userName", source = "trainer.user.userName")
 	@Mapping(target = "firstName", source = "trainer.user.firstName")
 	@Mapping(target = "lastName", source = "trainer.user.lastName")
-	public abstract TraineeResponseDTO.TrainerDTO trainerToTraineeResponseDTOTrainerDTO(Trainer trainer);
+	public abstract TraineeModel.Trainer trainerToTraineeModelTrainer(Trainer trainer);
 
-	public abstract List<TraineeResponseDTO> traineeListToTraineeResponseDTOList(List<Trainee> traineeList);
+	public abstract List<TraineeModel> traineeListToTraineeModelList(List<Trainee> trainees);
+
 	@Mapping(source = "userId", target = "user.id")
 	@Mapping(source = "firstName", target = "user.firstName")
 	@Mapping(source = "lastName", target = "user.lastName")
 	@Mapping(source = "active", target = "user.active")
 	@Mapping(target = "trainers", ignore = true)
-	public abstract Trainee traineeRequestDTOToTrainee(TraineeRequestDTO traineeRequestDTO);
+	public abstract Trainee traineeModelToTrainee(TraineeModel traineeModel);
 
-	public abstract TrainingTypeDTO trainingTypeToTrainingTypeDTO(TrainingType trainingType);
+	public abstract TrainingTypeModel trainingTypeToTrainingTypeModel(TrainingType trainingType);
 
-	public abstract List<TrainingTypeDTO> trainingTypeListToTrainingTypeDTOList(List<TrainingType> trainingTypes);
+	public abstract List<TrainingTypeModel> trainingTypeListToTrainingTypeModelList(List<TrainingType> trainingTypes);
 
-	public abstract TrainingType trainingTypeDTOToTrainingType(TrainingTypeDTO trainingTypeDTO);
+	public abstract TrainingType trainingTypeModelToTrainingType(TrainingTypeModel trainingTypeModel);
 
 	@Mapping(target = "userId", source = "trainer.user.id")
 	@Mapping(target = "firstName", source = "trainer.user.firstName")
 	@Mapping(target = "lastName", source = "trainer.user.lastName")
 	@Mapping(target = "userName", source = "trainer.user.userName")
 	@Mapping(target = "active", source = "trainer.user.active")
-	public abstract TrainerResponseDTO trainerToTrainerResponseDTO(Trainer trainer);
+	public abstract TrainerModel trainerToTrainerModel(Trainer trainer);
 
-	public abstract List<TrainerResponseDTO> trainerListToTrainerResponseDTOList(List<Trainer> trainerList);
+	public abstract List<TrainerModel> trainerListToTrainerModelList(List<Trainer> trainers);
 
 	@Mapping(source = "userId", target = "user.id")
 	@Mapping(source = "firstName", target = "user.firstName")
 	@Mapping(source = "lastName", target = "user.lastName")
 	@Mapping(source = "active", target = "user.active")
 	@Mapping(target = "trainees", ignore = true)
-	public abstract Trainer trainerRequestDTOToTrainer(TrainerRequestDTO trainerRequestDTO);
+	public abstract Trainer trainerModelToTrainer(TrainerModel trainerModel);
 
-	public abstract TrainingResponseDTO trainingToTrainingResponseDTO(Training training);
+	public abstract TrainingModel trainingToTrainingModel(Training training);
 
-	public abstract List<TrainingResponseDTO> trainingListToTrainingResponseDTOList(List<Training> trainingList);
+	public abstract List<TrainingModel> trainingListToTrainingModelList(List<Training> trainings);
 
-	@Mapping(target = "trainee", expression = "java(traineeRepository.findById(trainingRequestDTO.getTraineeId()).get())")
-	@Mapping(target = "trainer", expression = "java(trainerRepository.findById(trainingRequestDTO.getTrainerId()).get())")
+	@Mapping(target = "trainee", expression = "java(traineeRepository.findById(trainingModel.getTrainee().getId()).get())")
+	@Mapping(target = "trainer", expression = "java(trainerRepository.findById(trainingModel.getTrainer().getId()).get())")
 	@Mapping(target = "type", expression = "java(trainingTypeRepository.findById(" +
-			"trainerRepository.findById(trainingRequestDTO.getTrainerId()).get().getSpecialization().getId()" +
-		").get())")
-	public abstract Training trainingRequestDTOToTraining(TrainingRequestDTO trainingRequestDTO);
+		"trainerRepository.findById(trainingModel.getTrainer().getId()).get().getSpecialization().getId()).get())")
+	public abstract Training trainingModelToTraining(TrainingModel trainingModel);
 
-	public abstract TraineeTrainingsSearchCriteria searchRequestToSearchCriteria(TraineeTrainingsSearchRequestDTO request);
+	public abstract TraineeTrainingsSearchCriteria searchRequestToSearchCriteria(TraineeTrainingsSearchRequest request);
 
-	public abstract TrainerTrainingsSearchCriteria searchRequestToSearchCriteria(TrainerTrainingsSearchRequestDTO request);
+	public abstract TrainerTrainingsSearchCriteria searchRequestToSearchCriteria(TrainerTrainingsSearchRequest request);
 }

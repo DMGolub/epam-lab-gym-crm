@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.interceptor;
 
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
+import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,11 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginInterceptor.class);
 
 	private final LoginService loginService;
+	private final ModelToDtoMapper mapper;
 
-	public LoginInterceptor(final LoginService loginService) {
+	public LoginInterceptor(final LoginService loginService, final ModelToDtoMapper mapper) {
 		this.loginService = loginService;
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -41,8 +44,9 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 			LOGGER.debug("In preHandle - Incoming request session id={} for URI={}", sessionId, request.getRequestURI());
 		}
 
-		final LoginRequestDTO login = (LoginRequestDTO) request.getSession().getAttribute(LOGIN);
-		if (login != null && loginService.isValidLoginRequest(login)) {
+		final CredentialsDTO login = (CredentialsDTO) request.getSession().getAttribute(LOGIN);
+		final var credentials = mapper.credentialsDTOTOCredentials(login);
+		if (login != null && loginService.isValidLoginRequest(credentials)) {
 			LOGGER.debug("In preHandle - Successfully authenticated user={}", login.getUserName());
 			return true;
 		} else {

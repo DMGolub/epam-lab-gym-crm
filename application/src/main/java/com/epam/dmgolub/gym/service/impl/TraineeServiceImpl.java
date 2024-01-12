@@ -1,10 +1,9 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
-import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Training;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
@@ -33,7 +32,7 @@ public class TraineeServiceImpl implements TraineeService {
 	private final TraineeRepository traineeRepository;
 	private final TrainingRepository trainingRepository;
 	private final TrainerRepository trainerRepository;
-	private final MapStructMapper mapper;
+	private final EntityToModelMapper mapper;
 	private final UserCredentialsGenerator userCredentialsGenerator;
 
 	public TraineeServiceImpl(
@@ -41,7 +40,7 @@ public class TraineeServiceImpl implements TraineeService {
 		final TraineeRepository traineeRepository,
 		final TrainingRepository trainingRepository,
 		final TrainerRepository trainerRepository,
-		final MapStructMapper mapper,
+		final EntityToModelMapper mapper,
 		final UserCredentialsGenerator userCredentialsGenerator
 	) {
 		this.userRepository = userRepository;
@@ -53,48 +52,45 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
-	public TraineeResponseDTO save(final TraineeRequestDTO request) {
+	public TraineeModel save(final TraineeModel request) {
 		LOGGER.debug("In save - Saving trainee from request {}", request);
-		final var trainee = mapper.traineeRequestDTOToTrainee(request);
+		final var trainee = mapper.traineeModelToTrainee(request);
 		trainee.getUser().setUserName(userCredentialsGenerator.generateUserName(trainee.getUser()));
 		trainee.getUser().setPassword(userCredentialsGenerator.generatePassword(trainee.getUser()));
 		trainee.setUser(userRepository.saveAndFlush(trainee.getUser()));
-		return mapper.traineeToTraineeResponseDTO(traineeRepository.saveAndFlush(trainee));
+		return mapper.traineeToTraineeModel(traineeRepository.saveAndFlush(trainee));
 	}
 
 	@Override
-	public TraineeResponseDTO findById(final Long id) {
+	public TraineeModel findById(final Long id) {
 		LOGGER.debug("In findById - Fetching trainee by id={} from repository", id);
 		final var trainee = getById(id);
-		return mapper.traineeToTraineeResponseDTO(trainee);
+		return mapper.traineeToTraineeModel(trainee);
 	}
 
 	@Override
-	public List<TraineeResponseDTO> findAll() {
+	public List<TraineeModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainees from repository");
-		return mapper.traineeListToTraineeResponseDTOList(traineeRepository.findAll());
+		return mapper.traineeListToTraineeModelList(traineeRepository.findAll());
 	}
 
 	@Override
-	public TraineeResponseDTO findByUserName(final String userName) {
+	public TraineeModel findByUserName(final String userName) {
 		LOGGER.debug("In userName - Fetching trainee by userName={} from repository", userName);
 		final var trainee = getByUserName(userName);
-		return mapper.traineeToTraineeResponseDTO(trainee);
+		return mapper.traineeToTraineeModel(trainee);
 	}
 
 	@Override
-	public TraineeResponseDTO update(final TraineeRequestDTO request) {
+	public TraineeModel update(final TraineeModel request) {
 		LOGGER.debug("In update - Updating trainee from request {}", request);
 		final var trainee = getById(request.getId());
-		if (namesAreNotEqual(request, trainee)) {
-			trainee.getUser().setFirstName(request.getFirstName());
-			trainee.getUser().setLastName(request.getLastName());
-			trainee.getUser().setUserName(userCredentialsGenerator.generateUserName(trainee.getUser()));
-		}
+		trainee.getUser().setFirstName(request.getFirstName());
+		trainee.getUser().setLastName(request.getLastName());
 		trainee.getUser().setActive(request.isActive());
 		trainee.setDateOfBirth(request.getDateOfBirth());
 		trainee.setAddress(request.getAddress());
-		return mapper.traineeToTraineeResponseDTO(traineeRepository.saveAndFlush(trainee));
+		return mapper.traineeToTraineeModel(traineeRepository.saveAndFlush(trainee));
 	}
 
 	@Override
@@ -136,10 +132,5 @@ public class TraineeServiceImpl implements TraineeService {
 	private Trainee getByUserName(final String userName) {
 		return traineeRepository.findByUserUserName(userName)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
-	}
-
-	private boolean namesAreNotEqual(final TraineeRequestDTO request, final Trainee trainee) {
-		return !request.getFirstName().equals(trainee.getUser().getFirstName()) ||
-			!request.getLastName().equals(trainee.getUser().getLastName());
 	}
 }

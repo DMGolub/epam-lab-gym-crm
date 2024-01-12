@@ -1,11 +1,10 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
-import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
@@ -39,7 +38,7 @@ class TraineeServiceImplTest {
 	@Mock
 	private TrainingRepository trainingRepository;
 	@Mock
-	private MapStructMapper mapper;
+	private EntityToModelMapper mapper;
 	@Mock
 	private UserCredentialsGenerator generator;
 	@InjectMocks
@@ -47,42 +46,42 @@ class TraineeServiceImplTest {
 
 	@Test
 	void save_shouldAssignGeneratedUserNameAndPassword_whenInvoked() {
-		final TraineeRequestDTO request = new TraineeRequestDTO();
+		final var request = new TraineeModel();
 		final Trainee trainee = new Trainee();
-		when(mapper.traineeRequestDTOToTrainee(request)).thenReturn(trainee);
+		when(mapper.traineeModelToTrainee(request)).thenReturn(trainee);
 		final String userName = "username";
 		when(generator.generateUserName(trainee.getUser())).thenReturn(userName);
 		when(generator.generatePassword(trainee.getUser())).thenReturn("password");
 		when(userRepository.saveAndFlush(trainee.getUser())).thenReturn(trainee.getUser());
 		when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
-		final TraineeResponseDTO expected = new TraineeResponseDTO();
+		final TraineeModel expected = new TraineeModel();
 		expected.setUserName(userName);
-		when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expected);
+		when(mapper.traineeToTraineeModel(trainee)).thenReturn(expected);
 
 		assertEquals(expected, traineeService.save(request));
-		verify(mapper, times(1)).traineeRequestDTOToTrainee(request);
+		verify(mapper, times(1)).traineeModelToTrainee(request);
 		verify(generator, times(1)).generateUserName(trainee.getUser());
 		verify(generator, times(1)).generatePassword(trainee.getUser());
 		verify(userRepository, times(1)).saveAndFlush(trainee.getUser());
 		verify(traineeRepository, times(1)).saveAndFlush(trainee);
-		verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+		verify(mapper, times(1)).traineeToTraineeModel(trainee);
 	}
 
 	@Nested
 	class TestFindById {
 
 		@Test
-		void findById_shouldReturnTraineeResponseDTO_whenTraineeExists() {
+		void findById_shouldReturnTraineeModel_whenTraineeExists() {
 			final Long id = 1L;
 			final Trainee trainee = new Trainee();
 			trainee.setId(id);
 			when(traineeRepository.findById(id)).thenReturn(java.util.Optional.of(trainee));
-			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
-			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+			final TraineeModel expectedOutput = new TraineeModel();
+			when(mapper.traineeToTraineeModel(trainee)).thenReturn(expectedOutput);
 
 			assertEquals(expectedOutput, traineeService.findById(id));
 			verify(traineeRepository, times(1)).findById(id);
-			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+			verify(mapper, times(1)).traineeToTraineeModel(trainee);
 		}
 
 		@Test
@@ -92,38 +91,39 @@ class TraineeServiceImplTest {
 
 			assertThrows(EntityNotFoundException.class, () -> traineeService.findById(id));
 			verify(traineeRepository, times(1)).findById(id);
+			verifyNoInteractions(mapper);
 		}
 	}
 
 	@Test
-	void findAll_shouldReturnTwoTraineeResponseDTOs_whenThereAreTwoTrainees() {
+	void findAll_shouldReturnTwoTraineeModels_whenThereAreTwoTrainees() {
 		final List<Trainee> trainees = List.of(new Trainee(), new Trainee());
 		when(traineeRepository.findAll()).thenReturn(trainees);
-		final List<TraineeResponseDTO> response = List.of(new TraineeResponseDTO(), new TraineeResponseDTO());
-		when(mapper.traineeListToTraineeResponseDTOList(trainees)).thenReturn(response);
+		final List<TraineeModel> response = List.of(new TraineeModel(), new TraineeModel());
+		when(mapper.traineeListToTraineeModelList(trainees)).thenReturn(response);
 
-		final List<TraineeResponseDTO> result = traineeService.findAll();
+		final List<TraineeModel> result = traineeService.findAll();
 
 		assertEquals(2, result.size());
 		verify(traineeRepository, times(1)).findAll();
-		verify(mapper, times(1)).traineeListToTraineeResponseDTOList(trainees);
+		verify(mapper, times(1)).traineeListToTraineeModelList(trainees);
 	}
 
 	@Nested
 	class TestFindByUserName {
 
 		@Test
-		void findByUserName_shouldReturnTraineeResponseDTO_whenTraineeExists() {
+		void findByUserName_shouldReturnTraineeModel_whenTraineeExists() {
 			final String userName = "UserName";
 			final Trainee trainee = new Trainee();
 			trainee.getUser().setUserName(userName);
 			when(traineeRepository.findByUserUserName(userName)).thenReturn(java.util.Optional.of(trainee));
-			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
-			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+			final TraineeModel expectedOutput = new TraineeModel();
+			when(mapper.traineeToTraineeModel(trainee)).thenReturn(expectedOutput);
 
 			assertEquals(expectedOutput, traineeService.findByUserName(userName));
 			verify(traineeRepository, times(1)).findByUserUserName(userName);
-			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+			verify(mapper, times(1)).traineeToTraineeModel(trainee);
 		}
 
 		@Test
@@ -133,6 +133,7 @@ class TraineeServiceImplTest {
 
 			assertThrows(EntityNotFoundException.class, () -> traineeService.findByUserName(userName));
 			verify(traineeRepository, times(1)).findByUserUserName(userName);
+			verifyNoInteractions(mapper);
 		}
 	}
 
@@ -140,51 +141,51 @@ class TraineeServiceImplTest {
 	class TestUpdate {
 
 		@Test
-		void update_shouldUpdateUserNameAndReturnTraineeResponseDTO_whenInvoked() {
-			final TraineeRequestDTO request =
-				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
-			final Trainee trainee =
-				new Trainee(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, new Date(), "addr", null);
+		void update_shouldNotUpdateUserNameAndReturnTraineeModel_whenInvokedWithSameNames() {
+			final var request = new TraineeModel(
+				1L,
+				"firstName",
+				"lastName",
+				"firstName.lastName",
+				true,
+				1L,
+				new Date(),
+				"Address",
+				null
+			);
+			final var trainee = new Trainee(
+				1L,
+				"Fname",
+				"Lname",
+				"Fname.Lname",
+				"password",
+				false,
+				1L,
+				new Date(),
+				"addr",
+				null
+			);
 			trainee.setId(request.getId());
 			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
-			final String userName = "firstName.lastName";
-			when(generator.generateUserName(trainee.getUser())).thenReturn(userName);
 			when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
-			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
-			expectedOutput.setUserName(userName);
-			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
-
-			assertEquals(expectedOutput, traineeService.update(request));
-			verify(generator, times(1)).generateUserName(trainee.getUser());
-			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
-		}
-
-		@Test
-		void update_shouldNotUpdateUserNameAndReturnTraineeResponseDTO_whenInvokedWithSameNames() {
-			final TraineeRequestDTO request =
-				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
-			final Trainee trainee =
-				new Trainee(1L, "firstName", "lastName", "firstName.lastName", "password", false, 1L, new Date(), "addr", null);
-			trainee.setId(request.getId());
-			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
-			when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
-			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
-			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+			final TraineeModel expectedOutput = new TraineeModel();
+			when(mapper.traineeToTraineeModel(trainee)).thenReturn(expectedOutput);
 
 			assertEquals(expectedOutput, traineeService.update(request));
 			verifyNoInteractions(generator);
-			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+			verify(mapper, times(1)).traineeToTraineeModel(trainee);
 		}
 
 		@Test
 		void update_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
-			final TraineeRequestDTO request = new TraineeRequestDTO();
+			final TraineeModel request = new TraineeModel();
 			final Long id = 1L;
 			request.setId(id);
 			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.empty());
 
 			assertThrows(EntityNotFoundException.class, () -> traineeService.update(request));
 			verify(traineeRepository, times(1)).findById(id);
+			verifyNoInteractions(mapper);
 		}
 	}
 
@@ -211,6 +212,7 @@ class TraineeServiceImplTest {
 			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
 			verifyNoMoreInteractions(trainingRepository);
 			verify(traineeRepository, times(1)).deleteById(id);
+			verifyNoInteractions(mapper);
 		}
 
 		@Test
@@ -233,6 +235,7 @@ class TraineeServiceImplTest {
 			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
 			verifyNoMoreInteractions(trainingRepository);
 			verify(traineeRepository, times(1)).deleteByUserUserName(userName);
+			verifyNoInteractions(mapper);
 		}
 	}
 

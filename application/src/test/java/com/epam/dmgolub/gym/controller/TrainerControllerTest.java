@@ -2,6 +2,8 @@ package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
+import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
@@ -16,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
@@ -49,12 +52,14 @@ class TrainerControllerTest {
 	private TrainerService trainerService;
 	@Mock
 	private TrainingTypeService trainingTypeService;
+	@Mock
+	private ModelToDtoMapper mapper;
 	@InjectMocks
 	private TrainerController trainerController;
 
 	@BeforeEach
 	void setUp() {
-		trainerController = new TrainerController(trainerService, trainingTypeService);
+		trainerController = new TrainerController(trainerService, trainingTypeService, mapper);
 	}
 
 	@Test
@@ -83,11 +88,14 @@ class TrainerControllerTest {
 		@Test
 		void save_shouldSaveTrainerAndRedirectToNewTrainerPage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
-			final TrainerRequestDTO trainer = new TrainerRequestDTO();
+			final var request = new TrainerRequestDTO();
+			final var trainer = new TrainerModel();
+			when(mapper.trainerRequestDTOToTrainer(request)).thenReturn(trainer);
 
-			final String result = trainerController.save(trainer, bindingResult, redirectAttributes);
+			final String result = trainerController.save(request, bindingResult, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_NEW_TRAINER, result);
+			verify(mapper, times(1)).trainerRequestDTOToTrainer(request);
 			verify(trainerService, times(1)).save(trainer);
 		}
 	}
@@ -98,16 +106,20 @@ class TrainerControllerTest {
 		@Test
 		void handleActionByUserName_shouldRedirectToTrainerPage_whenActionIsFindAndTrainerExists() {
 			final String userName = "UserName";
-			final var trainer = new TrainerResponseDTO();
+			final var trainer = new TrainerModel();
 			final Long trainerId = 2L;
 			trainer.setId(trainerId);
+			final var response = new TrainerResponseDTO();
+			response.setId(trainerId);
 			when(trainerService.findByUserName(userName)).thenReturn(trainer);
+			when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(response);
 
 			final String result =
 				trainerController.handleActionByUserName("find", userName, model, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_TRAINER_INDEX + trainerId, result);
 			verify(trainerService, times(1)).findByUserName(userName);
+			verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
 			verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
 		}
 
@@ -127,7 +139,7 @@ class TrainerControllerTest {
 		@Test
 		void handleActionByUserName_shouldRedirectToTrainerIndexPage_whenActionUnknown() {
 			final String userName = "UserName";
-			when(trainerService.findByUserName(userName)).thenReturn(new TrainerResponseDTO());
+			when(trainerService.findByUserName(userName)).thenReturn(new TrainerModel());
 
 			final String result =
 				trainerController.handleActionByUserName("unknown", userName, model, redirectAttributes);
@@ -141,12 +153,18 @@ class TrainerControllerTest {
 	@Test
 	void edit_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
 		final Long id = 1L;
-		final TrainerResponseDTO trainer = new TrainerResponseDTO();
+		final var trainer = new TrainerModel();
 		trainer.setId(id);
 		when(trainerService.findById(id)).thenReturn(trainer);
+		final var response = new TrainerResponseDTO();
+		response.setId(id);
+		when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(response);
+		when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
+		when(mapper.trainingTypeListToTrainingTypeDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
 		assertEquals(TRAINER_EDIT_VIEW_NAME, trainerController.edit(id, model));
 		verify(trainerService, times(1)).findById(id);
+		verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
 		verify(trainingTypeService, times(1)).findAll();
 		verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
 		verify(model).addAttribute(eq(TRAINING_TYPES), any(List.class));
@@ -171,13 +189,17 @@ class TrainerControllerTest {
 		@Test
 		void update_shouldSaveTrainerAndRedirectToIndexPage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
-			final TrainerRequestDTO trainer = new TrainerRequestDTO();
+			final var request = new TrainerRequestDTO();
 			final Long id = 1L;
+			request.setId(id);
+			final var trainer = new TrainerModel();
 			trainer.setId(id);
+			when(mapper.trainerRequestDTOToTrainer(request)).thenReturn(trainer);
 
-			final String result = trainerController.update(id, trainer, bindingResult);
+			final String result = trainerController.update(id, request, bindingResult);
 
 			assertEquals(REDIRECT_TO_TRAINER_INDEX, result);
+			verify(mapper, times(1)).trainerRequestDTOToTrainer(request);
 			verify(trainerService, times(1)).update(trainer);
 		}
 	}
@@ -185,21 +207,24 @@ class TrainerControllerTest {
 	@Test
 	void findById_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainerExists() {
 		final Long id = 1L;
-		final TrainerResponseDTO trainer = new TrainerResponseDTO();
+		final var trainer = new TrainerModel();
 		trainer.setId(id);
-
+		final var response = new TrainerResponseDTO();
+		response.setId(id);
 		when(trainerService.findById(id)).thenReturn(trainer);
+		when(mapper.trainerToTrainerResponseDTO(trainer)).thenReturn(response);
 
 		final String view = trainerController.findById(id, model);
 
 		assertEquals(TRAINER_VIEW_NAME, view);
 		verify(trainerService, times(1)).findById(id);
+		verify(mapper, times(1)).trainerToTrainerResponseDTO(trainer);
 		verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
 	}
 
 	@Test
 	void findAll_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainersExist() {
-		when(trainerService.findAll()).thenReturn(List.of(new TrainerResponseDTO()));
+		when(trainerService.findAll()).thenReturn(List.of(new TrainerModel()));
 
 		final String view = trainerController.findAll(model);
 

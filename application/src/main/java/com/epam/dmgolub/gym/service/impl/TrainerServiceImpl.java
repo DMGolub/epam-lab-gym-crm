@@ -1,9 +1,8 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
 import com.epam.dmgolub.gym.entity.Trainer;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.TrainerService;
@@ -27,13 +26,13 @@ public class TrainerServiceImpl implements TrainerService {
 
 	private final UserRepository userRepository;
 	private final TrainerRepository trainerRepository;
-	private final MapStructMapper mapper;
+	private final EntityToModelMapper mapper;
 	private final UserCredentialsGenerator userCredentialsGenerator;
 
 	public TrainerServiceImpl(
 		final UserRepository userRepository,
 		final TrainerRepository trainerRepository,
-		final MapStructMapper mapper,
+		final EntityToModelMapper mapper,
 		final UserCredentialsGenerator userCredentialsGenerator
 	) {
 		this.userRepository = userRepository;
@@ -43,71 +42,63 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public TrainerResponseDTO save(final TrainerRequestDTO request) {
+	public TrainerModel save(final TrainerModel request) {
 		LOGGER.debug("In save - Saving trainer from request {}", request);
-		final var trainer = mapper.trainerRequestDTOToTrainer(request);
+		final var trainer = mapper.trainerModelToTrainer(request);
 		trainer.getUser().setUserName(userCredentialsGenerator.generateUserName(trainer.getUser()));
 		trainer.getUser().setPassword(userCredentialsGenerator.generatePassword(trainer.getUser()));
 		trainer.setUser(userRepository.saveAndFlush(trainer.getUser()));
-		return mapper.trainerToTrainerResponseDTO(trainerRepository.saveAndFlush(trainer));
+		return mapper.trainerToTrainerModel(trainerRepository.saveAndFlush(trainer));
 	}
 
 	@Override
-	public TrainerResponseDTO findById(final Long id) {
+	public TrainerModel findById(final Long id) {
 		LOGGER.debug("In findById - Fetching trainer by id={} from repository", id);
 		final var trainer = getById(id);
-		return mapper.trainerToTrainerResponseDTO(trainer);
+		return mapper.trainerToTrainerModel(trainer);
 	}
 
 	@Override
-	public List<TrainerResponseDTO> findAll() {
+	public List<TrainerModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainers from repository");
-		return mapper.trainerListToTrainerResponseDTOList(trainerRepository.findAll());
+		return mapper.trainerListToTrainerModelList(trainerRepository.findAll());
 	}
 
 	@Override
-	public TrainerResponseDTO findByUserName(final String userName) {
+	public TrainerModel findByUserName(final String userName) {
 		LOGGER.debug("In findByUserName - Fetching trainer by userName={} from repository", userName);
 		final var trainer = trainerRepository.findByUserUserName(userName)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
-		return mapper.trainerToTrainerResponseDTO(trainer);
+		return mapper.trainerToTrainerModel(trainer);
 	}
 
 	@Override
-	public TrainerResponseDTO update(final TrainerRequestDTO request) {
+	public TrainerModel update(final TrainerModel request) {
 		LOGGER.debug("In update - Updating trainer from request {}", request);
 		final var trainer = getById(request.getId());
-		if (namesAreNotEqual(request, trainer)) {
-			trainer.getUser().setFirstName(request.getFirstName());
-			trainer.getUser().setLastName(request.getLastName());
-			trainer.getUser().setUserName(userCredentialsGenerator.generateUserName(trainer.getUser()));
-		}
+		trainer.getUser().setFirstName(request.getFirstName());
+		trainer.getUser().setLastName(request.getLastName());
 		trainer.getUser().setActive(request.isActive());
-		trainer.setSpecialization(mapper.trainingTypeDTOToTrainingType(request.getSpecialization()));
-		return mapper.trainerToTrainerResponseDTO(trainerRepository.saveAndFlush(trainer));
+		trainer.setSpecialization(mapper.trainingTypeModelToTrainingType(request.getSpecialization()));
+		return mapper.trainerToTrainerModel(trainerRepository.saveAndFlush(trainer));
 	}
 
 	@Override
-	public List<TrainerResponseDTO> findActiveTrainersAssignedToTrainee(final Long id) {
+	public List<TrainerModel> findActiveTrainersAssignedToTrainee(final Long id) {
 		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for id={}", id);
 		final var trainers = trainerRepository.findActiveTrainersAssignedToTrainee(id);
-		return mapper.trainerListToTrainerResponseDTOList(trainers);
+		return mapper.trainerListToTrainerModelList(trainers);
 	}
 
 	@Override
-	public List<TrainerResponseDTO> findActiveTrainersNotAssignedToTrainee(final Long id) {
+	public List<TrainerModel> findActiveTrainersNotAssignedToTrainee(final Long id) {
 		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for id={}", id);
 		final var trainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(id);
-		return mapper.trainerListToTrainerResponseDTOList(trainers);
+		return mapper.trainerListToTrainerModelList(trainers);
 	}
 
 	private Trainer getById(final Long id) {
 		return trainerRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + id));
-	}
-
-	private boolean namesAreNotEqual(final TrainerRequestDTO request, final Trainer trainer) {
-		return !request.getFirstName().equals(trainer.getUser().getFirstName()) ||
-			!request.getLastName().equals(trainer.getUser().getLastName());
 	}
 }

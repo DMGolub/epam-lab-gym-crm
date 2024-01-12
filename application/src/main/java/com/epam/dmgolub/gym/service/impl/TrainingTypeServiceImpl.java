@@ -1,7 +1,7 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
@@ -20,27 +20,27 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainingTypeServiceImpl.class);
 
 	private final TrainingTypeRepository trainingTypeRepository;
-	private final MapStructMapper mapper;
+	private final EntityToModelMapper mapper;
 
 	public TrainingTypeServiceImpl(
 		final TrainingTypeRepository trainingTypeRepository,
-		final MapStructMapper mapper
+		final EntityToModelMapper mapper
 	) {
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.mapper = mapper;
 	}
 
 	@Override
-	public TrainingTypeDTO findById(final Long id) {
+	public TrainingTypeModel findById(final Long id) {
 		LOGGER.debug("In findById - Fetching training type by id={} from repository", id);
 		final var trainingType = trainingTypeRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINING_TYPE_NOT_FOUND_MESSAGE + id));
-		return mapper.trainingTypeToTrainingTypeDTO(trainingType);
+		return mapper.trainingTypeToTrainingTypeModel(trainingType);
 	}
 
 	@Override
-	public List<TrainingTypeDTO> findAll() {
+	public List<TrainingTypeModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all training types from repository");
-		return mapper.trainingTypeListToTrainingTypeDTOList(trainingTypeRepository.findAll());
+		return mapper.trainingTypeListToTrainingTypeModelList(trainingTypeRepository.findAll());
 	}
 }

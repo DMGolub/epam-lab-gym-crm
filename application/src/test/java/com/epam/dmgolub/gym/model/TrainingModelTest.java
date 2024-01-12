@@ -1,25 +1,26 @@
-package com.epam.dmgolub.gym.dto;
+package com.epam.dmgolub.gym.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class TrainingResponseDTOTest {
+class TrainingModelTest {
 
-	private TrainingResponseDTO responseDTO;
-	private TrainingTypeDTO type;
-	private TraineeResponseDTO trainee;
-	private TrainerResponseDTO trainer;
+	private TrainingModel responseDTO;
+	private TrainingTypeModel type;
+	private TraineeModel trainee;
+	private TrainerModel trainer;
 
 	@BeforeEach
 	void setUp() {
-		responseDTO = new TrainingResponseDTO();
-		type = new TrainingTypeDTO(1L, "Bodybuilding");
-		trainee = new TraineeResponseDTO();
-		trainer = new TrainerResponseDTO();
+		responseDTO = new TrainingModel();
+		type = new TrainingTypeModel(1L, "Bodybuilding");
+		trainee = new TraineeModel();
+		trainer = new TrainerModel();
 	}
 
 	@Test
@@ -67,10 +68,10 @@ class TrainingResponseDTOTest {
 
 	@Test
 	void toString_shouldReturnExpectedValue_whenInvoked() {
-		final TrainingTypeDTO type = new TrainingTypeDTO(1L, "Karate");
-		final TrainingResponseDTO training =
-			new TrainingResponseDTO(1L, null, null, "name", type, null, 60);
-		final String expected = "TrainingResponseDTO{id=1, trainee=null, trainer=null, name='name', " +
+		final var type = new TrainingTypeModel(1L, "Karate");
+		final var training =
+			new TrainingModel(1L, null, null, "name", type, null, 60);
+		final String expected = "TrainingModel{id=1, trainee=null, trainer=null, name='name', " +
 			"type=" + type + ", date=null, duration=60}";
 
 		assertEquals(expected, training.toString());
@@ -78,19 +79,19 @@ class TrainingResponseDTOTest {
 
 	@Test
 	void testEquals() {
-		final TrainingTypeDTO type2 = new TrainingTypeDTO(2L, "SomeName");
-		final TrainingResponseDTO responseDTO2 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO3 =
-			new TrainingResponseDTO(2L, trainee, trainer, "TestName", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO4 =
-			new TrainingResponseDTO(1L, null, trainer, "TestName", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO5 =
-			new TrainingResponseDTO(1L, trainee, null, "TestName", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO6 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName2", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO7 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type2, new Date(), 60);
+		final var type2 = new TrainingTypeModel(2L, "SomeName");
+		final var responseDTO2 =
+			new TrainingModel(1L, trainee, trainer, "TestName", type, new Date(), 60);
+		final var responseDTO3 =
+			new TrainingModel(2L, trainee, trainer, "TestName", type, new Date(), 60);
+		final var responseDTO4 =
+			new TrainingModel(1L, null, trainer, "TestName", type, new Date(), 60);
+		final var responseDTO5 =
+			new TrainingModel(1L, trainee, null, "TestName", type, new Date(), 60);
+		final var responseDTO6 =
+			new TrainingModel(1L, trainee, trainer, "TestName2", type, new Date(), 60);
+		final var responseDTO7 =
+			new TrainingModel(1L, trainee, trainer, "TestName", type2, new Date(), 60);
 
 		assertEquals(responseDTO2, responseDTO2);
 		assertNotEquals(responseDTO, responseDTO2);
@@ -104,8 +105,8 @@ class TrainingResponseDTOTest {
 
 	@Test
 	void testHashcode() {
-		final TrainingResponseDTO responseDTO2 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
+		final var responseDTO2 =
+			new TrainingModel(1L, trainee, trainer, "TestName", type, new Date(), 60);
 
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(responseDTO.hashCode(), responseDTO2.hashCode());

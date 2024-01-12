@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
@@ -40,19 +41,23 @@ public class TrainerController {
 
 	private final TrainerService trainerService;
 	private final TrainingTypeService trainingTypeService;
+	private final ModelToDtoMapper mapper;
 
 	public TrainerController(
 		final TrainerService trainerService,
-		final TrainingTypeService trainingTypeService
+		final TrainingTypeService trainingTypeService,
+		final ModelToDtoMapper mapper
 	) {
 		this.trainerService = trainerService;
 		this.trainingTypeService = trainingTypeService;
+		this.mapper = mapper;
 	}
 
 	@GetMapping("/new")
 	public String newTrainer(final Model model) {
 		model.addAttribute(TRAINER, new TrainerRequestDTO());
-		model.addAttribute(TRAINING_TYPES, trainingTypeService.findAll());
+		final var trainingTypes =  mapper.trainingTypeListToTrainingTypeDTOList(trainingTypeService.findAll());
+		model.addAttribute(TRAINING_TYPES, trainingTypes);
 		LOGGER.debug("In newTrainer - Training types fetched successfully. Returning new trainer view name");
 		return NEW_TRAINER_VIEW_NAME;
 	}
@@ -68,7 +73,7 @@ public class TrainerController {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, NEW_TRAINER_VIEW_NAME);
 			return NEW_TRAINER_VIEW_NAME;
 		}
-		trainerService.save(trainer);
+		trainerService.save(mapper.trainerRequestDTOToTrainer(trainer));
 		LOGGER.debug("In save - trainer saved successfully. Redirecting to new trainer view");
 		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE, "Trainer added successfully");
 		return REDIRECT_TO_NEW_TRAINER;
@@ -86,7 +91,7 @@ public class TrainerController {
 			final var trainer = trainerService.findByUserName(userName);
 			switch (action.toLowerCase()) {
 				case "find":
-					model.addAttribute(TRAINER, trainer);
+					model.addAttribute(TRAINER, mapper.trainerToTrainerResponseDTO(trainer));
 					return REDIRECT_TO_TRAINER_INDEX + trainer.getId();
 				default:
 					redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE, "Invalid action");
@@ -102,9 +107,10 @@ public class TrainerController {
 	@GetMapping("/{id:\\d+}/edit")
 	public String edit(@PathVariable("id") final Long id, final Model model) {
 		LOGGER.debug("In edit - fetching trainer with id={} from service", id);
-		model.addAttribute(TRAINER, trainerService.findById(id));
+		model.addAttribute(TRAINER, mapper.trainerToTrainerResponseDTO(trainerService.findById(id)));
 		LOGGER.debug("In edit - fetching training types from service");
-		model.addAttribute(TRAINING_TYPES, trainingTypeService.findAll());
+		final var trainingTypes = mapper.trainingTypeListToTrainingTypeDTOList(trainingTypeService.findAll());
+		model.addAttribute(TRAINING_TYPES, trainingTypes);
 		LOGGER.debug("In edit - trainer and training types fetched successfully. Returning edit view name");
 		return TRAINER_EDIT_VIEW_NAME;
 	}
@@ -121,21 +127,21 @@ public class TrainerController {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, TRAINER_EDIT_VIEW_NAME);
 			return TRAINER_EDIT_VIEW_NAME;
 		}
-		trainerService.update(trainer);
+		trainerService.update(mapper.trainerRequestDTOToTrainer(trainer));
 		LOGGER.debug("In update - trainer updated successfully. Redirecting to trainer index view");
 		return REDIRECT_TO_TRAINER_INDEX;
 	}
 
 	@GetMapping("/{id:\\d+}")
 	public String findById(@PathVariable("id") final Long id, final Model model) {
-		model.addAttribute(TRAINER, trainerService.findById(id));
+		model.addAttribute(TRAINER, mapper.trainerToTrainerResponseDTO(trainerService.findById(id)));
 		LOGGER.debug("In findById - Trainer with id={} fetched successfully. Returning trainer view name", id);
 		return TRAINER_VIEW_NAME;
 	}
 
 	@GetMapping("/")
 	public String findAll(final Model model) {
-		model.addAttribute(TRAINERS, trainerService.findAll());
+		model.addAttribute(TRAINERS, mapper.trainerListToTrainerResponseDTOList(trainerService.findAll()));
 		LOGGER.debug("In findAll - Trainers fetched successfully. Returning trainer index view name");
 		return TRAINER_INDEX_VIEW_NAME;
 	}

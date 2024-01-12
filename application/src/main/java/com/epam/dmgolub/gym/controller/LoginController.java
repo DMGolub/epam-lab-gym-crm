@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
+import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,16 @@ public class LoginController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 
 	private final LoginService loginService;
+	private final ModelToDtoMapper mapper;
 
-	public LoginController(final LoginService loginService) {
+	public LoginController(final LoginService loginService, final ModelToDtoMapper mapper) {
 		this.loginService = loginService;
+		this.mapper = mapper;
 	}
 
 	@ModelAttribute(LOGIN)
-	public LoginRequestDTO getDefaultLogin() {
-		return new LoginRequestDTO();
+	public CredentialsDTO getDefaultLogin() {
+		return new CredentialsDTO();
 	}
 
 	@GetMapping
@@ -46,7 +49,7 @@ public class LoginController {
 
 	@GetMapping("/log-in")
 	public String logIn(
-		@ModelAttribute(LOGIN) @Valid final LoginRequestDTO request,
+		@ModelAttribute(LOGIN) @Valid final CredentialsDTO request,
 		final BindingResult bindingResult,
 		final HttpSession session,
 		final RedirectAttributes redirectAttributes
@@ -56,7 +59,7 @@ public class LoginController {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, LOGIN_INDEX_VIEW_NAME);
 			return LOGIN_INDEX_VIEW_NAME;
 		}
-		if (loginService.isValidLoginRequest(request)) {
+		if (loginService.isValidLoginRequest(mapper.credentialsDTOTOCredentials(request))) {
 			session.setAttribute(LOGIN, request);
 			redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE,
 				"You authenticated successfully as " + request.getUserName());

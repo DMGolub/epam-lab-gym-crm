@@ -1,8 +1,8 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
 import com.epam.dmgolub.gym.entity.TrainingType;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import org.junit.jupiter.api.Nested;
@@ -23,7 +23,7 @@ class TrainingTypeServiceImplTest {
 	@Mock
 	private TrainingTypeRepository trainingTypeRepository;
 	@Mock
-	private MapStructMapper mapper;
+	private EntityToModelMapper mapper;
 	@InjectMocks
 	private TrainingTypeServiceImpl trainingTypeService;
 
@@ -32,16 +32,16 @@ class TrainingTypeServiceImplTest {
 
 		@Test
 		void findById_shouldReturnTrainingTypeDTO_whenTrainingTypeExists() {
-			final TrainingType trainingType = new TrainingType();
+			final var trainingType = new TrainingType();
 			final Long id = 1L;
 			trainingType.setId(id);
 			when(trainingTypeRepository.findById(id)).thenReturn(Optional.of(trainingType));
-			final TrainingTypeDTO trainingTypeDTO = new TrainingTypeDTO();
-			when(mapper.trainingTypeToTrainingTypeDTO(trainingType)).thenReturn(trainingTypeDTO);
+			final var trainingTypeModel = new TrainingTypeModel();
+			when(mapper.trainingTypeToTrainingTypeModel(trainingType)).thenReturn(trainingTypeModel);
 
-			assertEquals(trainingTypeDTO, trainingTypeService.findById(id));
+			assertEquals(trainingTypeModel, trainingTypeService.findById(id));
 			verify(trainingTypeRepository, times(1)).findById(id);
-			verify(mapper, times(1)).trainingTypeToTrainingTypeDTO(trainingType);
+			verify(mapper, times(1)).trainingTypeToTrainingTypeModel(trainingType);
 		}
 
 		@Test
@@ -51,6 +51,7 @@ class TrainingTypeServiceImplTest {
 
 			assertThrows(EntityNotFoundException.class, () -> trainingTypeService.findById(id));
 			verify(trainingTypeRepository, times(1)).findById(id);
+			verifyNoInteractions(mapper);
 		}
 	}
 
@@ -58,11 +59,11 @@ class TrainingTypeServiceImplTest {
 	void findAll_shouldReturnTwoTrainingTypeDTOs_whenThereAreTwoTrainingTypes() {
 		final List<TrainingType> trainingTypes = List.of(new TrainingType(), new TrainingType());
 		when(trainingTypeRepository.findAll()).thenReturn(trainingTypes);
-		final List<TrainingTypeDTO> response = List.of(new TrainingTypeDTO(), new TrainingTypeDTO());
-		when(mapper.trainingTypeListToTrainingTypeDTOList(trainingTypes)).thenReturn(response);
+		final List<TrainingTypeModel> response = List.of(new TrainingTypeModel(), new TrainingTypeModel());
+		when(mapper.trainingTypeListToTrainingTypeModelList(trainingTypes)).thenReturn(response);
 
 		assertEquals(response, trainingTypeService.findAll());
 		verify(trainingTypeRepository, times(1)).findAll();
-		verify(mapper, times(1)).trainingTypeListToTrainingTypeDTOList(trainingTypes);
+		verify(mapper, times(1)).trainingTypeListToTrainingTypeModelList(trainingTypes);
 	}
 }

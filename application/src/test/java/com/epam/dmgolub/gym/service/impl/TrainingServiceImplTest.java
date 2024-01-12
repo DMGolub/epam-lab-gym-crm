@@ -1,11 +1,10 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
 import com.epam.dmgolub.gym.entity.Training;
-import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.TraineeTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainerTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainingModel;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.repository.searchcriteria.TraineeTrainingsSearchCriteria;
 import com.epam.dmgolub.gym.repository.searchcriteria.TrainerTrainingsSearchCriteria;
@@ -33,43 +32,43 @@ class TrainingServiceImplTest {
 	@Mock
 	private TrainingRepository trainingRepository;
 	@Mock
-	private MapStructMapper mapper;
+	private EntityToModelMapper mapper;
 	@InjectMocks
 	private TrainingServiceImpl trainingService;
 
 	@Test
-	void save_shouldReturnTrainingResponseDTO_whenInvoked() {
-		final TrainingRequestDTO request = new TrainingRequestDTO();
+	void save_shouldReturnTrainingModel_whenInvoked() {
+		final var request = new TrainingModel();
 		final Training training = new Training();
-		when(mapper.trainingRequestDTOToTraining(request)).thenReturn(training);
+		when(mapper.trainingModelToTraining(request)).thenReturn(training);
 		when(trainingRepository.saveAndFlush(training)).thenReturn(training);
-		final TrainingResponseDTO expected = new TrainingResponseDTO();
-		when(mapper.trainingToTrainingResponseDTO(training)).thenReturn(expected);
+		final var expected = new TrainingModel();
+		when(mapper.trainingToTrainingModel(training)).thenReturn(expected);
 
-		final TrainingResponseDTO result = trainingService.save(request);
+		final var result = trainingService.save(request);
 
 		assertEquals(expected, result);
-		verify(mapper).trainingRequestDTOToTraining(request);
+		verify(mapper).trainingModelToTraining(request);
 		verify(trainingRepository).saveAndFlush(training);
-		verify(mapper).trainingToTrainingResponseDTO(training);
+		verify(mapper).trainingToTrainingModel(training);
 	}
 
 	@Nested
 	class TestFindById {
 
 		@Test
-		void findById_shouldReturnTrainingResponseDTO_whenTrainingExists() {
+		void findById_shouldReturnTrainingModel_whenTrainingExists() {
 			final Training training = new Training();
 			final Long id = 1L;
 			training.setId(id);
 			when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
-			final TrainingResponseDTO expectedResponse = new TrainingResponseDTO();
-			when(mapper.trainingToTrainingResponseDTO(training)).thenReturn(expectedResponse);
+			final TrainingModel expectedResponse = new TrainingModel();
+			when(mapper.trainingToTrainingModel(training)).thenReturn(expectedResponse);
 
-			final TrainingResponseDTO response = trainingService.findById(id);
+			final TrainingModel response = trainingService.findById(id);
 			assertEquals(expectedResponse, response);
 			verify(trainingRepository).findById(id);
-			verify(mapper).trainingToTrainingResponseDTO(training);
+			verify(mapper).trainingToTrainingModel(training);
 		}
 
 		@Test
@@ -79,54 +78,55 @@ class TrainingServiceImplTest {
 
 			assertThrows(EntityNotFoundException.class, () -> trainingService.findById(id));
 			verify(trainingRepository).findById(id);
+			verifyNoInteractions(mapper);
 		}
 	}
 
 	@Test
-	void findAll_shouldReturnTwoTrainingResponseDTOs_whenThereAreTwoTrainings() {
+	void findAll_shouldReturnTwoTrainingModels_whenThereAreTwoTrainings() {
 		final List<Training> trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll()).thenReturn(trainings);
-		final List<TrainingResponseDTO> response = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
-		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(response);
+		final List<TrainingModel> response = List.of(new TrainingModel(), new TrainingModel());
+		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(response);
 
 		assertEquals(response, trainingService.findAll());
 		verify(trainingRepository).findAll();
-		verify(mapper).trainingListToTrainingResponseDTOList(trainings);
+		verify(mapper).trainingListToTrainingModelList(trainings);
 	}
 
 	@Test
-	void searchByTrainee_shouldReturnTraineeResponseDTOs_whenTrainingsExist() {
+	void searchByTrainee_shouldReturnTraineeModels_whenTrainingsExist() {
 		final var request =
-			new TraineeTrainingsSearchRequestDTO("Trainee", null, null, null, null);
+			new TraineeTrainingsSearchRequest("Trainee", null, null, null, null);
 		final var criteria =
 			new TraineeTrainingsSearchCriteria("Trainee", null, null, null, null);
 		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
 		final var trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll(new TraineeTrainingSpecification(criteria))).thenReturn(trainings);
-		final var expected = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
-		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(expected);
+		final var expected = List.of(new TrainingModel(), new TrainingModel());
+		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(expected);
 
 		assertEquals(expected, trainingService.searchByTrainee(request));
 		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
 		verify(trainingRepository, times(1)).findAll(new TraineeTrainingSpecification(criteria));
-		verify(mapper, times(1)).trainingListToTrainingResponseDTOList(trainings);
+		verify(mapper, times(1)).trainingListToTrainingModelList(trainings);
 	}
 
 	@Test
-	void searchByTrainer_shouldReturnTrainerResponseDTOs_whenTrainingsExist() {
+	void searchByTrainer_shouldReturnTrainerModels_whenTrainingsExist() {
 		final var request =
-			new TrainerTrainingsSearchRequestDTO("Trainee", null, null, null);
+			new TrainerTrainingsSearchRequest("Trainee", null, null, null);
 		final var criteria =
 			new TrainerTrainingsSearchCriteria("Trainee", null, null, null);
 		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
 		final var trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll(new TrainerTrainingSpecification(criteria))).thenReturn(trainings);
-		final var expected = List.of(new TrainingResponseDTO(), new TrainingResponseDTO());
-		when(mapper.trainingListToTrainingResponseDTOList(trainings)).thenReturn(expected);
+		final var expected = List.of(new TrainingModel(), new TrainingModel());
+		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(expected);
 
 		assertEquals(expected, trainingService.searchByTrainer(request));
 		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
 		verify(trainingRepository, times(1)).findAll(new TrainerTrainingSpecification(criteria));
-		verify(mapper, times(1)).trainingListToTrainingResponseDTOList(trainings);
+		verify(mapper, times(1)).trainingListToTrainingModelList(trainings);
 	}
 }
