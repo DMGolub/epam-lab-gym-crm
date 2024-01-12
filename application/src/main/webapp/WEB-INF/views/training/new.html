@@ -4,70 +4,54 @@
     <meta charset="UTF-8"/>
     <title>Gym - new training</title>
     <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
 </head>
 
-<body class="d-flex flex-column min-vh-100">
-<div th:replace="~{../templates/header}"></div>
-<div th:replace="~{../templates/mainmenu}"></div>
-<div class="container">
-    <div class="row justify-content-md-center">
-        <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
-            <p>
-                Fill in all the fields to add a new training. Please note that all values are mandatory.<br/>
-                If there are no trainees available, please <a th:href="@{../trainees/new}">add a new trainee</a>,
-                if there are no trainers available, please <a th:href="@{../trainers/new}">add a new trainer</a> first.
-            </p>
-            <form th:method="POST" th:action="@{/trainings}" th:object="${training}" id="newTraining">
-                <h2>New training</h2>
-                <label for="traineeId">Trainee: </label>
-                <select th:field="*{traineeId}" id="traineeId">
-                    <option th:if="${trainees != null}" disabled="disabled" selected="selected" value="">Please select...</option>
-                    <option th:if="${training.getTraineeId() != null}" th:value="${training.getTraineeId()}"
-                            th:text="${training.getTraineeId()}">VALUE</option>
-                    <option th:if="${trainees != null}" th:each="trainee : ${trainees}" th:value="${trainee.getId()}"
-                            th:text="${trainee.getFirstName()} + ' ' + ${trainee.getLastName()}"></option>
-                </select>
-                <div style="color:red" th:if="${#fields.hasErrors('traineeId')}" th:errors="*{traineeId}">Trainee error</div>
-                <br/>
-                <label for="trainerId">Trainer: </label>
-                <select th:field="*{trainerId}" id="trainerId">
-                    <option th:if="${trainers != null}" disabled="disabled" selected="selected" value="">Please select...</option>
-                    <option th:if="${training.getTrainerId() != null}" th:value="${training.getTrainerId()}"
-                            th:text="${training.getTrainerId()}">VALUE</option>
-                    <option th:if="${trainers != null}" th:each="trainer : ${trainers}" th:value="${trainer.getId()}"
-                            th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName()}"></option>
-                </select>
-                <div style="color:red" th:if="${#fields.hasErrors('trainerId')}" th:errors="*{trainerId}">Trainer error</div>
-                <br/>
-                <label for="name">Name: </label>
-                <input type="text" th:field="*{name}" id="name"/>
-                <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</div>
-                <br/>
-                <label for="type">Type: </label>
-                <select th:field="*{type}" id="type">
-                    <option th:if="${trainingTypes != null}" disabled="disabled" selected="selected" value="">Please select...</option>
-                    <option th:if="${training.getType() != null}" th:value="${training.getType().getId()}"
-                            th:text="${training.getType().getName()}">VALUE</option>
-                    <option th:if="${trainingTypes != null}" th:each="type : ${trainingTypes}" th:value="${type.getId()}"
-                            th:text="${type.getName()}"></option>
-                </select>
-                <div style="color:red" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">Training type error</div>
-                <br/>
-                <label for="date">Date: </label>
-                <input type="date" th:field="*{date}" id="date"/>
-                <div style="color:red" th:if="${#fields.hasErrors('date')}" th:errors="*{date}">Date error</div>
-                <br/>
-                <label for="duration">Duration: </label>
-                <input type="number" th:field="*{duration}" id="duration"/>
-                <div style="color:red" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}">Duration error</div>
-                <br/>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Cancel</button>
-                <button type="reset" class="btn btn-outline-secondary btn-sm">Reset</button>
-                <button type="submit" class="btn btn-outline-secondary btn-sm" >Save</button>
-            </form>
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <p>
+                    Fill in all the fields to add a new training. Please note that all values are mandatory.<br/>
+                    if there are no trainers available, please add a new trainer first.
+                </p>
+                <form th:method="POST" th:action="@{/trainings}" th:object="${training}" id="newTraining">
+                    <h2>New training for <span th:text="${trainee.getFirstName() + ' ' + trainee.getLastName()}">VALUE</span></h2>
+                    <input type="hidden" id="traineeId" name="traineeId" th:value="${trainee.getId()}"/>
+                    <br/>
+                    <label for="trainerId">Trainer: </label>
+                    <select th:field="*{trainerId}" id="trainerId" name="trainerId">
+                        <option th:if="${trainers != null}" disabled="disabled" selected="selected" value="">Please select...</option>
+                        <option th:if="${training.getTrainerId() != null}" th:value="${training.getTrainerId()}"
+                                th:text="${training.getTrainerId()}">VALUE</option>
+                        <option th:if="${trainers != null}" th:each="trainer : ${trainers}" th:value="${trainer.getId()}"
+                                th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName() + ' (' + trainer.getSpecialization().getName() + ')'}"></option>
+                    </select>
+                    <div style="color:red" th:if="${#fields.hasErrors('trainerId')}" th:errors="*{trainerId}">Trainer error</div>
+                    <br/>
+                    <label for="name">Name: </label>
+                    <input type="text" th:field="*{name}" id="name"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</div>
+                    <br/>
+                    <label for="date">Date: </label>
+                    <input type="date" th:field="*{date}" id="date"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('date')}" th:errors="*{date}">Date error</div>
+                    <br/>
+                    <label for="duration">Duration: </label>
+                    <input type="number" th:field="*{duration}" id="duration"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}">Duration error</div>
+                    <br/>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Cancel</button>
+                    <button type="reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" >Save</button>
+                </form>
+            </div>
         </div>
     </div>
+    <div th:replace="~{../templates/footer}"></div>
 </div>
-<div th:replace="~{../templates/footer}"></div>
 </body>
 </html>

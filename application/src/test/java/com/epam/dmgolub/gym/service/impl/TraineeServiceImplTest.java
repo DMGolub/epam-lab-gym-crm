@@ -1,17 +1,21 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dao.TraineeDAO;
-import com.epam.dmgolub.gym.dao.TrainingDAO;
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.entity.Trainee;
+import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.MapStructMapper;
+import com.epam.dmgolub.gym.repository.TraineeRepository;
+import com.epam.dmgolub.gym.repository.TrainerRepository;
+import com.epam.dmgolub.gym.repository.TrainingRepository;
+import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,9 +31,13 @@ import static org.mockito.Mockito.*;
 class TraineeServiceImplTest {
 
 	@Mock
-	private TraineeDAO traineeDAO;
+	private UserRepository userRepository;
 	@Mock
-	private TrainingDAO trainingDAO;
+	private TraineeRepository traineeRepository;
+	@Mock
+	private TrainerRepository trainerRepository;
+	@Mock
+	private TrainingRepository trainingRepository;
 	@Mock
 	private MapStructMapper mapper;
 	@Mock
@@ -43,17 +51,20 @@ class TraineeServiceImplTest {
 		final Trainee trainee = new Trainee();
 		when(mapper.traineeRequestDTOToTrainee(request)).thenReturn(trainee);
 		final String userName = "username";
-		when(generator.generateUserName(trainee)).thenReturn(userName);
-		when(generator.generatePassword(trainee)).thenReturn("password");
-		when(traineeDAO.save(trainee)).thenReturn(trainee);
+		when(generator.generateUserName(trainee.getUser())).thenReturn(userName);
+		when(generator.generatePassword(trainee.getUser())).thenReturn("password");
+		when(userRepository.saveAndFlush(trainee.getUser())).thenReturn(trainee.getUser());
+		when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
 		final TraineeResponseDTO expected = new TraineeResponseDTO();
 		expected.setUserName(userName);
 		when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expected);
 
 		assertEquals(expected, traineeService.save(request));
 		verify(mapper, times(1)).traineeRequestDTOToTrainee(request);
-		verify(generator, times(1)).generateUserName(trainee);
-		verify(generator, times(1)).generatePassword(trainee);
+		verify(generator, times(1)).generateUserName(trainee.getUser());
+		verify(generator, times(1)).generatePassword(trainee.getUser());
+		verify(userRepository, times(1)).saveAndFlush(trainee.getUser());
+		verify(traineeRepository, times(1)).saveAndFlush(trainee);
 		verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
 	}
 
@@ -65,37 +76,64 @@ class TraineeServiceImplTest {
 			final Long id = 1L;
 			final Trainee trainee = new Trainee();
 			trainee.setId(id);
-			when(traineeDAO.findById(id)).thenReturn(java.util.Optional.of(trainee));
+			when(traineeRepository.findById(id)).thenReturn(java.util.Optional.of(trainee));
 			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
 			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
 
 			assertEquals(expectedOutput, traineeService.findById(id));
-			verify(traineeDAO, times(1)).findById(id);
+			verify(traineeRepository, times(1)).findById(id);
 			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
 		}
 
 		@Test
 		void findById_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
 			final Long id = 99L;
-			when(traineeDAO.findById(id)).thenReturn(java.util.Optional.empty());
+			when(traineeRepository.findById(id)).thenReturn(java.util.Optional.empty());
 
 			assertThrows(EntityNotFoundException.class, () -> traineeService.findById(id));
-			verify(traineeDAO, times(1)).findById(id);
+			verify(traineeRepository, times(1)).findById(id);
 		}
 	}
 
 	@Test
 	void findAll_shouldReturnTwoTraineeResponseDTOs_whenThereAreTwoTrainees() {
 		final List<Trainee> trainees = List.of(new Trainee(), new Trainee());
-		when(traineeDAO.findAll()).thenReturn(trainees);
+		when(traineeRepository.findAll()).thenReturn(trainees);
 		final List<TraineeResponseDTO> response = List.of(new TraineeResponseDTO(), new TraineeResponseDTO());
 		when(mapper.traineeListToTraineeResponseDTOList(trainees)).thenReturn(response);
 
 		final List<TraineeResponseDTO> result = traineeService.findAll();
 
 		assertEquals(2, result.size());
-		verify(traineeDAO, times(1)).findAll();
+		verify(traineeRepository, times(1)).findAll();
 		verify(mapper, times(1)).traineeListToTraineeResponseDTOList(trainees);
+	}
+
+	@Nested
+	class TestFindByUserName {
+
+		@Test
+		void findByUserName_shouldReturnTraineeResponseDTO_whenTraineeExists() {
+			final String userName = "UserName";
+			final Trainee trainee = new Trainee();
+			trainee.getUser().setUserName(userName);
+			when(traineeRepository.findByUserUserName(userName)).thenReturn(java.util.Optional.of(trainee));
+			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
+			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+
+			assertEquals(expectedOutput, traineeService.findByUserName(userName));
+			verify(traineeRepository, times(1)).findByUserUserName(userName);
+			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+		}
+
+		@Test
+		void findByUserName_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
+			final String userName = "UserName";
+			when(traineeRepository.findByUserUserName(userName)).thenReturn(java.util.Optional.empty());
+
+			assertThrows(EntityNotFoundException.class, () -> traineeService.findByUserName(userName));
+			verify(traineeRepository, times(1)).findByUserUserName(userName);
+		}
 	}
 
 	@Nested
@@ -104,19 +142,37 @@ class TraineeServiceImplTest {
 		@Test
 		void update_shouldUpdateUserNameAndReturnTraineeResponseDTO_whenInvoked() {
 			final TraineeRequestDTO request =
-				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "address");
-			final Trainee trainee = new Trainee();
+				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
+			final Trainee trainee =
+				new Trainee(1L, "Fname", "Lname", "Fname.Lname", "password", false, 1L, new Date(), "addr", null);
 			trainee.setId(request.getId());
-			when(traineeDAO.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
-			final String userName = "username";
-			when(generator.generateUserName(trainee)).thenReturn(userName);
-			when(traineeDAO.update(trainee)).thenReturn(trainee);
+			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
+			final String userName = "firstName.lastName";
+			when(generator.generateUserName(trainee.getUser())).thenReturn(userName);
+			when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
 			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
 			expectedOutput.setUserName(userName);
 			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
 
 			assertEquals(expectedOutput, traineeService.update(request));
-			verify(generator, times(1)).generateUserName(trainee);
+			verify(generator, times(1)).generateUserName(trainee.getUser());
+			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
+		}
+
+		@Test
+		void update_shouldNotUpdateUserNameAndReturnTraineeResponseDTO_whenInvokedWithSameNames() {
+			final TraineeRequestDTO request =
+				new TraineeRequestDTO(1L, "firstName", "lastName", true, null, new Date(), "Address");
+			final Trainee trainee =
+				new Trainee(1L, "firstName", "lastName", "firstName.lastName", "password", false, 1L, new Date(), "addr", null);
+			trainee.setId(request.getId());
+			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.of(trainee));
+			when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
+			final TraineeResponseDTO expectedOutput = new TraineeResponseDTO();
+			when(mapper.traineeToTraineeResponseDTO(trainee)).thenReturn(expectedOutput);
+
+			assertEquals(expectedOutput, traineeService.update(request));
+			verifyNoInteractions(generator);
 			verify(mapper, times(1)).traineeToTraineeResponseDTO(trainee);
 		}
 
@@ -125,33 +181,99 @@ class TraineeServiceImplTest {
 			final TraineeRequestDTO request = new TraineeRequestDTO();
 			final Long id = 1L;
 			request.setId(id);
-			when(traineeDAO.findById(request.getId())).thenReturn(java.util.Optional.empty());
+			when(traineeRepository.findById(request.getId())).thenReturn(java.util.Optional.empty());
 
 			assertThrows(EntityNotFoundException.class, () -> traineeService.update(request));
-			verify(traineeDAO, times(1)).findById(id);
+			verify(traineeRepository, times(1)).findById(id);
 		}
 	}
 
-	@Test
-	void delete_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
-		final Long id = 1L;
-		final Trainee trainee = new Trainee();
-		trainee.setId(id);
-		final Trainee trainee2 = new Trainee();
-		trainee2.setId(2L);
-		final List<Training> allTrainings = List.of(
-			new Training(1L, trainee, null, "name", null, null, 30),
-			new Training(2L, trainee, null, "another name", null, null, 60),
-			new Training(3L, trainee2, null, "yet another name", null, null, 45)
-		);
-		when(trainingDAO.findAll()).thenReturn(allTrainings);
+	@Nested
+	class TestDelete {
 
-		traineeService.delete(id);
+		@Test
+		void deleteById_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
+			final Long id = 1L;
+			final Trainee trainee = new Trainee();
+			trainee.setId(id);
+			final Trainee trainee2 = new Trainee();
+			trainee2.setId(2L);
+			final Training training1 = new Training(1L, trainee, null, "name", null, null, 30);
+			final Training training2 = new Training(2L, trainee, null, "another name", null, null, 60);
+			final Training training3 = new Training(3L, trainee2, null, "yet another name", null, null, 45);
+			final List<Training> allTrainings = List.of(training1, training2, training3);
+			when(trainingRepository.findAll()).thenReturn(allTrainings);
+			final List<Training> expectedTrainingsToDelete = List.of(training1, training2);
 
-		verify(trainingDAO, times(1)).findAll();
-		verify(trainingDAO, times(1)).delete(1L);
-		verify(trainingDAO, times(1)).delete(2L);
-		verifyNoMoreInteractions(trainingDAO);
-		verify(traineeDAO, times(1)).delete(id);
+			traineeService.delete(id);
+
+			verify(trainingRepository, times(1)).findAll();
+			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
+			verifyNoMoreInteractions(trainingRepository);
+			verify(traineeRepository, times(1)).deleteById(id);
+		}
+
+		@Test
+		void deleteByUserName_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
+			final String userName = "UserName";
+			final Trainee trainee = new Trainee();
+			trainee.getUser().setUserName(userName);
+			final Trainee trainee2 = new Trainee();
+			trainee2.getUser().setUserName("AnotherName");
+			final Training training1 = new Training(1L, trainee, null, "name", null, null, 30);
+			final Training training2 = new Training(2L, trainee, null, "another name", null, null, 60);
+			final Training training3 = new Training(3L, trainee2, null, "yet another name", null, null, 45);
+			final List<Training> allTrainings = List.of(training1, training2, training3);
+			when(trainingRepository.findAll()).thenReturn(allTrainings);
+			final List<Training> expectedTrainingsToDelete = List.of(training1, training2);
+
+			traineeService.delete(userName);
+
+			verify(trainingRepository, times(1)).findAll();
+			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
+			verifyNoMoreInteractions(trainingRepository);
+			verify(traineeRepository, times(1)).deleteByUserUserName(userName);
+		}
+	}
+
+	@Nested
+	class TestAddTrainer {
+
+		@Test
+		void addTrainer_shouldAddTrainerToTrainee_whenBothExist() {
+			final Long traineeId = 99L;
+			final Long trainerId = 99L;
+			final var trainee = new Trainee();
+			when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(new Trainer()));
+			when(traineeRepository.findById(trainerId)).thenReturn(Optional.of(trainee));
+
+			traineeService.addTrainer(traineeId, trainerId);
+			assertEquals(1, trainee.getTrainers().size());
+			verify(trainerRepository, times(1)).findById(trainerId);
+			verify(traineeRepository, times(1)).findById(traineeId);
+		}
+
+		@Test
+		void addTrainer_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
+			final Long traineeId = 99L;
+			final Long trainerId = 99L;
+			when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(new Trainer()));
+			when(traineeRepository.findById(traineeId)).thenThrow(new EntityNotFoundException("Not found"));
+
+			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeId, trainerId));
+			verify(trainerRepository, times(1)).findById(trainerId);
+			verify(traineeRepository, times(1)).findById(traineeId);
+		}
+
+		@Test
+		void addTrainer_shouldThrowEntityNotFoundException_whenTrainerNotFound() {
+			final Long traineeId = 99L;
+			final Long trainerId = 99L;
+			when(trainerRepository.findById(trainerId)).thenThrow(new EntityNotFoundException("Not found"));
+
+			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeId, trainerId));
+			verify(trainerRepository, times(1)).findById(trainerId);
+			verifyNoInteractions(traineeRepository);
+		}
 	}
 }

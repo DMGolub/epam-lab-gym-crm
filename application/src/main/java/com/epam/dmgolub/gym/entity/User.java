@@ -1,19 +1,38 @@
 package com.epam.dmgolub.gym.entity;
 
-public abstract class User implements BaseEntity<Long> {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+import java.util.Objects;
+
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity
+@Table(name = "users")
+public class User implements BaseEntity<Long> {
+
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
+	@Column(nullable = false)
 	private String firstName;
+	@Column(nullable = false)
 	private String lastName;
+	@Column(nullable = false, unique = true)
 	private String userName;
+	@Column(nullable = false)
 	private String password;
+	@Column(nullable = false)
 	private boolean isActive;
 
-	protected User() {
+	public User() {
 		// Empty
 	}
 
-	protected User(
+	public User(
 		final Long id,
 		final String firstName,
 		final String lastName,
@@ -82,6 +101,38 @@ public abstract class User implements BaseEntity<Long> {
 	@Override
 	public String toString() {
 		return "User{id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' +
-			", userName='" + userName + '\'' + ", password='" + password + '\'' + ", isActive=" + isActive + '}';
+			", userName='" + userName + '\'' + ", isActive=" + isActive + '}';
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		final User user = (User) o;
+		if (isActive != user.isActive) {
+			return false;
+		}
+		if (!Objects.equals(id, user.id)) {
+			return false;
+		}
+		if (!Objects.equals(firstName, user.firstName)) {
+			return false;
+		}
+		if (!Objects.equals(lastName, user.lastName)) {
+			return false;
+		}
+		if (!Objects.equals(userName, user.userName)) {
+			return false;
+		}
+		return Objects.equals(password, user.password);
+	}
+
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 }

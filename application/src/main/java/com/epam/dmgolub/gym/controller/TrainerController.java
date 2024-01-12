@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.controller;
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
+import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -14,11 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINER_VIEW_NAME;
+import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
+import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINERS;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINER_EDIT_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.TRAINER_INDEX_VIEW_NAME;
@@ -54,7 +60,8 @@ public class TrainerController {
 	@PostMapping()
 	public String save(
 		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
-		final BindingResult bindingResult
+		final BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes
 	) {
 		LOGGER.debug("In save - validating new trainer");
 		if (bindingResult.hasErrors()) {
@@ -62,8 +69,34 @@ public class TrainerController {
 			return NEW_TRAINER_VIEW_NAME;
 		}
 		trainerService.save(trainer);
-		LOGGER.debug("In save - trainer saved successfully. Redirecting to trainer index view");
-		return REDIRECT_TO_TRAINER_INDEX;
+		LOGGER.debug("In save - trainer saved successfully. Redirecting to new trainer view");
+		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE, "Trainer added successfully");
+		return REDIRECT_TO_NEW_TRAINER;
+	}
+
+	@PostMapping("/action")
+	public String handleActionByUserName(
+		@RequestParam final String action,
+		@RequestParam final String userName,
+		final Model model,
+		final RedirectAttributes redirectAttributes
+	) {
+		LOGGER.debug("In handleAction - Received a request to {} trainer by userName={}", action, userName);
+		try {
+			final var trainer = trainerService.findByUserName(userName);
+			switch (action.toLowerCase()) {
+				case "find":
+					model.addAttribute(TRAINER, trainer);
+					return REDIRECT_TO_TRAINER_INDEX + trainer.getId();
+				default:
+					redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE, "Invalid action");
+					return REDIRECT_TO_TRAINER_INDEX;
+			}
+		} catch (final EntityNotFoundException e) {
+			redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE,
+				"Trainer with user name '" + userName + "' not found");
+			return REDIRECT_TO_TRAINER_INDEX;
+		}
 	}
 
 	@GetMapping("/{id:\\d+}/edit")
@@ -79,7 +112,7 @@ public class TrainerController {
 	@PutMapping("/{id:\\d+}")
 	public String update(
 		@PathVariable("id") final Long id,
-		@ModelAttribute(TRAINER) final @Valid TrainerRequestDTO trainer,
+		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
 		final BindingResult bindingResult
 	) {
 		LOGGER.debug("In update - validating updated trainer");

@@ -70,13 +70,39 @@ class TrainerResponseDTOTest {
 	}
 
 	@Test
-	void testEqualsAndHashCode() {
+	void testEquals() {
+		final TrainerResponseDTO responseDTO2 =
+			new TrainerResponseDTO(1L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
+		final TrainerResponseDTO responseDTO3 =
+			new TrainerResponseDTO(2L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
+		final TrainerResponseDTO responseDTO4 =
+			new TrainerResponseDTO(1L, "FirstName2", "LastName", "UserName", true, 2L, trainingType);
+		final TrainerResponseDTO responseDTO5 =
+			new TrainerResponseDTO(1L, "FirstName", "LastName2", "UserName", true, 2L, trainingType);
+		final TrainerResponseDTO responseDTO6 =
+			new TrainerResponseDTO(1L, "FirstName", "LastName", "UserName2", true, 2L, trainingType);
+		final TrainerResponseDTO responseDTO7 =
+			new TrainerResponseDTO(1L, "FirstName", "LastName", "UserName", true, 3L, trainingType);
+		final TrainerResponseDTO responseDTO8 =
+			new TrainerResponseDTO(1L, "FirstName", "LastName", "UserName", true, 2L, new TrainingTypeDTO(3L, "Some name"));
+
+		assertEquals(responseDTO2, responseDTO2);
+		assertNotEquals(responseDTO, responseDTO2);
+		assertNotEquals(null, responseDTO2);
+		assertNotEquals(responseDTO2, responseDTO3);
+		assertNotEquals(responseDTO2, responseDTO4);
+		assertNotEquals(responseDTO2, responseDTO5);
+		assertNotEquals(responseDTO2, responseDTO6);
+		assertNotEquals(responseDTO2, responseDTO7);
+		assertNotEquals(responseDTO2, responseDTO8);
+	}
+
+	@Test
+	void testHashCode() {
 		final TrainerResponseDTO responseDTO2 =
 			new TrainerResponseDTO(1L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
 
-		assertEquals(responseDTO2, responseDTO2);
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
-		assertNotEquals(responseDTO, responseDTO2);
 		assertNotEquals(responseDTO.hashCode(), responseDTO2.hashCode());
 	}
 }

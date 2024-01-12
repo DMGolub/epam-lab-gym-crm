@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Gym CRM - main</title>
+    <script th:replace="~{../templates/bootstrap-head.html}"></script>
+    <style th:replace="~{../templates/style.html}"></style>
+</head>
+
+<body>
+<div class="page-container d-flex flex-column min-vh-100">
+    <div th:replace="~{../templates/header}"></div>
+    <div th:replace="~{../templates/mainmenu}"></div>
+    <div class="container">
+        <div class="row justify-content-md-left">
+            <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
+                <h2>Log in</h2>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
+                <div style="color:red" th:if="${param.error}">
+                    <p>You need to log in to access this page.</p>
+                </div>
+                <p>Please enter username and password.</p>
+                <form th:method="GET" th:action="@{/login/log-in}" th:object="${login}" id="login">
+                    <label for="userName">Username: </label>
+                    <input id="userName" name="userName" type="text"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}">User name error</div>
+                    <br/>
+                    <label for="password">Password: </label>
+                    <input id="password" name="password" type="password"/>
+                    <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</div>
+                    <br/>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Log in</button>
+                </form>
+                <br/>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{../templates/footer}"></div>
+</div>
+</body>
+</html>
