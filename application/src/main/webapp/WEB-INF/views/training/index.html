@@ -47,7 +47,7 @@
                             <input id="trainerUserName1" name="trainerUserName" type="text"/>
                             <br/>
                             <label for="trainingType">Type: </label>
-                            <select id="trainingType" name="trainingType">
+                            <select id="trainingType" name="type">
                                 <option th:if="${trainingTypes != null}" disabled="disabled" selected="selected" value="">Please select...</option>
                                 <option th:if="${trainingTypes != null}" th:each="type : ${trainingTypes}" th:value="${type.getId()}"
                                         th:text="${type.getName()}"></option>
