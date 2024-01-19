@@ -1,6 +1,8 @@
 package com.epam.dmgolub.gym.converter;
 
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
+import com.epam.dmgolub.gym.dto.mvc.TrainingTypeDTO;
+import com.epam.dmgolub.gym.mapper.mvc.ModelToDtoMapper;
+import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,18 +19,23 @@ class TrainingTypeDTOConverterTest {
 
 	@Mock
 	private TrainingTypeService trainingTypeService;
+	@Mock
+	private ModelToDtoMapper mapper;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
 		trainingTypeDTOConverter = new TrainingTypeDTOConverter();
 		trainingTypeDTOConverter.setTrainingTypeService(trainingTypeService);
+		trainingTypeDTOConverter.setModelToDtoMapper(mapper);
 	}
 
 	@Test
 	void convertTest() {
-		final TrainingTypeDTO expected = new TrainingTypeDTO();
-		when(trainingTypeService.findById(1L)).thenReturn(expected);
+		final var type = new TrainingTypeModel();
+		when(trainingTypeService.findById(1L)).thenReturn(type);
+		final var expected = new TrainingTypeDTO();
+		when(mapper.mapToTrainingTypeDTO(type)).thenReturn(expected);
 
 		final TrainingTypeDTO result = trainingTypeDTOConverter.convert("1");
 

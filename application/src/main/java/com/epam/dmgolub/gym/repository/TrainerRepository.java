@@ -14,9 +14,17 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 
 	@Query("FROM Trainer t WHERE t.user.isActive=true AND t.id IN " +
 		"(SELECT t.id FROM Trainer t JOIN t.trainees tr WHERE tr.id = :traineeId)")
-	List<Trainer> findActiveTrainersAssignedToTrainee(@Param("traineeId") Long id);
+	List<Trainer> findActiveTrainersAssignedOnTrainee(@Param("traineeId") Long id);
+
+	@Query("FROM Trainer t WHERE t.user.isActive=true AND t.id IN " +
+		"(SELECT t.id FROM Trainer t JOIN t.trainees tr WHERE tr.user.userName = :traineeUserName)")
+	List<Trainer> findActiveTrainersAssignedOnTrainee(@Param("traineeUserName") String userName);
 
 	@Query("FROM Trainer t WHERE t.user.isActive=true AND t.id NOT IN " +
 		"(SELECT t.id FROM Trainer t JOIN t.trainees tr WHERE tr.id = :traineeId)")
-	List<Trainer> findActiveTrainersNotAssignedToTrainee(@Param("traineeId") Long id);
+	List<Trainer> findActiveTrainersNotAssignedOnTrainee(@Param("traineeId") Long id);
+
+	@Query("FROM Trainer t WHERE t.user.isActive=true AND t.id NOT IN " +
+		"(SELECT t.id FROM Trainer t JOIN t.trainees tr WHERE tr.user.userName = :traineeUserName)")
+	List<Trainer> findActiveTrainersNotAssignedOnTrainee(@Param("traineeUserName") String userName);
 }

@@ -8,6 +8,9 @@ public class Constants {
 	public static final String TRAINER_NOT_FOUND_BY_ID_MESSAGE = "Can not find trainer by id=";
 	public static final String TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE = "Can not find trainer by userName=";
 
+	public static final String USER_NOT_FOUND_BY_ID_MESSAGE = "Can not find user by id=";
+	public static final String USER_NOT_FOUND_BY_USERNAME_MESSAGE = "Can not find user by userName=";
+
 	public static final String TRAINING_NOT_FOUND_BY_ID_MESSAGE = "Can not find training by id=";
 
 	private Constants() {

@@ -23,7 +23,7 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 		"abcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserCredentialsGeneratorImpl.class);
 
-	@Value("${password.generated.length}")
+	@Value("${password.generated.length:10}")
 	private int passwordLength;
 
 	private final UserRepository userRepository;
