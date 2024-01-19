@@ -40,17 +40,17 @@ class TrainingServiceImplTest {
 	void save_shouldReturnTrainingModel_whenInvoked() {
 		final var request = new TrainingModel();
 		final Training training = new Training();
-		when(mapper.trainingModelToTraining(request)).thenReturn(training);
+		when(mapper.mapToTraining(request)).thenReturn(training);
 		when(trainingRepository.saveAndFlush(training)).thenReturn(training);
 		final var expected = new TrainingModel();
-		when(mapper.trainingToTrainingModel(training)).thenReturn(expected);
+		when(mapper.mapToTrainingModel(training)).thenReturn(expected);
 
 		final var result = trainingService.save(request);
 
 		assertEquals(expected, result);
-		verify(mapper).trainingModelToTraining(request);
+		verify(mapper).mapToTraining(request);
 		verify(trainingRepository).saveAndFlush(training);
-		verify(mapper).trainingToTrainingModel(training);
+		verify(mapper).mapToTrainingModel(training);
 	}
 
 	@Nested
@@ -63,12 +63,12 @@ class TrainingServiceImplTest {
 			training.setId(id);
 			when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
 			final TrainingModel expectedResponse = new TrainingModel();
-			when(mapper.trainingToTrainingModel(training)).thenReturn(expectedResponse);
+			when(mapper.mapToTrainingModel(training)).thenReturn(expectedResponse);
 
 			final TrainingModel response = trainingService.findById(id);
 			assertEquals(expectedResponse, response);
 			verify(trainingRepository).findById(id);
-			verify(mapper).trainingToTrainingModel(training);
+			verify(mapper).mapToTrainingModel(training);
 		}
 
 		@Test
@@ -87,11 +87,11 @@ class TrainingServiceImplTest {
 		final List<Training> trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll()).thenReturn(trainings);
 		final List<TrainingModel> response = List.of(new TrainingModel(), new TrainingModel());
-		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(response);
+		when(mapper.mapToTrainingModelList(trainings)).thenReturn(response);
 
 		assertEquals(response, trainingService.findAll());
 		verify(trainingRepository).findAll();
-		verify(mapper).trainingListToTrainingModelList(trainings);
+		verify(mapper).mapToTrainingModelList(trainings);
 	}
 
 	@Test
@@ -100,16 +100,16 @@ class TrainingServiceImplTest {
 			new TraineeTrainingsSearchRequest("Trainee", null, null, null, null);
 		final var criteria =
 			new TraineeTrainingsSearchCriteria("Trainee", null, null, null, null);
-		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
+		when(mapper.mapToTraineeTrainingsSearchCriteria(request)).thenReturn(criteria);
 		final var trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll(new TraineeTrainingSpecification(criteria))).thenReturn(trainings);
 		final var expected = List.of(new TrainingModel(), new TrainingModel());
-		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(expected);
+		when(mapper.mapToTrainingModelList(trainings)).thenReturn(expected);
 
 		assertEquals(expected, trainingService.searchByTrainee(request));
-		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
+		verify(mapper, times(1)).mapToTraineeTrainingsSearchCriteria(request);
 		verify(trainingRepository, times(1)).findAll(new TraineeTrainingSpecification(criteria));
-		verify(mapper, times(1)).trainingListToTrainingModelList(trainings);
+		verify(mapper, times(1)).mapToTrainingModelList(trainings);
 	}
 
 	@Test
@@ -118,15 +118,15 @@ class TrainingServiceImplTest {
 			new TrainerTrainingsSearchRequest("Trainee", null, null, null);
 		final var criteria =
 			new TrainerTrainingsSearchCriteria("Trainee", null, null, null);
-		when(mapper.searchRequestToSearchCriteria(request)).thenReturn(criteria);
+		when(mapper.mapToTrainerTrainingsSearchCriteria(request)).thenReturn(criteria);
 		final var trainings = List.of(new Training(), new Training());
 		when(trainingRepository.findAll(new TrainerTrainingSpecification(criteria))).thenReturn(trainings);
 		final var expected = List.of(new TrainingModel(), new TrainingModel());
-		when(mapper.trainingListToTrainingModelList(trainings)).thenReturn(expected);
+		when(mapper.mapToTrainingModelList(trainings)).thenReturn(expected);
 
 		assertEquals(expected, trainingService.searchByTrainer(request));
-		verify(mapper, times(1)).searchRequestToSearchCriteria(request);
+		verify(mapper, times(1)).mapToTrainerTrainingsSearchCriteria(request);
 		verify(trainingRepository, times(1)).findAll(new TrainerTrainingSpecification(criteria));
-		verify(mapper, times(1)).trainingListToTrainingModelList(trainings);
+		verify(mapper, times(1)).mapToTrainingModelList(trainings);
 	}
 }

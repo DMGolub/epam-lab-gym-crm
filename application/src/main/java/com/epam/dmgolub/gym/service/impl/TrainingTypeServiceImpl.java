@@ -35,12 +35,12 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 		LOGGER.debug("In findById - Fetching training type by id={} from repository", id);
 		final var trainingType = trainingTypeRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINING_TYPE_NOT_FOUND_MESSAGE + id));
-		return mapper.trainingTypeToTrainingTypeModel(trainingType);
+		return mapper.mapToTrainingTypeModel(trainingType);
 	}
 
 	@Override
 	public List<TrainingTypeModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all training types from repository");
-		return mapper.trainingTypeListToTrainingTypeModelList(trainingTypeRepository.findAll());
+		return mapper.mapToTrainingTypeModelList(trainingTypeRepository.findAll());
 	}
 }

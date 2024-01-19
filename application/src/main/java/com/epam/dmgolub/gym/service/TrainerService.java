@@ -12,7 +12,11 @@ public interface TrainerService extends BaseService<Long, TrainerModel> {
 
 	TrainerModel update(TrainerModel trainer);
 
-	List<TrainerModel> findActiveTrainersAssignedToTrainee(Long id);
+	List<TrainerModel> findActiveTrainersAssignedOnTrainee(Long id);
 
-	List<TrainerModel> findActiveTrainersNotAssignedToTrainee(Long id);
+	List<TrainerModel> findActiveTrainersAssignedOnTrainee(String userName);
+
+	List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(Long id);
+
+	List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(String userName);
 }

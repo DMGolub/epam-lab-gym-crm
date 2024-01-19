@@ -44,61 +44,79 @@ public class TrainerServiceImpl implements TrainerService {
 	@Override
 	public TrainerModel save(final TrainerModel request) {
 		LOGGER.debug("In save - Saving trainer from request {}", request);
-		final var trainer = mapper.trainerModelToTrainer(request);
+		final var trainer = mapper.mapToTrainer(request);
 		trainer.getUser().setUserName(userCredentialsGenerator.generateUserName(trainer.getUser()));
 		trainer.getUser().setPassword(userCredentialsGenerator.generatePassword(trainer.getUser()));
 		trainer.setUser(userRepository.saveAndFlush(trainer.getUser()));
-		return mapper.trainerToTrainerModel(trainerRepository.saveAndFlush(trainer));
+		return mapper.mapToTrainerModel(trainerRepository.saveAndFlush(trainer));
 	}
 
 	@Override
 	public TrainerModel findById(final Long id) {
 		LOGGER.debug("In findById - Fetching trainer by id={} from repository", id);
-		final var trainer = getById(id);
-		return mapper.trainerToTrainerModel(trainer);
+		final var trainer = getTrainer(id);
+		return mapper.mapToTrainerModel(trainer);
 	}
 
 	@Override
 	public List<TrainerModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainers from repository");
-		return mapper.trainerListToTrainerModelList(trainerRepository.findAll());
+		return mapper.mapToTrainerModelList(trainerRepository.findAll());
 	}
 
 	@Override
 	public TrainerModel findByUserName(final String userName) {
 		LOGGER.debug("In findByUserName - Fetching trainer by userName={} from repository", userName);
-		final var trainer = trainerRepository.findByUserUserName(userName)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
-		return mapper.trainerToTrainerModel(trainer);
+		final var trainer = getTrainer(userName);
+		return mapper.mapToTrainerModel(trainer);
 	}
 
 	@Override
 	public TrainerModel update(final TrainerModel request) {
 		LOGGER.debug("In update - Updating trainer from request {}", request);
-		final var trainer = getById(request.getId());
+		final var trainer = getTrainer(request.getUserName());
 		trainer.getUser().setFirstName(request.getFirstName());
 		trainer.getUser().setLastName(request.getLastName());
 		trainer.getUser().setActive(request.isActive());
-		trainer.setSpecialization(mapper.trainingTypeModelToTrainingType(request.getSpecialization()));
-		return mapper.trainerToTrainerModel(trainerRepository.saveAndFlush(trainer));
+		trainer.setSpecialization(mapper.mapToTrainingType(request.getSpecialization()));
+		return mapper.mapToTrainerModel(trainerRepository.saveAndFlush(trainer));
 	}
 
 	@Override
-	public List<TrainerModel> findActiveTrainersAssignedToTrainee(final Long id) {
+	public List<TrainerModel> findActiveTrainersAssignedOnTrainee(final Long id) {
 		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for id={}", id);
-		final var trainers = trainerRepository.findActiveTrainersAssignedToTrainee(id);
-		return mapper.trainerListToTrainerModelList(trainers);
+		final var trainers = trainerRepository.findActiveTrainersAssignedOnTrainee(id);
+		return mapper.mapToTrainerModelList(trainers);
 	}
 
 	@Override
-	public List<TrainerModel> findActiveTrainersNotAssignedToTrainee(final Long id) {
-		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for id={}", id);
-		final var trainers = trainerRepository.findActiveTrainersNotAssignedToTrainee(id);
-		return mapper.trainerListToTrainerModelList(trainers);
+	public List<TrainerModel> findActiveTrainersAssignedOnTrainee(final String userName) {
+		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for trainee={}", userName);
+		final var trainers = trainerRepository.findActiveTrainersAssignedOnTrainee(userName);
+		return mapper.mapToTrainerModelList(trainers);
 	}
 
-	private Trainer getById(final Long id) {
+	@Override
+	public List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(final Long id) {
+		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for id={}", id);
+		final var trainers = trainerRepository.findActiveTrainersNotAssignedOnTrainee(id);
+		return mapper.mapToTrainerModelList(trainers);
+	}
+
+	@Override
+	public List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(final String userName) {
+		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for trainee={}", userName);
+		final var trainers = trainerRepository.findActiveTrainersNotAssignedOnTrainee(userName);
+		return mapper.mapToTrainerModelList(trainers);
+	}
+
+	private Trainer getTrainer(final Long id) {
 		return trainerRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + id));
+	}
+
+	private Trainer getTrainer(final String userName) {
+		return trainerRepository.findByUserUserName(userName)
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
 	}
 }

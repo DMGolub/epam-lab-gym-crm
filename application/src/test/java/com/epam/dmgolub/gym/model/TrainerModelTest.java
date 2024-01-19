@@ -64,7 +64,7 @@ class TrainerModelTest {
 	void toString_shouldReturnExpectedValue_whenInvoked() {
 		final var type = new TrainingTypeModel(1L, "Karate");
 		final TrainerModel trainer =
-			new TrainerModel(1L, "firstName", "lastName", "userName", true, 2L, type);
+			new TrainerModel(1L, "firstName", "lastName", "userName", "Password", true, 2L, type);
 		final String expected = "TrainerModel{userId=1, firstName='firstName', lastName='lastName', userName='userName', " +
 			"isActive=true, id=2, specialization=" + type + "}";
 
@@ -74,19 +74,19 @@ class TrainerModelTest {
 	@Test
 	void testEquals() {
 		final var responseDTO2 =
-			new TrainerModel(1L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
+			new TrainerModel(1L, "FirstName", "LastName", "UserName", "Password", true, 2L, trainingType);
 		final var responseDTO3 =
-			new TrainerModel(2L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
+			new TrainerModel(2L, "FirstName", "LastName", "UserName", "Password", true, 2L, trainingType);
 		final var responseDTO4 =
-			new TrainerModel(1L, "FirstName2", "LastName", "UserName", true, 2L, trainingType);
+			new TrainerModel(1L, "FirstName2", "LastName", "UserName", "Password", true, 2L, trainingType);
 		final var responseDTO5 =
-			new TrainerModel(1L, "FirstName", "LastName2", "UserName", true, 2L, trainingType);
+			new TrainerModel(1L, "FirstName", "LastName2", "UserName", "Password", true, 2L, trainingType);
 		final var responseDTO6 =
-			new TrainerModel(1L, "FirstName", "LastName", "UserName2", true, 2L, trainingType);
+			new TrainerModel(1L, "FirstName", "LastName", "UserName2", "Password", true, 2L, trainingType);
 		final var responseDTO7 =
-			new TrainerModel(1L, "FirstName", "LastName", "UserName", true, 3L, trainingType);
+			new TrainerModel(1L, "FirstName", "LastName", "UserName", "Password", true, 3L, trainingType);
 		final var responseDTO8 =
-			new TrainerModel(1L, "FirstName", "LastName", "UserName", true, 2L, new TrainingTypeModel(3L, "Some name"));
+			new TrainerModel(1L, "FirstName", "LastName", "UserName", "Password", true, 2L, new TrainingTypeModel(3L, "Some name"));
 
 		assertEquals(responseDTO2, responseDTO2);
 		assertNotEquals(trainer, responseDTO2);
@@ -102,7 +102,7 @@ class TrainerModelTest {
 	@Test
 	void testHashCode() {
 		final var responseDTO2 =
-			new TrainerModel(1L, "FirstName", "LastName", "UserName", true, 2L, trainingType);
+			new TrainerModel(1L, "FirstName", "LastName", "UserName", "Password", true, 2L, trainingType);
 
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(trainer.hashCode(), responseDTO2.hashCode());

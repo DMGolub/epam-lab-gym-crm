@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.controller.exception.RequestIdsInvalidException;
+import com.epam.dmgolub.gym.controller.mvc.exception.RequestIdsInvalidException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -11,8 +11,8 @@ import org.springframework.validation.ObjectError;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epam.dmgolub.gym.controller.constant.Constants.BINDING_RESULT_ERROR_MESSAGE;
-import static com.epam.dmgolub.gym.controller.constant.Constants.REQUEST_ID_INVALID_EXCEPTION_MESSAGE;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.BINDING_RESULT_ERROR_MESSAGE;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REQUEST_ID_INVALID_EXCEPTION_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;

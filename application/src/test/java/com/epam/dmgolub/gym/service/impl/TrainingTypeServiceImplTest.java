@@ -37,11 +37,11 @@ class TrainingTypeServiceImplTest {
 			trainingType.setId(id);
 			when(trainingTypeRepository.findById(id)).thenReturn(Optional.of(trainingType));
 			final var trainingTypeModel = new TrainingTypeModel();
-			when(mapper.trainingTypeToTrainingTypeModel(trainingType)).thenReturn(trainingTypeModel);
+			when(mapper.mapToTrainingTypeModel(trainingType)).thenReturn(trainingTypeModel);
 
 			assertEquals(trainingTypeModel, trainingTypeService.findById(id));
 			verify(trainingTypeRepository, times(1)).findById(id);
-			verify(mapper, times(1)).trainingTypeToTrainingTypeModel(trainingType);
+			verify(mapper, times(1)).mapToTrainingTypeModel(trainingType);
 		}
 
 		@Test
@@ -60,10 +60,10 @@ class TrainingTypeServiceImplTest {
 		final List<TrainingType> trainingTypes = List.of(new TrainingType(), new TrainingType());
 		when(trainingTypeRepository.findAll()).thenReturn(trainingTypes);
 		final List<TrainingTypeModel> response = List.of(new TrainingTypeModel(), new TrainingTypeModel());
-		when(mapper.trainingTypeListToTrainingTypeModelList(trainingTypes)).thenReturn(response);
+		when(mapper.mapToTrainingTypeModelList(trainingTypes)).thenReturn(response);
 
 		assertEquals(response, trainingTypeService.findAll());
 		verify(trainingTypeRepository, times(1)).findAll();
-		verify(mapper, times(1)).trainingTypeListToTrainingTypeModelList(trainingTypes);
+		verify(mapper, times(1)).mapToTrainingTypeModelList(trainingTypes);
 	}
 }

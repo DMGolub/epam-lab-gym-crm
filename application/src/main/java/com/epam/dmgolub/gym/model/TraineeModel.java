@@ -1,7 +1,5 @@
 package com.epam.dmgolub.gym.model;
 
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +11,7 @@ public class TraineeModel {
 	private String firstName;
 	private String lastName;
 	private String userName;
+	private String password;
 	private boolean isActive;
 	private Long id;
 	private Date dateOfBirth;
@@ -28,6 +27,7 @@ public class TraineeModel {
 		final String firstName,
 		final String lastName,
 		final String userName,
+		final String password,
 		final boolean isActive,
 		final Long id,
 		final Date dateOfBirth,
@@ -38,6 +38,7 @@ public class TraineeModel {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
+		this.password = password;
 		this.isActive = isActive;
 		this.id = id;
 		this.dateOfBirth = dateOfBirth;
@@ -75,6 +76,14 @@ public class TraineeModel {
 
 	public void setUserName(final String userName) {
 		this.userName = userName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(final String password) {
+		this.password = password;
 	}
 
 	public boolean isActive() {
@@ -120,10 +129,16 @@ public class TraineeModel {
 	@Override
 	public String
 	toString() {
-		return "TraineeModel{userId=" + userId + ", firstName='" + firstName + '\'' +
-			", lastName='" + lastName + '\'' + ", userName='" + userName + '\'' +
-			", isActive=" + isActive + ", id=" + id + ", dateOfBirth=" + dateOfBirth +
-			", address='" + address + '\'' + ", trainers=" + trainers + '}';
+		return "TraineeModel{userId=" + userId +
+			", firstName='" + firstName + '\'' +
+			", lastName='" + lastName + '\'' +
+			", userName='" + userName + '\'' +
+			", isActive=" + isActive +
+			", id=" + id +
+			", dateOfBirth=" + dateOfBirth +
+			", address='" + address + '\'' +
+			", trainers=" + trainers +
+			'}';
 	}
 
 	@Override
@@ -150,6 +165,9 @@ public class TraineeModel {
 		if (!Objects.equals(userName, that.userName)) {
 			return false;
 		}
+		if (!Objects.equals(password, that.password)) {
+			return false;
+		}
 		if (!Objects.equals(id, that.id)) {
 			return false;
 		}
@@ -172,7 +190,7 @@ public class TraineeModel {
 		private String userName;
 		private String firstName;
 		private String lastName;
-		private TrainingTypeDTO specialization;
+		private TrainingTypeModel specialization;
 
 		public String getUserName() {
 			return userName;
@@ -198,11 +216,11 @@ public class TraineeModel {
 			this.lastName = lastName;
 		}
 
-		public TrainingTypeDTO getSpecialization() {
+		public TrainingTypeModel getSpecialization() {
 			return specialization;
 		}
 
-		public void setSpecialization(final TrainingTypeDTO specialization) {
+		public void setSpecialization(final TrainingTypeModel specialization) {
 			this.specialization = specialization;
 		}
 

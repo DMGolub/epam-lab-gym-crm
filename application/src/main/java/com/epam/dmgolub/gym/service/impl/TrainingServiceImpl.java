@@ -39,8 +39,8 @@ public class TrainingServiceImpl implements TrainingService {
 	@Override
 	public TrainingModel save(final TrainingModel request) {
 		LOGGER.debug("In save - Saving training from request {}", request);
-		final Training training = mapper.trainingModelToTraining(request);
-		return mapper.trainingToTrainingModel(trainingRepository.saveAndFlush(training));
+		final Training training = mapper.mapToTraining(request);
+		return mapper.mapToTrainingModel(trainingRepository.saveAndFlush(training));
 	}
 
 	@Override
@@ -48,30 +48,30 @@ public class TrainingServiceImpl implements TrainingService {
 		LOGGER.debug("In findById - Fetching training by id={} from repository", id);
 		final var training = trainingRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(TRAINING_NOT_FOUND_BY_ID_MESSAGE + id));
-		return mapper.trainingToTrainingModel(training);
+		return mapper.mapToTrainingModel(training);
 	}
 
 	@Override
 	public List<TrainingModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainings from repository");
-		return mapper.trainingListToTrainingModelList(trainingRepository.findAll());
+		return mapper.mapToTrainingModelList(trainingRepository.findAll());
 	}
 
 	@Override
 	public List<TrainingModel> searchByTrainee(final TraineeTrainingsSearchRequest request) {
 		LOGGER.debug("In searchByTrainee - Received search request={}", request);
-		final var criteria = mapper.searchRequestToSearchCriteria(request);
+		final var criteria = mapper.mapToTraineeTrainingsSearchCriteria(request);
 		final List<Training> trainings = trainingRepository.findAll(new TraineeTrainingSpecification(criteria));
 		LOGGER.debug("In searchByTrainee - found {} trainings", trainings.size());
-		return mapper.trainingListToTrainingModelList(trainings);
+		return mapper.mapToTrainingModelList(trainings);
 	}
 
 	@Override
 	public List<TrainingModel> searchByTrainer(final TrainerTrainingsSearchRequest request) {
 		LOGGER.debug("In searchByTrainer - Received search request={}", request);
-		final var criteria = mapper.searchRequestToSearchCriteria(request);
+		final var criteria = mapper.mapToTrainerTrainingsSearchCriteria(request);
 		final List<Training> trainings = trainingRepository.findAll(new TrainerTrainingSpecification(criteria));
 		LOGGER.debug("In searchByTrainer - found {} trainings", trainings.size());
-		return mapper.trainingListToTrainingModelList(trainings);
+		return mapper.mapToTrainingModelList(trainings);
 	}
 }

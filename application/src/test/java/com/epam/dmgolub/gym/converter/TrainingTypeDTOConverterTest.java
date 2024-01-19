@@ -1,7 +1,7 @@
 package com.epam.dmgolub.gym.converter;
 
-import com.epam.dmgolub.gym.dto.TrainingTypeDTO;
-import com.epam.dmgolub.gym.mapper.ModelToDtoMapper;
+import com.epam.dmgolub.gym.dto.mvc.TrainingTypeDTO;
+import com.epam.dmgolub.gym.mapper.mvc.ModelToDtoMapper;
 import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 
@@ -35,7 +35,7 @@ class TrainingTypeDTOConverterTest {
 		final var type = new TrainingTypeModel();
 		when(trainingTypeService.findById(1L)).thenReturn(type);
 		final var expected = new TrainingTypeDTO();
-		when(mapper.trainingTypeToTrainingTypeDTO(type)).thenReturn(expected);
+		when(mapper.mapToTrainingTypeDTO(type)).thenReturn(expected);
 
 		final TrainingTypeDTO result = trainingTypeDTOConverter.convert("1");
 
