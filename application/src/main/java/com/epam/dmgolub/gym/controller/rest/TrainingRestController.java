@@ -30,7 +30,7 @@ import static com.epam.dmgolub.gym.controller.rest.constant.Constants.BASE_API_U
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class TrainingRestController {
 
 	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/trainings";
@@ -44,7 +44,7 @@ public class TrainingRestController {
 		this.mapper = mapper;
 	}
 
-	@GetMapping("/search-by-trainee")
+	@GetMapping(value = "/search-by-trainee", consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "View all trainings associated with a specific trainee", response = List.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully retrieved trainings associated with trainee"),
@@ -60,7 +60,7 @@ public class TrainingRestController {
 		return new ResponseEntity<>(mapper.mapToTraineeTrainingResponseDTOList(trainings), HttpStatus.OK);
 	}
 
-	@GetMapping("/search-by-trainer")
+	@GetMapping(value = "/search-by-trainer", consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "View all trainings associated with a specific trainer", response = List.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully retrieved trainings associated with trainer"),
@@ -76,7 +76,7 @@ public class TrainingRestController {
 		return new ResponseEntity<>(mapper.mapToTrainerTrainingResponseDTOList(trainings), HttpStatus.OK);
 	}
 
-	@PostMapping
+	@PostMapping(consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Create a training")
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully created new training"),

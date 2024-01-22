@@ -32,7 +32,7 @@ import static com.epam.dmgolub.gym.controller.rest.constant.Constants.BASE_API_U
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = URL,  consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 @Api(produces = APPLICATION_JSON_VALUE, value = "Operations for creating, updating and retrieving trainers")
 public class TrainerRestController {
 
@@ -104,7 +104,7 @@ public class TrainerRestController {
 		return new ResponseEntity<>(mapper.mapToTrainerResponseDTO(trainer), HttpStatus.OK);
 	}
 
-	@PostMapping
+	@PostMapping(consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Create a trainer", response = CredentialsDTO.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 201, message = "Successfully created new trainer"),
@@ -117,7 +117,7 @@ public class TrainerRestController {
 		return new ResponseEntity<>(credentials, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/profile")
+	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Update a specific trainer data", response = TrainerResponseDTO.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully updated trainer"),
