@@ -1,19 +1,22 @@
 package com.epam.dmgolub.gym.service;
 
-import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
-import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
+import com.epam.dmgolub.gym.model.TraineeModel;
 
-public interface TraineeService extends BaseService<Long, TraineeRequestDTO, TraineeResponseDTO> {
+import java.util.List;
 
-	TraineeResponseDTO findByUserName(String userName);
+public interface TraineeService extends BaseService<Long, TraineeModel> {
 
-	TraineeResponseDTO save(TraineeRequestDTO request);
+	TraineeModel findByUserName(String userName);
 
-	TraineeResponseDTO update(TraineeRequestDTO trainee);
+	TraineeModel save(TraineeModel request);
+
+	TraineeModel update(TraineeModel trainee);
 
 	void delete(Long id);
 
 	void delete(String userName);
 
 	void addTrainer(Long traineeId, Long trainerIds);
+
+	void updateTrainers(String traineeUserName, List<String> trainerUserNames);
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -25,7 +26,7 @@ public class Trainer implements BaseEntity<Long> {
 	@OneToOne
 	@JoinColumn(name = "user_id")
 	private User user;
-	@ManyToMany(mappedBy = "trainers")
+	@ManyToMany(mappedBy = "trainers", fetch = EAGER)
 	private List<Trainee> trainees;
 
 	public Trainer() {
@@ -68,10 +69,6 @@ public class Trainer implements BaseEntity<Long> {
 		this.user = user;
 	}
 
-	public void setUserId(final Long id) {
-		user.setId(id);
-	}
-
 	public TrainingType getSpecialization() {
 		return specialization;
 	}
@@ -103,9 +100,7 @@ public class Trainer implements BaseEntity<Long> {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-
 		final Trainer trainer = (Trainer) o;
-
 		if (!Objects.equals(id, trainer.id)) {
 			return false;
 		}

@@ -1,6 +1,8 @@
 package com.epam.dmgolub.gym.config;
 
-import com.epam.dmgolub.gym.interceptor.LoginInterceptor;
+import com.epam.dmgolub.gym.interceptor.HeaderLoginInterceptor;
+import com.epam.dmgolub.gym.interceptor.LoggingInterceptor;
+import com.epam.dmgolub.gym.interceptor.SessionLoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +25,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -48,7 +51,9 @@ public class AppConfig implements WebMvcConfigurer {
 	private final ApplicationContext applicationContext;
 	private final Environment environment;
 	private List<Converter<String, ?>> converters;
-	private LoginInterceptor loginInterceptor;
+	private SessionLoginInterceptor sessionLoginInterceptor;
+	private HeaderLoginInterceptor headerLoginInterceptor;
+	private LoggingInterceptor loggingInterceptor;
 
 	public AppConfig(final ApplicationContext applicationContext, final Environment environment) {
 		this.applicationContext = applicationContext;
@@ -61,8 +66,18 @@ public class AppConfig implements WebMvcConfigurer {
 	}
 
 	@Autowired
-	void setLoggingInterceptor(final LoginInterceptor loginInterceptor) {
-		this.loginInterceptor = loginInterceptor;
+	void setSessionLoginInterceptor(final SessionLoginInterceptor sessionLoginInterceptor) {
+		this.sessionLoginInterceptor = sessionLoginInterceptor;
+	}
+
+	@Autowired
+	void setHeaderLoginInterceptor(final HeaderLoginInterceptor headerLoginInterceptor) {
+		this.headerLoginInterceptor = headerLoginInterceptor;
+	}
+
+	@Autowired
+	void setLoggingInterceptor(final LoggingInterceptor loggingInterceptor) {
+		this.loggingInterceptor = loggingInterceptor;
 	}
 
 	@Bean
@@ -92,6 +107,7 @@ public class AppConfig implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(final ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("index");
+		registry.addViewController("/swagger-ui/").setViewName("forward:/swagger-ui/index.html");
 	}
 
 	@Override
@@ -113,9 +129,22 @@ public class AppConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(final InterceptorRegistry registry) {
-		registry.addInterceptor(loginInterceptor)
+		registry.addInterceptor(sessionLoginInterceptor)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/*", "/trainers/new", "/trainees/new", "/login/*");
+			.excludePathPatterns("/*", "/trainers/new", "/trainees/new", "/login/*")
+			.excludePathPatterns("/api/v1/**");
+		registry.addInterceptor(headerLoginInterceptor)
+			.addPathPatterns("/api/v1/**")
+			.excludePathPatterns("/api/v1/trainers", "/api/v1/trainees", "/api/v1/login");
+		registry.addInterceptor(loggingInterceptor)
+			.addPathPatterns("/api/v1/**");
+	}
+
+	@Override
+	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/swagger-ui/**")
+			.addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
+			.resourceChain(false);
 	}
 
 	@Bean

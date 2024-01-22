@@ -1,8 +1,8 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
-import com.epam.dmgolub.gym.dto.LoginRequestDTO;
 import com.epam.dmgolub.gym.entity.User;
+import com.epam.dmgolub.gym.model.ChangePasswordRequest;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ class LoginServiceImplTest {
 		void isValidLoginRequest_shouldReturnTrue_whenUserNameAndPasswordAreValid() {
 			final String userName = "User.Name";
 			final String password = "Password";
-			final LoginRequestDTO request = new LoginRequestDTO(userName, password);
-			final User user = new User(1L, "User", "Name", userName, password, true);
+			final var request = new Credentials(userName, password);
+			final var user = new User(1L, "User", "Name", userName, password, true);
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
 
 			assertTrue(loginService.isValidLoginRequest(request));
@@ -46,7 +46,7 @@ class LoginServiceImplTest {
 		void isValidLoginRequest_shouldReturnFalse_whenUserNotFound() {
 			final String userName = "User.Name";
 			final String password = "Password";
-			final LoginRequestDTO request = new LoginRequestDTO(userName, password);
+			final var request = new Credentials(userName, password);
 
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
@@ -58,8 +58,8 @@ class LoginServiceImplTest {
 		void isValidLoginRequest_shouldReturnFalse_whenPasswordsDoNotMatch() {
 			final String userName = "User.Name";
 			final String password = "WrongPassword";
-			final LoginRequestDTO request = new LoginRequestDTO(userName, password);
-			final User user = new User(1L, "User", "Name", userName, "OldPassword", true);
+			final var request = new Credentials(userName, password);
+			final var user = new User(1L, "User", "Name", userName, "OldPassword", true);
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
 
 			assertFalse(loginService.isValidLoginRequest(request));
@@ -75,7 +75,7 @@ class LoginServiceImplTest {
 			final String userName = "User.Name";
 			final String oldPassword = "OldPassword";
 			final String newPassword = "NewPassword";
-			final var request = new ChangePasswordRequestDTO(userName, oldPassword, newPassword);
+			final var request = new ChangePasswordRequest(userName, oldPassword, newPassword);
 			final User user = new User(1L, "User", "Name", userName, oldPassword, true);
 			final User updatedUser = new User(1L, "User", "Name", userName, newPassword, true);
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
@@ -90,7 +90,7 @@ class LoginServiceImplTest {
 			final String userName = "User.Name";
 			final String oldPassword = "OldPassword";
 			final String newPassword = "NewPassword";
-			final var request = new ChangePasswordRequestDTO(userName, oldPassword, newPassword);
+			final var request = new ChangePasswordRequest(userName, oldPassword, newPassword);
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
 			assertFalse(loginService.changePassword(request));
@@ -103,7 +103,7 @@ class LoginServiceImplTest {
 			final String userName = "User.Name";
 			final String oldPassword = "WrongPassword";
 			final String newPassword = "NewPassword";
-			final var request = new ChangePasswordRequestDTO(userName, oldPassword, newPassword);
+			final var request = new ChangePasswordRequest(userName, oldPassword, newPassword);
 			final User user = new User(1L, "User", "Name", userName, "OldPassword", true);
 			when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
 

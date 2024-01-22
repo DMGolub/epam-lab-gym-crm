@@ -1,17 +1,16 @@
 package com.epam.dmgolub.gym.service;
 
-import com.epam.dmgolub.gym.dto.TraineeTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainerTrainingsSearchRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingRequestDTO;
-import com.epam.dmgolub.gym.dto.TrainingResponseDTO;
+import com.epam.dmgolub.gym.model.TraineeTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainerTrainingsSearchRequest;
+import com.epam.dmgolub.gym.model.TrainingModel;
 
 import java.util.List;
 
-public interface TrainingService extends BaseService<Long, TrainingRequestDTO, TrainingResponseDTO> {
+public interface TrainingService extends BaseService<Long, TrainingModel> {
 
-	TrainingResponseDTO save(TrainingRequestDTO training);
+	TrainingModel save(TrainingModel training);
 
-	List<TrainingResponseDTO> searchByTrainee(TraineeTrainingsSearchRequestDTO request);
+	List<TrainingModel> searchByTrainee(TraineeTrainingsSearchRequest request);
 
-	List<TrainingResponseDTO> searchByTrainer(TrainerTrainingsSearchRequestDTO request);
+	List<TrainingModel> searchByTrainer(TrainerTrainingsSearchRequest request);
 }

@@ -2,9 +2,9 @@ package com.epam.dmgolub.gym.service;
 
 import java.util.List;
 
-public interface BaseService<K, Req, Resp> {
+public interface BaseService<K, T> {
 
-	Resp findById(K id);
+	T findById(K id);
 
-	List<Resp> findAll();
+	List<T> findAll();
 }
