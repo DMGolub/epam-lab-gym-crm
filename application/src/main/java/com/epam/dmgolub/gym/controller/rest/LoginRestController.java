@@ -26,7 +26,7 @@ import static com.epam.dmgolub.gym.controller.rest.constant.Constants.BASE_API_U
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class LoginRestController {
 
 	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/login";
@@ -40,7 +40,7 @@ public class LoginRestController {
 		this.mapper = mapper;
 	}
 
-	@GetMapping
+	@GetMapping(consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "User authentication")
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "User authenticated successfully"),
@@ -61,7 +61,7 @@ public class LoginRestController {
 		}
 	}
 
-	@PutMapping
+	@PutMapping(consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "User password changing")
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "User password changed successfully"),

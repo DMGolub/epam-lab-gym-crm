@@ -34,7 +34,7 @@ import static com.epam.dmgolub.gym.controller.rest.constant.Constants.BASE_API_U
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 @Api(produces = APPLICATION_JSON_VALUE, value = "Operations for creating, updating, retrieving and deleting trainees")
 public class TraineeRestController {
 
@@ -76,7 +76,7 @@ public class TraineeRestController {
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
 	}
 
-	@PostMapping
+	@PostMapping(consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Create a trainee", response = CredentialsDTO.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 201, message = "Successfully created new trainee"),
@@ -89,7 +89,7 @@ public class TraineeRestController {
 		return new ResponseEntity<>(credentials, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/profile")
+	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Update a specific trainee data", response = TraineeResponseDTO.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully updated trainee"),
@@ -103,7 +103,7 @@ public class TraineeRestController {
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
 	}
 
-	@PutMapping("/profile/update-trainers")
+	@PutMapping(value = "/profile/update-trainers", consumes = APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Update a specific trainee trainer list", response = List.class)
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "Successfully updated trainee trainer list"),
@@ -129,7 +129,7 @@ public class TraineeRestController {
 		@ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),
 		@ApiResponse(code = 500, message = "Application failed to process the request")
 	})
-	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseStatus(HttpStatus.OK)
 	public void delete(@RequestParam("userName") final String userName) {
 		LOGGER.debug("In delete - Received a request to delete trainee={}", userName);
 		traineeService.delete(userName);
