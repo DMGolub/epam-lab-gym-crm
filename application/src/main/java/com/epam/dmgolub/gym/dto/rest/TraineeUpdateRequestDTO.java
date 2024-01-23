@@ -3,9 +3,9 @@ package com.epam.dmgolub.gym.dto.rest;
 import com.epam.dmgolub.gym.validation.annotation.MinimumAgeLimit;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.Objects;
 

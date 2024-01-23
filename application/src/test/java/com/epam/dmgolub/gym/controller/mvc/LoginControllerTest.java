@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.LOGIN;

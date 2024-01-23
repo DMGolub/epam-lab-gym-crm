@@ -2,6 +2,9 @@ package com.epam.dmgolub.gym.controller.rest;
 
 import com.epam.dmgolub.gym.controller.rest.constant.ApiVersion;
 import com.epam.dmgolub.gym.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,13 @@ public class UserRestController {
 	}
 
 	@PatchMapping("/profile")
+	@Operation(summary = "Change activity status by the supplied username")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Successfully changed user activity status"),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The user you were trying to update is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
+	})
 	@ResponseStatus(HttpStatus.OK)
 	public void changeActivityStatus(@RequestParam("userName") final String userName) {
 		LOGGER.debug("In changeActivityStatus - Received a request to change status for user={}", userName);

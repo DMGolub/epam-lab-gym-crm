@@ -8,7 +8,7 @@ import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -2,12 +2,12 @@ package com.epam.dmgolub.gym.dto.mvc;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.Objects;
 

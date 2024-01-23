@@ -6,13 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class HeaderLoginInterceptor extends HandlerInterceptorAdapter {
+public class HeaderLoginInterceptor implements HandlerInterceptor {
 
 	private static final String USERNAME_HEADER = "userName";
 	private static final String PASSWORD_HEADER = "password";
@@ -29,7 +29,7 @@ public class HeaderLoginInterceptor extends HandlerInterceptorAdapter {
 		@NonNull final HttpServletRequest request,
 		@NonNull final HttpServletResponse response,
 		@NonNull final Object handler
-	) throws Exception {
+	) {
 		final String userName = request.getHeader(USERNAME_HEADER);
 		final String password = request.getHeader(PASSWORD_HEADER);
 		if (isValidLogin(userName, password)) {

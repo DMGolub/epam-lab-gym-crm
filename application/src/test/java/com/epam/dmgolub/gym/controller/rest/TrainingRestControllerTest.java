@@ -27,11 +27,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TrainingRestControllerTest {
@@ -66,7 +68,8 @@ class TrainingRestControllerTest {
 		mockMvc.perform(get(URL + "/search-by-trainee")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(requestDTO)))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$", hasSize(response.size())));
 
 		verify(mapper, times(1)).mapToTraineeTrainingsSearchRequest(requestDTO);
 		verify(trainingService, times(1)).searchByTrainee(request);
@@ -87,7 +90,8 @@ class TrainingRestControllerTest {
 		mockMvc.perform(get(URL + "/search-by-trainer")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(requestDTO)))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$", hasSize(response.size())));
 
 		verify(mapper, times(1)).mapToTrainerTrainingsSearchRequest(requestDTO);
 		verify(trainingService, times(1)).searchByTrainer(request);
