@@ -8,9 +8,12 @@ import com.epam.dmgolub.gym.dto.rest.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.rest.TrainingCreateRequestDTO;
 import com.epam.dmgolub.gym.mapper.rest.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.service.TrainingService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.rest.TrainingRestController.URL;
@@ -45,11 +48,13 @@ public class TrainingRestController {
 	}
 
 	@GetMapping(value = "/search-by-trainee", consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "View all trainings associated with a specific trainee", response = List.class)
+	@Operation(summary = "View all trainings associated with a specific trainee")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved trainings associated with trainee"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved trainings associated with trainee",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				array = @ArraySchema(schema = @Schema(implementation = TraineeTrainingResponseDTO.class)))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TraineeTrainingResponseDTO>> searchByTrainee(
 		@RequestBody @Valid final TraineeTrainingsSearchRequestDTO request
@@ -61,11 +66,13 @@ public class TrainingRestController {
 	}
 
 	@GetMapping(value = "/search-by-trainer", consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "View all trainings associated with a specific trainer", response = List.class)
+	@Operation(summary = "View all trainings associated with a specific trainer")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved trainings associated with trainer"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved trainings associated with trainer",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				array = @ArraySchema(schema = @Schema(implementation = TraineeTrainingResponseDTO.class)))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TrainerTrainingResponseDTO>> searchByTrainer(
 		@RequestBody @Valid final TrainerTrainingsSearchRequestDTO request
@@ -77,12 +84,12 @@ public class TrainingRestController {
 	}
 
 	@PostMapping(consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Create a training")
+	@Operation(summary = "Create a training")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully created new training"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully created new training"),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	@ResponseStatus(HttpStatus.OK)
 	public void create(@RequestBody @Valid final TrainingCreateRequestDTO request) {

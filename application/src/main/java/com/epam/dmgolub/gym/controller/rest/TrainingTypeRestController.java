@@ -4,9 +4,12 @@ import com.epam.dmgolub.gym.controller.rest.constant.ApiVersion;
 import com.epam.dmgolub.gym.dto.rest.TrainingTypeDTO;
 import com.epam.dmgolub.gym.mapper.rest.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,11 +44,13 @@ public class TrainingTypeRestController {
 	}
 
 	@GetMapping
-	@ApiOperation(value = "View all training types", response = List.class)
+	@Operation(summary = "View all training types")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved all training types"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved all training types",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				array = @ArraySchema(schema = @Schema(implementation = TrainingTypeDTO.class)))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TrainingTypeDTO>> getAll() {
 		LOGGER.debug("In getAll - Received a request to get all training types");
@@ -54,12 +59,14 @@ public class TrainingTypeRestController {
 	}
 
 	@GetMapping("/{id:\\d+}")
-	@ApiOperation(value = "Retrieve specific training type with the supplied id", response = TrainingTypeDTO.class)
+	@Operation(summary = "Retrieve specific training type with the supplied id")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved the training type with the supplied id"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved the training type with the supplied id",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = TrainingTypeDTO.class))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The training type you were trying to get is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TrainingTypeDTO> getById(@PathVariable("id") final Long id) {
 		LOGGER.debug("In getById - Received a request to get training type by id={}", id);

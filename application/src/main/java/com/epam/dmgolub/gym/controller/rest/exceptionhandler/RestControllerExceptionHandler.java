@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
@@ -34,12 +35,11 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
 
-	@NonNull
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 		final MethodArgumentNotValidException ex,
 		@NonNull final HttpHeaders headers,
-		@NonNull final HttpStatus status,
+		@NonNull final HttpStatusCode status,
 		@NonNull final WebRequest request
 	) {
 		final List<String> details = new ArrayList<>();
@@ -51,12 +51,11 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 		return handleExceptionInternal(ex, message, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
 	}
 
-	@NonNull
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 		final HttpMessageNotReadableException ex,
-		@NonNull final HttpHeaders headers,
-		@NonNull final HttpStatus status,
+		@NonNull HttpHeaders headers,
+		@NonNull final HttpStatusCode status,
 		@NonNull final WebRequest request
 	) {
 		final String cause = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();

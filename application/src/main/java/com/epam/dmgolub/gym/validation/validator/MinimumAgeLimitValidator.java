@@ -2,8 +2,8 @@ package com.epam.dmgolub.gym.validation.validator;
 
 import com.epam.dmgolub.gym.validation.annotation.MinimumAgeLimit;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Calendar;
 import java.util.Date;
 

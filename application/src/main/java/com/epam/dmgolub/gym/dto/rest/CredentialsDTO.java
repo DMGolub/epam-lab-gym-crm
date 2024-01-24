@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.dto.rest;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Objects;
 

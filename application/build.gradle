@@ -1,5 +1,7 @@
 plugins {
-    id 'war'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'jacoco'
 }
 
@@ -7,63 +9,38 @@ group = 'com.epam.dmgolub.gym'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.springframework/spring-web
-    implementation "org.springframework:spring-web:$springVersion"
-    // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    implementation "org.springframework:spring-webmvc:$springVersion"
-    // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
-    implementation "org.springframework:spring-jdbc:$springVersion"
-    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
-    implementation "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
-    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
-    implementation "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    runtimeOnly 'org.postgresql:postgresql'
 
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"
 
-    // https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring5
-    implementation "org.thymeleaf:thymeleaf-spring5:$thymeleafVersion"
-
-    // https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
-    implementation "javax.annotation:javax.annotation-api:$javaxAnnotationApi"
-
-    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
-    implementation "javax.servlet:javax.servlet-api:$javaxServletApi"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    implementation "org.mapstruct:mapstruct:$mapstructVersion"
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"
 
-    // https://mvnrepository.com/artifact/javax.validation/validation-api
-    implementation "javax.validation:validation-api:$javaxValidationVersion"
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiStarterWebmvcUiVersion"
+    // https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
+    implementation "io.swagger.core.v3:swagger-annotations:$swaggerAnnotationsVersion"
 
-    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
-    implementation "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
+    // https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
+    implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
 
-    implementation 'org.glassfish:javax.el:3.0.1-b08'
+    // https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+    implementation "io.micrometer:micrometer-registry-prometheus:$prometheusVersion"
 
-    // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    implementation "org.postgresql:postgresql:$postgresqlVersion"
-
-    // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
-    implementation "org.hibernate:hibernate-core:$hibernateCoreVersion"
-    // https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager
-    implementation "org.hibernate:hibernate-entitymanager:$hibernateEntityNanagerVersion"
-
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-52:3.3.2'
-    implementation 'com.vladmihalcea:hibernate-types-52:2.12.0'
-    implementation 'javax.xml.bind:jaxb-api:2.3.0'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.0'
-    implementation 'org.javassist:javassist:3.29.0-GA'
-
-    implementation "io.springfox:springfox-swagger2:$springfoxVersion"
-    implementation "io.springfox:springfox-data-rest:$springfoxVersion"
-    implementation "io.springfox:springfox-swagger-ui:$springfoxVersion"
-
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 jacoco {

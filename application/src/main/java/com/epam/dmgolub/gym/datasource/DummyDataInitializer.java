@@ -10,12 +10,14 @@ import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
+import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,21 +31,27 @@ import java.util.Locale;
 import java.util.Objects;
 
 @Component
+@ConditionalOnProperty(name = "dummy.data.initialization", havingValue = "true")
 public class DummyDataInitializer {
 
 	private static final String VALUE_DELIMITER = ";";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyDataInitializer.class);
 
-	@Value("${trainee.data.filePath}")
+	@NotBlank
+	@Value("${dummy.data.trainee.filePath}")
 	private String traineeDataFilePath;
-	@Value("${trainer.data.filePath}")
+	@NotBlank
+	@Value("${dummy.data.trainer.filePath}")
 	private String trainerDataFilePath;
-	@Value("${trainersToTrainees.data.filePath}")
+	@NotBlank
+	@Value("${dummy.data.trainersToTrainees.filePath}")
 	private String trainersToTraineesFilePath;
-	@Value("${training.data.filePath}")
+	@NotBlank
+	@Value("${dummy.data.training.filePath}")
 	private String trainingDataFilePath;
-	@Value("${training-type.data.filePath}")
+	@NotBlank
+	@Value("${dummy.data.training-type.filePath}")
 	private String trainingTypeDataFilePath;
 
 	private final UserRepository userRepository;

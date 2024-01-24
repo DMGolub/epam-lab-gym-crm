@@ -14,16 +14,6 @@ subprojects {
 		mavenCentral()
 	}
 
-	dependencies {
-		implementation "org.springframework:spring-context:$springVersion"
-
-		testImplementation "org.springframework:spring-test:$springVersion"
-		testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
-		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
-
-		annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-		implementation "org.mapstruct:mapstruct:$mapstructVersion"
-	}
 	test {
 		useJUnitPlatform()
 	}

@@ -2,7 +2,7 @@ package com.epam.dmgolub.gym.dto.mvc;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.Objects;
 

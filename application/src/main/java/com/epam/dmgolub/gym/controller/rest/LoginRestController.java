@@ -6,9 +6,9 @@ import com.epam.dmgolub.gym.dto.rest.ChangePasswordRequestDTO;
 import com.epam.dmgolub.gym.dto.rest.CredentialsDTO;
 import com.epam.dmgolub.gym.mapper.rest.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.service.LoginService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static com.epam.dmgolub.gym.controller.rest.LoginRestController.URL;
 import static com.epam.dmgolub.gym.controller.rest.constant.Constants.BASE_API_URL;
@@ -41,11 +41,11 @@ public class LoginRestController {
 	}
 
 	@GetMapping(consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "User authentication")
+	@Operation(summary = "User authentication")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "User authenticated successfully"),
-		@ApiResponse(code = 401, message = "User authentication failed"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "User authenticated successfully"),
+		@ApiResponse(responseCode = "401", description = "User authentication failed"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<String> logIn(@RequestBody @Valid final CredentialsDTO request) {
 		final String userName = request.getUserName();
@@ -62,10 +62,10 @@ public class LoginRestController {
 	}
 
 	@PutMapping(consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "User password changing")
+	@Operation(summary = "User password changing")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "User password changed successfully"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "User password changed successfully"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<String> changePassword(@RequestBody @Valid final ChangePasswordRequestDTO request) {
 		final String userName = request.getUserName();

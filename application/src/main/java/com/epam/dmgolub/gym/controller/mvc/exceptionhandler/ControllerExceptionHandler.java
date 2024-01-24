@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.CONTROLLER_EXCEPTION_LOG_MESSAGE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.ENTITY_NOT_FOUND_VIEW;

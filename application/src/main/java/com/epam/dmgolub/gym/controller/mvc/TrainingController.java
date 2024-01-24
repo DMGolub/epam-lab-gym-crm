@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINING_INDEX;

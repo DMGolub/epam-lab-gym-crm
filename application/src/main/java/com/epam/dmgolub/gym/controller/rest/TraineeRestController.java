@@ -8,10 +8,12 @@ import com.epam.dmgolub.gym.dto.rest.TraineeUpdateRequestDTO;
 import com.epam.dmgolub.gym.dto.rest.TraineeUpdateTrainerListRequestDTO;
 import com.epam.dmgolub.gym.mapper.rest.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.service.TraineeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.rest.TraineeRestController.URL;
@@ -35,7 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
-@Api(produces = APPLICATION_JSON_VALUE, value = "Operations for creating, updating, retrieving and deleting trainees")
 public class TraineeRestController {
 
 	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/trainees";
@@ -50,11 +51,13 @@ public class TraineeRestController {
 	}
 
 	@GetMapping
-	@ApiOperation(value = "View all trainees", response = List.class)
+	@Operation(summary = "View all trainees")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved all trainees"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved all trainees",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				array = @ArraySchema(schema = @Schema(implementation = TraineeResponseDTO.class)))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TraineeResponseDTO>> getAll() {
 		LOGGER.debug("In getAll - Received a request to get all trainees");
@@ -63,12 +66,14 @@ public class TraineeRestController {
 	}
 
 	@GetMapping("/profile")
-	@ApiOperation(value = "Retrieve specific trainee with the supplied username", response = TraineeResponseDTO.class)
+	@Operation(summary = "Retrieve specific trainee with the supplied username")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully retrieved the trainee with the supplied username"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved trainee with the supplied username",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = TraineeResponseDTO.class))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The trainee you were trying to get is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TraineeResponseDTO> getByUserName(@RequestParam("userName") final String userName) {
 		LOGGER.debug("In getByUserName - Received a request to get trainee={}", userName);
@@ -77,10 +82,12 @@ public class TraineeRestController {
 	}
 
 	@PostMapping(consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Create a trainee", response = CredentialsDTO.class)
+	@Operation(summary = "Create a trainee")
 	@ApiResponses(value = {
-		@ApiResponse(code = 201, message = "Successfully created new trainee"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "201", description = "Successfully created new trainee",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = CredentialsDTO.class))}),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<CredentialsDTO> create(@RequestBody @Valid final TraineeCreateRequestDTO request) {
 		LOGGER.debug("In create - Received a request to create trainee={}", request);
@@ -90,12 +97,14 @@ public class TraineeRestController {
 	}
 
 	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Update a specific trainee data", response = TraineeResponseDTO.class)
+	@Operation(summary = "Update a specific trainee data")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully updated trainee"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully updated trainee",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = TraineeResponseDTO.class))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The trainee you were trying to update is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TraineeResponseDTO> update(@RequestBody @Valid final TraineeUpdateRequestDTO request) {
 		LOGGER.debug("In update - Received a request to update trainee={}", request);
@@ -104,12 +113,14 @@ public class TraineeRestController {
 	}
 
 	@PutMapping(value = "/profile/update-trainers", consumes = APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Update a specific trainee trainer list", response = List.class)
+	@Operation(summary = "Update a specific trainee trainer list")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully updated trainee trainer list"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully updated trainee trainer list",
+			content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+				array = @ArraySchema(schema = @Schema(implementation = TraineeResponseDTO.TrainerDTO.class)))}),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The user you were trying to update is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TraineeResponseDTO.TrainerDTO>> updateTrainerList(
 		@RequestBody @Valid final TraineeUpdateTrainerListRequestDTO request
@@ -122,12 +133,12 @@ public class TraineeRestController {
 	}
 
 	@DeleteMapping("/profile")
-	@ApiOperation(value = "Deletes a specific trainee with supplied username")
+	@Operation(summary = "Deletes a specific trainee with supplied username")
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "Successfully deleted the specific trainee"),
-		@ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-		@ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),
-		@ApiResponse(code = 500, message = "Application failed to process the request")
+		@ApiResponse(responseCode = "200", description = "Successfully deleted the specific trainee"),
+		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
+		@ApiResponse(responseCode = "404", description = "The trainee you were trying to delete is not found"),
+		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	@ResponseStatus(HttpStatus.OK)
 	public void delete(@RequestParam("userName") final String userName) {

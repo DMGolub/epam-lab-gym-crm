@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TraineeRestControllerTest {
@@ -53,7 +55,8 @@ class TraineeRestControllerTest {
 		when(mapper.mapToTraineeResponseDTOList(trainees)).thenReturn(response);
 
 		mockMvc.perform(get(URL).contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$", hasSize(response.size())));
 
 		verify(traineeService, times(1)).findAll();
 		verify(mapper, times(1)).mapToTraineeResponseDTOList(trainees);

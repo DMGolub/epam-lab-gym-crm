@@ -7,15 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.LOGIN;
 
 @Component
-public class SessionLoginInterceptor extends HandlerInterceptorAdapter {
+public class SessionLoginInterceptor implements HandlerInterceptor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionLoginInterceptor.class);
 

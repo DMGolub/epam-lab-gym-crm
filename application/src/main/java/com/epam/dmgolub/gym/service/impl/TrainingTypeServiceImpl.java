@@ -5,7 +5,7 @@ import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.repository.TrainingTypeRepository;
 import com.epam.dmgolub.gym.service.TrainingTypeService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
