@@ -17,12 +17,6 @@ class TrainerRequestDTOTest {
 	}
 
 	@Test
-	void userIdGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		requestDTO.setUserId(1L);
-		assertEquals(1L, requestDTO.getUserId());
-	}
-
-	@Test
 	void firstNameGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
 		requestDTO.setFirstName("FirstName");
 		assertEquals("FirstName", requestDTO.getFirstName());
@@ -41,12 +35,6 @@ class TrainerRequestDTOTest {
 	}
 
 	@Test
-	void idGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		requestDTO.setId(2L);
-		assertEquals(2L, requestDTO.getId());
-	}
-
-	@Test
 	void specializationGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
 		requestDTO.setSpecialization(trainingTypeDTO);
 		assertEquals(trainingTypeDTO, requestDTO.getSpecialization());
@@ -56,9 +44,9 @@ class TrainerRequestDTOTest {
 	void toString_shouldReturnExpectedValue_whenInvoked() {
 		final TrainingTypeDTO type = new TrainingTypeDTO(1L, "Karate");
 		final TrainerRequestDTO trainer =
-			new TrainerRequestDTO(1L, "firstName", "lastName", "firstName.lastName", true, 2L, type);
-		final String expected = "TrainerRequestDTO{userId=1, firstName='firstName', lastName='lastName', " +
-			"userName='firstName.lastName', isActive=true, id=2, specialization=" + type + "}";
+			new TrainerRequestDTO("firstName", "lastName", "firstName.lastName", true, type);
+		final String expected = "TrainerRequestDTO{firstName='firstName', lastName='lastName', " +
+			"userName='firstName.lastName', isActive=true, specialization=" + type + "}";
 
 		assertEquals(expected, trainer.toString());
 	}
@@ -66,35 +54,20 @@ class TrainerRequestDTOTest {
 	@Test
 	void testEqualsAndHashCode() {
 		final TrainerRequestDTO requestDTO2 =
-			new TrainerRequestDTO(1L, "FirstName", "LastName", "firstName.lastName", true, 2L, trainingTypeDTO);
+			new TrainerRequestDTO("FirstName", "LastName", "firstName.lastName", true, trainingTypeDTO);
 		final TrainerRequestDTO requestDTO3 =
-			new TrainerRequestDTO(2L, "FirstName", "LastName", "firstName.lastName", true, 2L, trainingTypeDTO);
+			new TrainerRequestDTO("Another firstName", "LastName", "firstName.lastName", true, trainingTypeDTO);
 		final TrainerRequestDTO requestDTO4 =
-			new TrainerRequestDTO(1L, "Another firstName", "LastName", "firstName.lastName", true, 2L, trainingTypeDTO);
+			new TrainerRequestDTO("FirstName", "Another lastName", "firstName.lastName", true, trainingTypeDTO);
 		final TrainerRequestDTO requestDTO5 =
-			new TrainerRequestDTO(1L, "FirstName", "Another lastName", "firstName.lastName", true, 2L, trainingTypeDTO);
-		final TrainerRequestDTO requestDTO6 =
-			new TrainerRequestDTO(1L, "FirstName", "LastName", "firstName.lastName", true, 3L, trainingTypeDTO);
-		final TrainerRequestDTO requestDTO7 =
-			new TrainerRequestDTO(1L, "FirstName", "LastName", "firstName.lastName2", true, 2L, trainingTypeDTO);
+			new TrainerRequestDTO("FirstName", "LastName", "firstName.lastName2", true, trainingTypeDTO);
 
 		assertEquals(requestDTO2, requestDTO2);
+		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
 		assertNotEquals(requestDTO, requestDTO2);
 		assertNotEquals(requestDTO2, requestDTO3);
 		assertNotEquals(requestDTO2, requestDTO4);
 		assertNotEquals(requestDTO2, requestDTO5);
-		assertNotEquals(requestDTO2, requestDTO6);
-		assertNotEquals(requestDTO2, requestDTO7);
-	}
-
-	@Test
-	void testHashCode() {
-		final TrainerRequestDTO requestDTO2 =
-			new TrainerRequestDTO(1L, "FirstName", "LastName", "FirstName.LastName", true, 2L, trainingTypeDTO);
-		final TrainingRequestDTO requestDTO3 = new TrainingRequestDTO();
-
-		assertEquals(requestDTO2.hashCode(), requestDTO2.hashCode());
-		assertNotEquals(requestDTO.hashCode(), requestDTO2.hashCode());
-		assertEquals(0, requestDTO3.hashCode());
+		assertNotEquals(requestDTO2.hashCode(), requestDTO5.hashCode());
 	}
 }

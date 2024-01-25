@@ -19,13 +19,9 @@ class TrainingResponseDTOTest {
 		responseDTO = new TrainingResponseDTO();
 		type = new TrainingTypeDTO(1L, "Bodybuilding");
 		trainee = new TraineeResponseDTO();
+		trainee.setUserName("Trainee.UserName");
 		trainer = new TrainerResponseDTO();
-	}
-
-	@Test
-	void idGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		responseDTO.setId(1L);
-		assertEquals(1L, responseDTO.getId());
+		trainer.setUserName("Trainer.UserName");
 	}
 
 	@Test
@@ -69,43 +65,46 @@ class TrainingResponseDTOTest {
 	void toString_shouldReturnExpectedValue_whenInvoked() {
 		final TrainingTypeDTO type = new TrainingTypeDTO(1L, "Karate");
 		final TrainingResponseDTO training =
-			new TrainingResponseDTO(1L, null, null, "name", type, null, 60);
-		final String expected = "TrainingResponseDTO{id=1, trainee=null, trainer=null, name='name', " +
+			new TrainingResponseDTO(null, null, "name", type, null, 60);
+		final String expected = "TrainingResponseDTO{trainee=null, trainer=null, name='name', " +
 			"type=" + type + ", date=null, duration=60}";
 
 		assertEquals(expected, training.toString());
 	}
 
 	@Test
-	void testEquals() {
+	void testEqualsAndHashCode() {
 		final TrainingTypeDTO type2 = new TrainingTypeDTO(2L, "SomeName");
 		final TrainingResponseDTO responseDTO2 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
+			new TrainingResponseDTO(trainee, trainer, "TestName", type, new Date(), 60);
 		final TrainingResponseDTO responseDTO3 =
-			new TrainingResponseDTO(2L, trainee, trainer, "TestName", type, new Date(), 60);
+			new TrainingResponseDTO(null, trainer, "TestName", type, new Date(), 60);
 		final TrainingResponseDTO responseDTO4 =
-			new TrainingResponseDTO(1L, null, trainer, "TestName", type, new Date(), 60);
+			new TrainingResponseDTO(trainee, null, "TestName", type, new Date(), 60);
 		final TrainingResponseDTO responseDTO5 =
-			new TrainingResponseDTO(1L, trainee, null, "TestName", type, new Date(), 60);
+			new TrainingResponseDTO(trainee, trainer, "TestName2", type, new Date(), 60);
 		final TrainingResponseDTO responseDTO6 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName2", type, new Date(), 60);
-		final TrainingResponseDTO responseDTO7 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type2, new Date(), 60);
+			new TrainingResponseDTO(trainee, trainer, "TestName", type2, new Date(), 60);
 
 		assertEquals(responseDTO2, responseDTO2);
+		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(responseDTO, responseDTO2);
+		assertNotEquals(responseDTO.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(null, responseDTO2);
 		assertNotEquals(responseDTO2, responseDTO3);
+		assertNotEquals(responseDTO2.hashCode(), responseDTO3.hashCode());
 		assertNotEquals(responseDTO2, responseDTO4);
+		assertNotEquals(responseDTO2.hashCode(), responseDTO4.hashCode());
 		assertNotEquals(responseDTO2, responseDTO5);
+		assertNotEquals(responseDTO2.hashCode(), responseDTO5.hashCode());
 		assertNotEquals(responseDTO2, responseDTO6);
-		assertNotEquals(responseDTO2, responseDTO7);
+		assertNotEquals(responseDTO2.hashCode(), responseDTO6.hashCode());
 	}
 
 	@Test
 	void testHashcode() {
 		final TrainingResponseDTO responseDTO2 =
-			new TrainingResponseDTO(1L, trainee, trainer, "TestName", type, new Date(), 60);
+			new TrainingResponseDTO(trainee, trainer, "TestName", type, new Date(), 60);
 
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(responseDTO.hashCode(), responseDTO2.hashCode());

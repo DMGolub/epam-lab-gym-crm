@@ -9,15 +9,12 @@ import com.epam.dmgolub.gym.repository.specification.TraineeTrainingSpecificatio
 import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecification;
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.service.TrainingService;
-import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINING_NOT_FOUND_BY_ID_MESSAGE;
 
 @Service
 @Transactional
@@ -41,14 +38,6 @@ public class TrainingServiceImpl implements TrainingService {
 		LOGGER.debug("In save - Saving training from request {}", request);
 		final Training training = mapper.mapToTraining(request);
 		return mapper.mapToTrainingModel(trainingRepository.saveAndFlush(training));
-	}
-
-	@Override
-	public TrainingModel findById(final Long id) {
-		LOGGER.debug("In findById - Fetching training by id={} from repository", id);
-		final var training = trainingRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINING_NOT_FOUND_BY_ID_MESSAGE + id));
-		return mapper.mapToTrainingModel(training);
 	}
 
 	@Override

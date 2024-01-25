@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +29,7 @@ import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINEE
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_NEW_TRAINEE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINEE_PROFILE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINEE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINEES;
@@ -96,7 +96,7 @@ public class TraineeController {
 			switch (action.toLowerCase()) {
 				case "find":
 					model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(trainee));
-					return REDIRECT_TO_TRAINEE_INDEX + trainee.getId();
+					return REDIRECT_TO_TRAINEE_PROFILE + userName;
 				case "delete":
 					traineeService.delete(userName);
 					redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE,
@@ -113,67 +113,67 @@ public class TraineeController {
 		}
 	}
 
-	@GetMapping("/{id:\\d+}/edit")
-	public String edit(@PathVariable final Long id, final Model model) {
-		LOGGER.debug("In edit - fetching trainee with id={} from service", id);
-		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findById(id)));
-		LOGGER.debug("In edit - trainee fetched successfully. Returning edit view name");
+	@GetMapping("/edit")
+	public String edit(@RequestParam final String userName, final Model model) {
+		LOGGER.debug("In edit - Fetching trainee with userName={} from service", userName);
+		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findByUserName(userName)));
+		LOGGER.debug("In edit - Trainee fetched successfully. Returning edit view name");
 		return TRAINEE_EDIT_VIEW_NAME;
 	}
 
-	@PutMapping("/{id:\\d+}")
+	@PutMapping("/profile")
 	public String update(
-		@PathVariable("id") final Long id,
 		@ModelAttribute @Valid final TraineeRequestDTO trainee,
 		final BindingResult bindingResult
 	) {
-		ControllerUtilities.validateRequestId(id, trainee.getId());
-		LOGGER.debug("In update - validating updated trainee");
+		LOGGER.debug("In update - Validating trainee update request {}", trainee);
 		if (bindingResult.hasErrors()) {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, TRAINEE_EDIT_VIEW_NAME);
 			return TRAINEE_EDIT_VIEW_NAME;
 		}
 		traineeService.update(mapper.mapToTraineeModel(trainee));
-		LOGGER.debug("In update - trainee updated successfully. Redirecting to trainee index view");
+		LOGGER.debug("In update - Trainee updated successfully. Redirecting to trainee index view");
 		return REDIRECT_TO_TRAINEE_INDEX;
 	}
 
-	@PutMapping("/{id:\\d+}/add-trainer")
+	@PutMapping("/profile/add-trainer")
 	public String addTrainer(
-		@PathVariable("id") final Long traineeId,
-		@RequestParam("trainerId") final Long trainerId,
+		@RequestParam final String traineeUserName,
+		@RequestParam final String trainerUserName,
 		final Model model
 	) {
-		LOGGER.debug("In addTrainer - Received request to add trainer={} to trainee={}", trainerId, traineeId);
-		traineeService.addTrainer(traineeId, trainerId);
-		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findById(traineeId)));
-		final var trainers = trainerService.findActiveTrainersNotAssignedOnTrainee(traineeId);
+		LOGGER.debug("In addTrainer - Received request to assign {} on trainee={}", trainerUserName, traineeUserName);
+		traineeService.addTrainer(traineeUserName, trainerUserName);
+		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findByUserName(traineeUserName)));
+		final var trainers = trainerService.findActiveTrainersNotAssignedOnTrainee(traineeUserName);
 		model.addAttribute(AVAILABLE_TRAINERS, mapper.mapToTrainerResponseDTOList(trainers));
-		return REDIRECT_TO_TRAINEE_INDEX + traineeId;
+		return REDIRECT_TO_TRAINEE_PROFILE + traineeUserName;
 	}
 
-	@GetMapping("/{id:\\d+}/add-training")
-	public String addTraining(@PathVariable("id") final Long traineeId, final Model model) {
+	@GetMapping("profile/add-training")
+	public String addTraining(@RequestParam final String traineeUserName, final Model model) {
+		LOGGER.debug("In addTraining - Received a request to show new training page for trainee={}", traineeUserName);
 		model.addAttribute(TRAINING, new TrainingRequestDTO());
-		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findById(traineeId)));
-		final var trainers = trainerService.findActiveTrainersAssignedOnTrainee(traineeId);
+		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findByUserName(traineeUserName)));
+		final var trainers = trainerService.findActiveTrainersAssignedOnTrainee(traineeUserName);
 		model.addAttribute(TRAINERS, mapper.mapToTrainerResponseDTOList(trainers));
 		LOGGER.debug("In newTraining - All data fetched successfully. Returning new training view name");
 		return NEW_TRAINING_VIEW_NAME;
 	}
 
-	@DeleteMapping("/{id:\\d+}")
-	public String delete(@PathVariable("id") final Long id) {
-		LOGGER.debug("In delete - removing trainee with id={}", id);
-		traineeService.delete(id);
+	@DeleteMapping("/delete")
+	public String delete(@RequestParam final String userName) {
+		LOGGER.debug("In delete - Removing trainee with userName={}", userName);
+		traineeService.delete(userName);
 		return REDIRECT_TO_TRAINEE_INDEX;
 	}
 
-	@GetMapping("/{id:\\d+}")
-	public String findById(@PathVariable("id") final Long id, final Model model) {
-		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findById(id)));
-		LOGGER.debug("In findById - Trainee with id={} fetched successfully. Returning trainee view name", id);
-		final var trainers = trainerService.findActiveTrainersNotAssignedOnTrainee(id);
+	@GetMapping("/profile")
+	public String findByUserName(@RequestParam final String userName, final Model model) {
+		LOGGER.debug("In findByUserName - Received a request to show user with userName={}", userName);
+		model.addAttribute(TRAINEE, mapper.mapToTraineeResponseDTO(traineeService.findByUserName(userName)));
+		LOGGER.debug("In findByUserName - Trainee '{}' fetched successfully. Returning trainee view name", userName);
+		final var trainers = trainerService.findActiveTrainersNotAssignedOnTrainee(userName);
 		model.addAttribute(AVAILABLE_TRAINERS, mapper.mapToTrainerResponseDTOList(trainers));
 		return TRAINEE_VIEW_NAME;
 	}

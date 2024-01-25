@@ -45,7 +45,6 @@
                     <caption>All gym trainees</caption>
                     <thead class="thead-dark">
                         <tr>
-                            <th>Id</th>
                             <th>First name</th>
                             <th>Last name</th>
                             <th>User name</th>
@@ -58,20 +57,21 @@
                     </thead>
                     <tbody>
                         <tr th:each="trainee, iterStat : ${trainees}">
-                            <td><a th:href="@{/trainees/{id}(id=${trainee.getId()})}" th:text="${trainee.getId()}">VALUE</a></td>
                             <td th:text="${trainee.getFirstName()}">VALUE</td>
                             <td th:text="${trainee.getLastName()}">VALUE</td>
-                            <td th:text="${trainee.getUserName()}">VALUE</td>
+                            <td><a th:href="@{/trainees/profile(userName=${trainee.getUserName()})}" th:text="${trainee.getUserName()}">VALUE</a></td>
                             <td th:text="${trainee.isActive()}">VALUE</td>
                             <td th:text="${#dates.format(trainee.getDateOfBirth(), 'dd-MM-yyyy')}">VALUE</td>
                             <td th:text="${trainee.getAddress()}">VALUE</td>
                             <td>
-                                <form th:method="GET" th:action="@{/trainees/{id}/edit(id=${trainee.getId()})}">
+                                <form th:method="GET" th:action="@{/trainees/edit}">
+                                    <input type="hidden" name="userName" th:value="${trainee.getUserName()}" />
                                     <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
                                 </form>
                             </td>
                             <td>
-                                <form th:method="DELETE" th:action="@{/trainees/{id}(id=${trainee.getId()})}">
+                                <form th:method="DELETE" th:action="@{/trainees/delete}">
+                                    <input type="hidden" name="userName" th:value="${trainee.getUserName()}" />
                                     <button type="submit" class="btn btn-outline-secondary btn-sm"
                                             onclick="return confirm('Are you sure you want to delete this trainee?');">Delete</button>
                                 </form>

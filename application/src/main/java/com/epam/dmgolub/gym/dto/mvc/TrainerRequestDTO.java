@@ -10,7 +10,6 @@ import static com.epam.dmgolub.gym.dto.constant.Constants.LAST_NAME_PATTERN_REGE
 
 public class TrainerRequestDTO {
 
-	private Long userId;
 	@NotBlank(message = "{firstName.notBlank.violation}")
 	@Pattern(regexp = FIRST_NAME_PATTERN_REGEXP, message = "{firstName.pattern.violation}")
 	private String firstName;
@@ -19,7 +18,6 @@ public class TrainerRequestDTO {
 	private String lastName;
 	private String userName;
 	private boolean isActive;
-	private Long id;
 	@NotNull(message = "{trainer.specialization.notNull.violation}")
 	private TrainingTypeDTO specialization;
 
@@ -28,29 +26,17 @@ public class TrainerRequestDTO {
 	}
 
 	public TrainerRequestDTO(
-		final Long userId,
 		final String firstName,
 		final String lastName,
 		final String userName,
 		final boolean isActive,
-		final Long id,
 		final TrainingTypeDTO specialization
 	) {
-		this.userId = userId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
 		this.isActive = isActive;
-		this.id = id;
 		this.specialization = specialization;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(final Long userId) {
-		this.userId = userId;
 	}
 
 	public String getFirstName() {
@@ -85,14 +71,6 @@ public class TrainerRequestDTO {
 		isActive = active;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
 	public TrainingTypeDTO getSpecialization() {
 		return specialization;
 	}
@@ -103,12 +81,10 @@ public class TrainerRequestDTO {
 
 	@Override
 	public String toString() {
-		return "TrainerRequestDTO{userId=" + userId +
-			", firstName='" + firstName + '\'' +
+		return "TrainerRequestDTO{firstName='" + firstName + '\'' +
 			", lastName='" + lastName + '\'' +
 			", userName='" + userName + '\'' +
 			", isActive=" + isActive +
-			", id=" + id +
 			", specialization=" + specialization +
 			'}';
 	}
@@ -125,9 +101,6 @@ public class TrainerRequestDTO {
 		if (isActive != that.isActive) {
 			return false;
 		}
-		if (!Objects.equals(userId, that.userId)) {
-			return false;
-		}
 		if (!Objects.equals(firstName, that.firstName)) {
 			return false;
 		}
@@ -137,14 +110,11 @@ public class TrainerRequestDTO {
 		if (!Objects.equals(lastName, that.lastName)) {
 			return false;
 		}
-		if (!Objects.equals(id, that.id)) {
-			return false;
-		}
 		return Objects.equals(specialization, that.specialization);
 	}
 
 	@Override
 	public int hashCode() {
-		return userId != null ? userId.hashCode() : 0;
+		return userName != null ? userName.hashCode() : 0;
 	}
 }

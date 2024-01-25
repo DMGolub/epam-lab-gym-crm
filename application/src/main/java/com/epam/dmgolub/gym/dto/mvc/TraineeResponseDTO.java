@@ -9,12 +9,10 @@ import java.util.Objects;
 
 public class TraineeResponseDTO {
 
-	private Long userId;
 	private String firstName;
 	private String lastName;
 	private String userName;
 	private boolean isActive;
-	private Long id;
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private Date dateOfBirth;
 	private String address;
@@ -25,33 +23,21 @@ public class TraineeResponseDTO {
 	}
 
 	public TraineeResponseDTO(
-		final Long userId,
 		final String firstName,
 		final String lastName,
 		final String userName,
 		final boolean isActive,
-		final Long id,
 		final Date dateOfBirth,
 		final String address,
 		final List<TrainerDTO> trainers
 	) {
-		this.userId = userId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
 		this.isActive = isActive;
-		this.id = id;
 		this.dateOfBirth = dateOfBirth;
 		this.address = address;
 		this.trainers = trainers;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(final Long userId) {
-		this.userId = userId;
 	}
 
 	public String getFirstName() {
@@ -86,14 +72,6 @@ public class TraineeResponseDTO {
 		isActive = active;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
 	public Date getDateOfBirth() {
 		return dateOfBirth;
 	}
@@ -121,9 +99,9 @@ public class TraineeResponseDTO {
 	@Override
 	public String
 	toString() {
-		return "TraineeResponseDTO{userId=" + userId + ", firstName='" + firstName + '\'' +
+		return "TraineeResponseDTO{firstName='" + firstName + '\'' +
 			", lastName='" + lastName + '\'' + ", userName='" + userName + '\'' +
-			", isActive=" + isActive + ", id=" + id + ", dateOfBirth=" + dateOfBirth +
+			", isActive=" + isActive + ", dateOfBirth=" + dateOfBirth +
 			", address='" + address + '\'' + ", trainers=" + trainers + '}';
 	}
 
@@ -139,9 +117,6 @@ public class TraineeResponseDTO {
 		if (isActive != that.isActive) {
 			return false;
 		}
-		if (!Objects.equals(userId, that.userId)) {
-			return false;
-		}
 		if (!Objects.equals(firstName, that.firstName)) {
 			return false;
 		}
@@ -149,9 +124,6 @@ public class TraineeResponseDTO {
 			return false;
 		}
 		if (!Objects.equals(userName, that.userName)) {
-			return false;
-		}
-		if (!Objects.equals(id, that.id)) {
 			return false;
 		}
 		if (!Objects.equals(dateOfBirth, that.dateOfBirth)) {
@@ -165,7 +137,7 @@ public class TraineeResponseDTO {
 
 	@Override
 	public int hashCode() {
-		return userId != null ? userId.hashCode() : 0;
+		return userName != null ? userName.hashCode() : 0;
 	}
 
 	public static class TrainerDTO {

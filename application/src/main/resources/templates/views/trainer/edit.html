@@ -18,10 +18,8 @@
                     Some 'edit' trainer view description...
                     Please note that all values are mandatory.
                 </p>
-                <form th:method="PUT" th:action="@{/trainers/{id}(id=${trainer.getId()})}" th:object="${trainer}">
+                <form th:method="PUT" th:action="@{/trainers/profile}" th:object="${trainer}">
                     <h2>Edit trainer data</h2>
-                    <input type="hidden" id="id" name="id" th:value="${trainer.getId()}"/>
-                    <input type="hidden" id="userId" name="userId" th:value="${trainer.getUserId()}"/>
                     <input type="hidden" id="userName" name="userName" th:value="${trainer.getUserName()}"/>
                     <label for="firstName">First name: </label>
                     <input type="text" th:field="*{firstName}" id="firstName"/>

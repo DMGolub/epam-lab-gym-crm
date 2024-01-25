@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_ID_MESSAGE;
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_MESSAGE;
 
 @Service
 @Transactional
@@ -52,13 +51,6 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public TrainerModel findById(final Long id) {
-		LOGGER.debug("In findById - Fetching trainer by id={} from repository", id);
-		final var trainer = getTrainer(id);
-		return mapper.mapToTrainerModel(trainer);
-	}
-
-	@Override
 	public List<TrainerModel> findAll() {
 		LOGGER.debug("In findAll - Fetching all trainers from repository");
 		return mapper.mapToTrainerModelList(trainerRepository.findAll());
@@ -83,23 +75,9 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public List<TrainerModel> findActiveTrainersAssignedOnTrainee(final Long id) {
-		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for id={}", id);
-		final var trainers = trainerRepository.findActiveTrainersAssignedOnTrainee(id);
-		return mapper.mapToTrainerModelList(trainers);
-	}
-
-	@Override
 	public List<TrainerModel> findActiveTrainersAssignedOnTrainee(final String userName) {
 		LOGGER.debug("In findActiveTrainersAssignedToTrainee - Fetching assigned trainers for trainee={}", userName);
 		final var trainers = trainerRepository.findActiveTrainersAssignedOnTrainee(userName);
-		return mapper.mapToTrainerModelList(trainers);
-	}
-
-	@Override
-	public List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(final Long id) {
-		LOGGER.debug("In findActiveTrainersNotAssignedToTrainee - Fetching not assigned trainers for id={}", id);
-		final var trainers = trainerRepository.findActiveTrainersNotAssignedOnTrainee(id);
 		return mapper.mapToTrainerModelList(trainers);
 	}
 
@@ -110,13 +88,8 @@ public class TrainerServiceImpl implements TrainerService {
 		return mapper.mapToTrainerModelList(trainers);
 	}
 
-	private Trainer getTrainer(final Long id) {
-		return trainerRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + id));
-	}
-
 	private Trainer getTrainer(final String userName) {
 		return trainerRepository.findByUserUserName(userName)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_MESSAGE + userName));
 	}
 }

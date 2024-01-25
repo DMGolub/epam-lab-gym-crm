@@ -70,34 +70,6 @@ class TraineeServiceImplTest {
 		verify(mapper, times(1)).mapToTraineeModel(trainee);
 	}
 
-	@Nested
-	class TestFindById {
-
-		@Test
-		void findById_shouldReturnTraineeModel_whenTraineeExists() {
-			final Long id = 1L;
-			final Trainee trainee = new Trainee();
-			trainee.setId(id);
-			when(traineeRepository.findById(id)).thenReturn(java.util.Optional.of(trainee));
-			final TraineeModel expectedOutput = new TraineeModel();
-			when(mapper.mapToTraineeModel(trainee)).thenReturn(expectedOutput);
-
-			assertEquals(expectedOutput, traineeService.findById(id));
-			verify(traineeRepository, times(1)).findById(id);
-			verify(mapper, times(1)).mapToTraineeModel(trainee);
-		}
-
-		@Test
-		void findById_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
-			final Long id = 99L;
-			when(traineeRepository.findById(id)).thenReturn(java.util.Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> traineeService.findById(id));
-			verify(traineeRepository, times(1)).findById(id);
-			verifyNoInteractions(mapper);
-		}
-	}
-
 	@Test
 	void findAll_shouldReturnTwoTraineeModels_whenThereAreTwoTrainees() {
 		final List<Trainee> trainees = List.of(new Trainee(), new Trainee());
@@ -199,30 +171,6 @@ class TraineeServiceImplTest {
 	class TestDelete {
 
 		@Test
-		void deleteById_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
-			final Long id = 1L;
-			final Trainee trainee = new Trainee();
-			trainee.setId(id);
-			final Trainee trainee2 = new Trainee();
-			trainee2.setId(2L);
-			final Training training1 = new Training(1L, trainee, null, "name", null, null, 30);
-			final Training training2 = new Training(2L, trainee, null, "another name", null, null, 60);
-			final Training training3 = new Training(3L, trainee2, null, "yet another name", null, null, 45);
-			final List<Training> allTrainings = List.of(training1, training2, training3);
-			when(traineeRepository.findById(id)).thenReturn(Optional.of(trainee));
-			when(trainingRepository.findAll()).thenReturn(allTrainings);
-			final List<Training> expectedTrainingsToDelete = List.of(training1, training2);
-
-			traineeService.delete(id);
-
-			verify(trainingRepository, times(1)).findAll();
-			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
-			verifyNoMoreInteractions(trainingRepository);
-			verify(traineeRepository, times(1)).deleteById(id);
-			verifyNoInteractions(mapper);
-		}
-
-		@Test
 		void deleteByUserName_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
 			final String userName = "UserName";
 			final Trainee trainee = new Trainee();
@@ -247,14 +195,6 @@ class TraineeServiceImplTest {
 		}
 
 		@Test
-		void deleteById_shouldThrowEntityNotFoundException_whenEntityDoesNotExist() {
-			final Long id = 99L;
-			when(traineeRepository.findById(id)).thenReturn(Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> traineeService.delete(id));
-		}
-
-		@Test
 		void deleteByUserName_shouldThrowEntityNotFoundException_whenEntityDoesNotExist() {
 			final String userName = "User.Name";
 			when(traineeRepository.findByUserUserName(userName)).thenReturn(Optional.empty());
@@ -268,38 +208,38 @@ class TraineeServiceImplTest {
 
 		@Test
 		void addTrainer_shouldAddTrainerToTrainee_whenBothExist() {
-			final Long traineeId = 99L;
-			final Long trainerId = 99L;
+			final String traineeUserName = "Trainee.UserName";
+			final String trainerUserName = "Trainer.UserName";
 			final var trainee = new Trainee();
-			when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(new Trainer()));
-			when(traineeRepository.findById(trainerId)).thenReturn(Optional.of(trainee));
+			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.of(new Trainer()));
+			when(traineeRepository.findByUserUserName(traineeUserName)).thenReturn(Optional.of(trainee));
 
-			traineeService.addTrainer(traineeId, trainerId);
+			traineeService.addTrainer(traineeUserName, trainerUserName);
 			assertEquals(1, trainee.getTrainers().size());
-			verify(trainerRepository, times(1)).findById(trainerId);
-			verify(traineeRepository, times(1)).findById(traineeId);
+			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
+			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
 		}
 
 		@Test
 		void addTrainer_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
-			final Long traineeId = 99L;
-			final Long trainerId = 99L;
-			when(trainerRepository.findById(trainerId)).thenReturn(Optional.of(new Trainer()));
-			when(traineeRepository.findById(traineeId)).thenReturn(Optional.empty());
+			final String traineeUserName = "Trainee.UserName";
+			final String trainerUserName = "Trainer.UserName";
+			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.of(new Trainer()));
+			when(traineeRepository.findByUserUserName(traineeUserName)).thenReturn(Optional.empty());
 
-			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeId, trainerId));
-			verify(trainerRepository, times(1)).findById(trainerId);
-			verify(traineeRepository, times(1)).findById(traineeId);
+			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeUserName, trainerUserName));
+			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
+			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
 		}
 
 		@Test
 		void addTrainer_shouldThrowEntityNotFoundException_whenTrainerNotFound() {
-			final Long traineeId = 99L;
-			final Long trainerId = 99L;
-			when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
+			final String traineeUserName = "Trainee.UserName";
+			final String trainerUserName = "Trainer.UserName";
+			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.empty());
 
-			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeId, trainerId));
-			verify(trainerRepository, times(1)).findById(trainerId);
+			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeUserName, trainerUserName));
+			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
 			verifyNoInteractions(traineeRepository);
 		}
 	}

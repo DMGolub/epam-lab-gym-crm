@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +25,7 @@ import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.ERROR_MESSA
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINER_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINER_PROFILE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINERS;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINER_EDIT_VIEW_NAME;
@@ -63,7 +63,7 @@ public class TrainerController {
 		return NEW_TRAINER_VIEW_NAME;
 	}
 
-	@PostMapping()
+	@PostMapping
 	public String save(
 		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
 		final BindingResult bindingResult,
@@ -90,13 +90,12 @@ public class TrainerController {
 		LOGGER.debug("In handleAction - Received a request to {} trainer by userName={}", action, userName);
 		try {
 			final var trainer = trainerService.findByUserName(userName);
-			switch (action.toLowerCase()) {
-				case "find":
-					model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainer));
-					return REDIRECT_TO_TRAINER_INDEX + trainer.getId();
-				default:
-					redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE, "Invalid action");
-					return REDIRECT_TO_TRAINER_INDEX;
+			if ("find".equalsIgnoreCase(action)) {
+				model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainer));
+				return REDIRECT_TO_TRAINER_PROFILE + userName;
+			} else {
+				redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE, "Invalid action");
+				return REDIRECT_TO_TRAINER_INDEX;
 			}
 		} catch (final EntityNotFoundException e) {
 			redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTRIBUTE,
@@ -105,10 +104,10 @@ public class TrainerController {
 		}
 	}
 
-	@GetMapping("/{id:\\d+}/edit")
-	public String edit(@PathVariable("id") final Long id, final Model model) {
-		LOGGER.debug("In edit - fetching trainer with id={} from service", id);
-		model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainerService.findById(id)));
+	@GetMapping("/edit")
+	public String edit(@RequestParam final String userName, final Model model) {
+		LOGGER.debug("In edit - fetching trainer with userName={} from service", userName);
+		model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainerService.findByUserName(userName)));
 		LOGGER.debug("In edit - fetching training types from service");
 		final var trainingTypes = mapper.mapToTrainingTypeDTOList(trainingTypeService.findAll());
 		model.addAttribute(TRAINING_TYPES, trainingTypes);
@@ -116,27 +115,25 @@ public class TrainerController {
 		return TRAINER_EDIT_VIEW_NAME;
 	}
 
-	@PutMapping("/{id:\\d+}")
+	@PutMapping("/profile")
 	public String update(
-		@PathVariable("id") final Long id,
 		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
 		final BindingResult bindingResult
 	) {
-		LOGGER.debug("In update - validating updated trainer");
-		ControllerUtilities.validateRequestId(id, trainer.getId());
+		LOGGER.debug("In update - Validating updated trainer {}", trainer);
 		if (bindingResult.hasErrors()) {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, TRAINER_EDIT_VIEW_NAME);
 			return TRAINER_EDIT_VIEW_NAME;
 		}
 		trainerService.update(mapper.mapToTrainerModel(trainer));
-		LOGGER.debug("In update - trainer updated successfully. Redirecting to trainer index view");
+		LOGGER.debug("In update - Trainer updated successfully. Redirecting to trainer index view");
 		return REDIRECT_TO_TRAINER_INDEX;
 	}
 
-	@GetMapping("/{id:\\d+}")
-	public String findById(@PathVariable("id") final Long id, final Model model) {
-		model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainerService.findById(id)));
-		LOGGER.debug("In findById - Trainer with id={} fetched successfully. Returning trainer view name", id);
+	@GetMapping("/profile")
+	public String findByUserName(@RequestParam final String userName, final Model model) {
+		model.addAttribute(TRAINER, mapper.mapToTrainerResponseDTO(trainerService.findByUserName(userName)));
+		LOGGER.debug("In findByUserName - Trainer {} fetched successfully. Returning trainer view name", userName);
 		return TRAINER_VIEW_NAME;
 	}
 

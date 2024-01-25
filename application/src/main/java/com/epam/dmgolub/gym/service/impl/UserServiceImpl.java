@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.util.List;
 
-import static com.epam.dmgolub.gym.service.constant.Constants.USER_NOT_FOUND_BY_ID_MESSAGE;
-import static com.epam.dmgolub.gym.service.constant.Constants.USER_NOT_FOUND_BY_USERNAME_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.USER_NOT_FOUND_MESSAGE;
 
 @Service
 @Transactional
@@ -28,12 +27,6 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(final UserRepository userRepository, final EntityToModelMapper mapper) {
 		this.userRepository = userRepository;
 		this.mapper = mapper;
-	}
-
-	@Override
-	public UserModel findById(final Long id) {
-		LOGGER.debug("In findById - Received a request to find user by id={}", id);
-		return mapper.mapToUserModel(getUser(id));
 	}
 
 	@Override
@@ -52,13 +45,8 @@ public class UserServiceImpl implements UserService {
 		userRepository.saveAndFlush(user);
 	}
 
-	private User getUser(final Long id) {
-		return userRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_BY_ID_MESSAGE + id));
-	}
-
 	private User getUser(final String userName) {
 		return userRepository.findByUserName(userName)
-			.orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
+			.orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_MESSAGE + userName));
 	}
 }

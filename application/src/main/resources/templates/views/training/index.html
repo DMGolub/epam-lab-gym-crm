@@ -80,7 +80,6 @@
                     <caption>All gym trainings</caption>
                     <thead class="thead-dark">
                     <tr>
-                        <th>Id</th>
                         <th>Trainee</th>
                         <th>Trainer</th>
                         <th>Name</th>
@@ -91,11 +90,12 @@
                     </thead>
                     <tbody>
                     <tr th:each="training, iterStat : ${trainings}">
-                        <td><a th:href="@{/trainings/{id}(id=${training.getId()})}" th:text="${training.getId()}">VALUE</a></td>
-                        <td><a th:href="@{/trainees/{id}(id=${training.getTrainee().getId()})}"
-                               th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}">VALUE</a></td>
-                        <td><a th:href="@{/trainers/{id}(id=${training.getTrainer().getId()})}"
-                               th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}">VALUE</a></td>
+                        <td><a th:href="@{/trainees/profile(userName=${training.getTrainee().getUserName()})}"
+                               th:text="${training.getTrainee().getFirstName()} + ' ' + ${training.getTrainee().getLastName()}
+                               + ' (' + ${training.getTrainee().getUserName()} + ')'">VALUE</a></td>
+                        <td><a th:href="@{/trainers/profile(userName=${training.getTrainer().getUserName()})}"
+                               th:text="${training.getTrainer().getFirstName()} + ' ' + ${training.getTrainer().getLastName()}
+                               + ' (' + ${training.getTrainer().getUserName()} + ')'">VALUE</a></td>
                         <td th:text="${training.getName()}">VALUE</td>
                         <td th:text="${training.getType().getName()}">VALUE</td>
                         <td th:text="${#dates.format(training.getDate(), 'dd-MM-yyyy')}">VALUE</td>

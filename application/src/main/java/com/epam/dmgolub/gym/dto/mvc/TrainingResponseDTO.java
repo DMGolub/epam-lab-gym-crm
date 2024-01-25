@@ -7,7 +7,6 @@ import java.util.Objects;
 
 public class TrainingResponseDTO {
 
-	private Long id;
 	private TraineeResponseDTO trainee;
 	private TrainerResponseDTO trainer;
 	private String name;
@@ -21,7 +20,6 @@ public class TrainingResponseDTO {
 	}
 
 	public TrainingResponseDTO(
-		final Long id,
 		final TraineeResponseDTO trainee,
 		final TrainerResponseDTO trainer,
 		final String name,
@@ -29,21 +27,12 @@ public class TrainingResponseDTO {
 		final Date date,
 		final int duration
 	) {
-		this.id = id;
 		this.trainee = trainee;
 		this.trainer = trainer;
 		this.name = name;
 		this.type = type;
 		this.date = date;
 		this.duration = duration;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
 	}
 
 	public TraineeResponseDTO getTrainee() {
@@ -96,7 +85,7 @@ public class TrainingResponseDTO {
 
 	@Override
 	public String toString() {
-		return "TrainingResponseDTO{id=" + id + ", trainee=" + trainee + ", trainer=" + trainer +
+		return "TrainingResponseDTO{trainee=" + trainee + ", trainer=" + trainer +
 			", name='" + name + '\'' + ", type=" + type + ", date=" + date + ", duration=" + duration + '}';
 	}
 
@@ -110,9 +99,6 @@ public class TrainingResponseDTO {
 		}
 		final TrainingResponseDTO that = (TrainingResponseDTO) o;
 		if (duration != that.duration) {
-			return false;
-		}
-		if (!Objects.equals(id, that.id)) {
 			return false;
 		}
 		if (!Objects.equals(trainee, that.trainee)) {
@@ -132,6 +118,12 @@ public class TrainingResponseDTO {
 
 	@Override
 	public int hashCode() {
-		return id != null ? id.hashCode() : 0;
+		int result = trainee != null ? trainee.hashCode() : 0;
+		result = 31 * result + (trainer != null ? trainer.hashCode() : 0);
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		result = 31 * result + (type != null ? type.hashCode() : 0);
+		result = 31 * result + (date != null ? date.hashCode() : 0);
+		result = 31 * result + duration;
+		return result;
 	}
 }

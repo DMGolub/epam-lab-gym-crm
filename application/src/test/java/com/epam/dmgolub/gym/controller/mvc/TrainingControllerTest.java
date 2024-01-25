@@ -3,7 +3,6 @@ package com.epam.dmgolub.gym.controller.mvc;
 import com.epam.dmgolub.gym.dto.mvc.TraineeTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.mvc.TrainerTrainingsSearchRequestDTO;
 import com.epam.dmgolub.gym.dto.mvc.TrainingRequestDTO;
-import com.epam.dmgolub.gym.dto.mvc.TrainingResponseDTO;
 import com.epam.dmgolub.gym.mapper.mvc.ModelToDtoMapper;
 import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.model.TrainingModel;
@@ -81,22 +80,6 @@ class TrainingControllerTest {
 			verify(mapper, times(1)).mapToTrainingModel(request);
 			verify(trainingService, times(1)).save(training);
 		}
-	}
-
-	@Test
-	void findById_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainingExists() {
-		long id = 1L;
-		final var training = new TrainingModel();
-		when(trainingService.findById(id)).thenReturn(training);
-		final var response = new TrainingResponseDTO();
-		when(mapper.mapTrainingResponseDTO(training)).thenReturn(response);
-
-		final String result = trainingController.findById(id, model);
-
-		assertEquals(TRAINING_VIEW_NAME, result);
-		verify(trainingService, times(1)).findById(id);
-		verify(mapper, times(1)).mapTrainingResponseDTO(training);
-		verify(model).addAttribute(eq(TRAINING), any(TrainingResponseDTO.class));
 	}
 
 	@Test

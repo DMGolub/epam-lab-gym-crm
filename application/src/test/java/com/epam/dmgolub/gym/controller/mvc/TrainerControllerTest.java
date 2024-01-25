@@ -25,6 +25,7 @@ import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.ERROR_MESSA
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINER_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINER_PROFILE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINER;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINERS;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINER_EDIT_VIEW_NAME;
@@ -107,17 +108,16 @@ class TrainerControllerTest {
 		void handleActionByUserName_shouldRedirectToTrainerPage_whenActionIsFindAndTrainerExists() {
 			final String userName = "UserName";
 			final var trainer = new TrainerModel();
-			final Long trainerId = 2L;
-			trainer.setId(trainerId);
+			trainer.setUserName(userName);
 			final var response = new TrainerResponseDTO();
-			response.setId(trainerId);
+			response.setUserName(userName);
 			when(trainerService.findByUserName(userName)).thenReturn(trainer);
 			when(mapper.mapToTrainerResponseDTO(trainer)).thenReturn(response);
 
 			final String result =
 				trainerController.handleActionByUserName("find", userName, model, redirectAttributes);
 
-			assertEquals(REDIRECT_TO_TRAINER_INDEX + trainerId, result);
+			assertEquals(REDIRECT_TO_TRAINER_PROFILE + userName, result);
 			verify(trainerService, times(1)).findByUserName(userName);
 			verify(mapper, times(1)).mapToTrainerResponseDTO(trainer);
 			verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
@@ -152,18 +152,18 @@ class TrainerControllerTest {
 
 	@Test
 	void edit_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
-		final Long id = 1L;
+		final String userName = "User.Name";
 		final var trainer = new TrainerModel();
-		trainer.setId(id);
-		when(trainerService.findById(id)).thenReturn(trainer);
+		trainer.setUserName(userName);
+		when(trainerService.findByUserName(userName)).thenReturn(trainer);
 		final var response = new TrainerResponseDTO();
-		response.setId(id);
+		response.setUserName(userName);
 		when(mapper.mapToTrainerResponseDTO(trainer)).thenReturn(response);
 		when(trainingTypeService.findAll()).thenReturn(Collections.emptyList());
 		when(mapper.mapToTrainingTypeDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-		assertEquals(TRAINER_EDIT_VIEW_NAME, trainerController.edit(id, model));
-		verify(trainerService, times(1)).findById(id);
+		assertEquals(TRAINER_EDIT_VIEW_NAME, trainerController.edit(userName, model));
+		verify(trainerService, times(1)).findByUserName(userName);
 		verify(mapper, times(1)).mapToTrainerResponseDTO(trainer);
 		verify(trainingTypeService, times(1)).findAll();
 		verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
@@ -177,10 +177,10 @@ class TrainerControllerTest {
 		void update_shouldReturnNewTrainerPage_whenBingingResultHasErrors() {
 			when(bindingResult.hasErrors()).thenReturn(true);
 			final TrainerRequestDTO trainer = new TrainerRequestDTO();
-			final Long id = 1L;
-			trainer.setId(id);
+			final String userName = "User.Name";
+			trainer.setUserName(userName);
 
-			final String result = trainerController.update(id, trainer, bindingResult);
+			final String result = trainerController.update(trainer, bindingResult);
 
 			assertEquals(TRAINER_EDIT_VIEW_NAME, result);
 			verifyNoInteractions(trainerService);
@@ -190,13 +190,13 @@ class TrainerControllerTest {
 		void update_shouldSaveTrainerAndRedirectToIndexPage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			final var request = new TrainerRequestDTO();
-			final Long id = 1L;
-			request.setId(id);
+			final String userName = "User.Name";
+			request.setUserName(userName);
 			final var trainer = new TrainerModel();
-			trainer.setId(id);
+			trainer.setUserName(userName);
 			when(mapper.mapToTrainerModel(request)).thenReturn(trainer);
 
-			final String result = trainerController.update(id, request, bindingResult);
+			final String result = trainerController.update(request, bindingResult);
 
 			assertEquals(REDIRECT_TO_TRAINER_INDEX, result);
 			verify(mapper, times(1)).mapToTrainerModel(request);
@@ -205,19 +205,19 @@ class TrainerControllerTest {
 	}
 
 	@Test
-	void findById_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainerExists() {
-		final Long id = 1L;
+	void findByUserName_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainerExists() {
+		final String userName = "User.Name";
 		final var trainer = new TrainerModel();
-		trainer.setId(id);
+		trainer.setUserName(userName);
 		final var response = new TrainerResponseDTO();
-		response.setId(id);
-		when(trainerService.findById(id)).thenReturn(trainer);
+		response.setUserName(userName);
+		when(trainerService.findByUserName(userName)).thenReturn(trainer);
 		when(mapper.mapToTrainerResponseDTO(trainer)).thenReturn(response);
 
-		final String view = trainerController.findById(id, model);
+		final String view = trainerController.findByUserName(userName, model);
 
 		assertEquals(TRAINER_VIEW_NAME, view);
-		verify(trainerService, times(1)).findById(id);
+		verify(trainerService, times(1)).findByUserName(userName);
 		verify(mapper, times(1)).mapToTrainerResponseDTO(trainer);
 		verify(model).addAttribute(eq(TRAINER), any(TrainerResponseDTO.class));
 	}

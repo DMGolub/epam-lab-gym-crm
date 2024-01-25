@@ -45,7 +45,6 @@
                     <caption>All gym trainers</caption>
                     <thead class="thead-dark">
                     <tr>
-                        <th>Id</th>
                         <th>First name</th>
                         <th>Last name</th>
                         <th>User name</th>
@@ -56,14 +55,14 @@
                     </thead>
                     <tbody>
                     <tr th:each="trainer, iterStat : ${trainers}">
-                        <td><a th:href="@{/trainers/{id}(id=${trainer.getId()})}" th:text="${trainer.getId()}">VALUE</a></td>
                         <td th:text="${trainer.getFirstName()}">VALUE</td>
                         <td th:text="${trainer.getLastName()}">VALUE</td>
-                        <td th:text="${trainer.getUserName()}">VALUE</td>
+                        <td><a th:href="@{/trainers/profile(userName=${trainer.getUserName()})}" th:text="${trainer.getUserName()}">VALUE</a></td>
                         <td th:text="${trainer.isActive()}">VALUE</td>
                         <td th:text="${trainer.getSpecialization().getName()}">VALUE</td>
                         <td>
-                            <form th:method="GET" th:action="@{/trainers/{id}/edit(id=${trainer.getId()})}">
+                            <form th:method="GET" th:action="@{/trainers/edit}">
+                                <input type="hidden" name="userName" th:value="${trainer.getUserName()}" />
                                 <button type="submit" class="btn btn-outline-secondary btn-sm">Edit</button>
                             </form>
                         </td>

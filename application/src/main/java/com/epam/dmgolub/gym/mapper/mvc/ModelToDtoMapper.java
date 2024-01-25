@@ -31,6 +31,8 @@ public abstract class ModelToDtoMapper {
 
 	public abstract List<TraineeResponseDTO> mapToTraineeResponseDTOList(List<TraineeModel> traineeList);
 
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "userId", ignore = true)
 	@Mapping(target = "password", ignore = true)
 	@Mapping(target = "trainers", ignore = true)
 	public abstract TraineeModel mapToTraineeModel(TraineeRequestDTO traineeRequestDTO);
@@ -45,6 +47,8 @@ public abstract class ModelToDtoMapper {
 
 	public abstract List<TrainerResponseDTO> mapToTrainerResponseDTOList(List<TrainerModel> trainerList);
 
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "userId", ignore = true)
 	@Mapping(target = "password", ignore = true)
 	@Mapping(target = "trainees", ignore = true)
 	public abstract TrainerModel mapToTrainerModel(TrainerRequestDTO trainerRequestDTO);

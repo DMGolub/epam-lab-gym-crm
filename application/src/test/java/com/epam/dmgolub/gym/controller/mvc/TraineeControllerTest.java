@@ -31,6 +31,7 @@ import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINEE
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.NEW_TRAINING_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_NEW_TRAINEE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINEE_INDEX;
+import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.REDIRECT_TO_TRAINEE_PROFILE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINEE;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINEES;
@@ -80,17 +81,17 @@ class TraineeControllerTest {
 
 	@Test
 	void addTraining_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
-		final Long id = 1L;
+		final String userName = "User.Name";
 		final var trainee = new TraineeModel();
-		when(traineeService.findById(id)).thenReturn(trainee);
+		when(traineeService.findByUserName(userName)).thenReturn(trainee);
 		final var trainers = new ArrayList<TrainerModel>();
-		when(trainerService.findActiveTrainersAssignedOnTrainee(id)).thenReturn(trainers);
+		when(trainerService.findActiveTrainersAssignedOnTrainee(userName)).thenReturn(trainers);
 		when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(new TraineeResponseDTO());
 		when(mapper.mapToTrainerResponseDTOList(trainers)).thenReturn(Collections.emptyList());
 
-		assertEquals(NEW_TRAINING_VIEW_NAME, traineeController.addTraining(id, model));
-		verify(traineeService, times(1)).findById(id);
-		verify(trainerService, times(1)).findActiveTrainersAssignedOnTrainee(id);
+		assertEquals(NEW_TRAINING_VIEW_NAME, traineeController.addTraining(userName, model));
+		verify(traineeService, times(1)).findByUserName(userName);
+		verify(trainerService, times(1)).findActiveTrainersAssignedOnTrainee(userName);
 		verify(model).addAttribute(eq(TRAINING), any(TrainingRequestDTO.class));
 		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
 		verify(model).addAttribute(eq(TRAINERS), any(List.class));
@@ -131,17 +132,15 @@ class TraineeControllerTest {
 		void handleActionByUserName_shouldRedirectToTraineePage_whenActionIsFindAndTraineeExists() {
 			final String userName = "UserName";
 			final var trainee = new TraineeModel();
-			final Long traineeId = 2L;
-			trainee.setId(traineeId);
 			final var response = new TraineeResponseDTO();
-			response.setId(traineeId);
+			response.setUserName(userName);
 			when(traineeService.findByUserName(userName)).thenReturn(trainee);
 			when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(response);
 
 			final String result =
 				traineeController.handleActionByUserName("find", userName, model, redirectAttributes);
 
-			assertEquals(REDIRECT_TO_TRAINEE_INDEX + traineeId, result);
+			assertEquals(REDIRECT_TO_TRAINEE_PROFILE + userName, result);
 			verify(traineeService, times(1)).findByUserName(userName);
 			verify(mapper, times(1)).mapToTraineeResponseDTO(trainee);
 			verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
@@ -190,15 +189,15 @@ class TraineeControllerTest {
 
 	@Test
 	void edit_shouldPopulateModelWithAttributesAndReturnProperViewName_whenInvoked() {
-		final Long id = 1L;
+		final String userName = "User.Name";
 		final var trainee = new TraineeModel();
-		trainee.setId(id);
-		when(traineeService.findById(id)).thenReturn(trainee);
+		trainee.setUserName(userName);
+		when(traineeService.findByUserName(userName)).thenReturn(trainee);
 		final var response = new TraineeResponseDTO();
 		when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(response);
 
-		assertEquals(TRAINEE_EDIT_VIEW_NAME, traineeController.edit(id, model));
-		verify(traineeService, times(1)).findById(id);
+		assertEquals(TRAINEE_EDIT_VIEW_NAME, traineeController.edit(userName, model));
+		verify(traineeService, times(1)).findByUserName(userName);
 		verify(mapper, times(1)).mapToTraineeResponseDTO(trainee);
 		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
 	}
@@ -210,10 +209,10 @@ class TraineeControllerTest {
 		void update_shouldReturnNewTraineePage_whenBingingResultHasErrors() {
 			when(bindingResult.hasErrors()).thenReturn(true);
 			final var trainee = new TraineeRequestDTO();
-			final Long id = 1L;
-			trainee.setId(id);
+			final String userName = "User.Name";
+			trainee.setUserName(userName);
 
-			final String result = traineeController.update(id, trainee, bindingResult);
+			final String result = traineeController.update(trainee, bindingResult);
 
 			assertEquals(TRAINEE_EDIT_VIEW_NAME, result);
 			verifyNoInteractions(traineeService);
@@ -224,13 +223,13 @@ class TraineeControllerTest {
 		void update_shouldSaveTraineeAndRedirectToIndexPage_whenThereAreNoErrors() {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			final var request = new TraineeRequestDTO();
-			final Long id = 1L;
-			request.setId(id);
+			final String userName = "User.Name";
+			request.setUserName(userName);
 			final var trainee = new TraineeModel();
-			trainee.setId(id);
+			trainee.setUserName(userName);
 			when(mapper.mapToTraineeModel(request)).thenReturn(trainee);
 
-			final String result = traineeController.update(id, request, bindingResult);
+			final String result = traineeController.update(request, bindingResult);
 
 			assertEquals(REDIRECT_TO_TRAINEE_INDEX, result);
 			verify(mapper, times(1)).mapToTraineeModel(request);
@@ -240,51 +239,51 @@ class TraineeControllerTest {
 
 	@Test
 	void addTrainer_shouldAddTrainerAndRedirectToTraineePage_whenInvokedWithParams() {
-		final Long traineeId = 1L;
-		final Long trainerId = 2L;
+		final String traineeUserName = "Trainee.UserName";
+		final String trainerUserName = "Trainer.UserName";
 		final var trainee = new TraineeModel();
-		when(traineeService.findById(traineeId)).thenReturn(trainee);
+		when(traineeService.findByUserName(traineeUserName)).thenReturn(trainee);
 		final var trainers = new ArrayList<TrainerModel>();
-		when(trainerService.findActiveTrainersNotAssignedOnTrainee(traineeId)).thenReturn(trainers);
+		when(trainerService.findActiveTrainersNotAssignedOnTrainee(traineeUserName)).thenReturn(trainers);
 		when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(new TraineeResponseDTO());
 		when(mapper.mapToTrainerResponseDTOList(trainers)).thenReturn(Collections.emptyList());
 
-		final String result = traineeController.addTrainer(traineeId, trainerId, model);
+		final String result = traineeController.addTrainer(traineeUserName, trainerUserName, model);
 
-		assertEquals(REDIRECT_TO_TRAINEE_INDEX + traineeId, result);
-		verify(traineeService, times(1)).addTrainer(traineeId, trainerId);
-		verify(traineeService, times(1)).findById(traineeId);
-		verify(trainerService, times(1)).findActiveTrainersNotAssignedOnTrainee(traineeId);
+		assertEquals(REDIRECT_TO_TRAINEE_PROFILE + traineeUserName, result);
+		verify(traineeService, times(1)).addTrainer(traineeUserName, trainerUserName);
+		verify(traineeService, times(1)).findByUserName(traineeUserName);
+		verify(trainerService, times(1)).findActiveTrainersNotAssignedOnTrainee(traineeUserName);
 		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));
 		verify(model).addAttribute(eq(AVAILABLE_TRAINERS), any(List.class));
 	}
 
 	@Test
 	void delete_shouldInvokeServiceAndRedirectToTraineeIndexPage_whenInvoked() {
-		final Long id = 1L;
+		final String userName = "User.Name";
 
-		assertEquals(REDIRECT_TO_TRAINEE_INDEX, traineeController.delete(id));
-		verify(traineeService, times(1)).delete(id);
+		assertEquals(REDIRECT_TO_TRAINEE_INDEX, traineeController.delete(userName));
+		verify(traineeService, times(1)).delete(userName);
 		verifyNoInteractions(mapper);
 	}
 
 	@Test
 	void findById_shouldPopulateModelWithAttributeAndReturnProperViewName_whenTrainerExists() {
-		final Long id = 1L;
+		final String userName = "User.Name";
 		final var trainee = new TraineeModel();
-		trainee.setId(id);
+		trainee.setUserName(userName);
 		final var response = new TraineeResponseDTO();
-		response.setId(id);
+		response.setUserName(userName);
 		final var trainers = new ArrayList<TrainerModel>();
-		when(traineeService.findById(id)).thenReturn(trainee);
-		when(trainerService.findActiveTrainersNotAssignedOnTrainee(id)).thenReturn(trainers);
+		when(traineeService.findByUserName(userName)).thenReturn(trainee);
+		when(trainerService.findActiveTrainersNotAssignedOnTrainee(userName)).thenReturn(trainers);
 		when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(response);
 		when(mapper.mapToTrainerResponseDTOList(trainers)).thenReturn(Collections.emptyList());
 
-		final String view = traineeController.findById(id, model);
+		final String view = traineeController.findByUserName(userName, model);
 
 		assertEquals(TRAINEE_VIEW_NAME, view);
-		verify(traineeService, times(1)).findById(id);
+		verify(traineeService, times(1)).findByUserName(userName);
 		verify(mapper, times(1)).mapToTraineeResponseDTO(trainee);
 		verify(mapper, times(1)).mapToTrainerResponseDTOList(trainers);
 		verify(model).addAttribute(eq(TRAINEE), any(TraineeResponseDTO.class));

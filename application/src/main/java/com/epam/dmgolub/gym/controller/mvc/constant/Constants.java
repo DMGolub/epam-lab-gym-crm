@@ -8,6 +8,7 @@ public class Constants {
 	public static final String TRAINEE_EDIT_VIEW_NAME = "trainee/edit";
 	public static final String TRAINEE_INDEX_VIEW_NAME = "trainee/index";
 	public static final String REDIRECT_TO_TRAINEE_INDEX = "redirect:/trainees/";
+	public static final String REDIRECT_TO_TRAINEE_PROFILE = "redirect:/trainees/profile?userName=";
 	public static final String REDIRECT_TO_NEW_TRAINEE = "redirect:/trainees/new";
 	public static final String TRAINEE_VIEW_NAME = "trainee/trainee";
 	public static final String AVAILABLE_TRAINERS = "availableTrainers";
@@ -18,16 +19,15 @@ public class Constants {
 	public static final String TRAINER_EDIT_VIEW_NAME = "trainer/edit";
 	public static final String TRAINER_INDEX_VIEW_NAME = "trainer/index";
 	public static final String REDIRECT_TO_TRAINER_INDEX = "redirect:/trainers/";
+	public static final String REDIRECT_TO_TRAINER_PROFILE = "redirect:/trainers/profile?userName=";
 	public static final String REDIRECT_TO_NEW_TRAINER = "redirect:/trainers/new";
 	public static final String TRAINER_VIEW_NAME = "trainer/trainer";
 
 	public static final String TRAINING = "training";
 	public static final String TRAININGS = "trainings";
 	public static final String NEW_TRAINING_VIEW_NAME = "training/new";
-	public static final String TRAINING_EDIT_VIEW_NAME = "training/edit";
 	public static final String TRAINING_INDEX_VIEW_NAME = "training/index";
 	public static final String REDIRECT_TO_TRAINING_INDEX = "redirect:/trainings/";
-	public static final String TRAINING_VIEW_NAME = "training/training";
 
 	public static final String TRAINING_TYPES = "trainingTypes";
 

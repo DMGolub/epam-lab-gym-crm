@@ -16,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -30,7 +29,6 @@ import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINING;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAININGS;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINING_INDEX_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINING_TYPES;
-import static com.epam.dmgolub.gym.controller.mvc.constant.Constants.TRAINING_VIEW_NAME;
 
 @Controller
 @RequestMapping("/trainings")
@@ -76,13 +74,6 @@ public class TrainingController {
 		return REDIRECT_TO_TRAINING_INDEX;
 	}
 
-	@GetMapping("/{id:\\d+}")
-	public String findById(@PathVariable("id") final Long id, final Model model) {
-		model.addAttribute(TRAINING, mapper.mapTrainingResponseDTO(trainingService.findById(id)));
-		LOGGER.debug("In findById - Training with id={} fetched successfully. Returning training view name", id);
-		return TRAINING_VIEW_NAME;
-	}
-
 	@GetMapping("/")
 	public String findAll(final Model model) {
 		model.addAttribute(TRAININGS, mapper.mapToTrainingResponseDTOList(trainingService.findAll()));
@@ -103,10 +94,10 @@ public class TrainingController {
 		model.addAttribute(TRAINING_TYPES, trainingTypes);
 		if (bindingResult.hasErrors()) {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, TRAINING_INDEX_VIEW_NAME);
-			return TRAINING_INDEX_VIEW_NAME;
+		} else {
+			final var request = mapper.mapToTraineeTrainingsSearchRequest(traineeRequest);
+			model.addAttribute(TRAININGS, trainingService.searchByTrainee(request));
 		}
-		final var request = mapper.mapToTraineeTrainingsSearchRequest(traineeRequest);
-		model.addAttribute(TRAININGS, trainingService.searchByTrainee(request));
 		return TRAINING_INDEX_VIEW_NAME;
 	}
 
@@ -120,10 +111,10 @@ public class TrainingController {
 		model.addAttribute(TRAINING_TYPES, trainingTypeService.findAll());
 		if (bindingResult.hasErrors()) {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, TRAINING_INDEX_VIEW_NAME);
-			return TRAINING_INDEX_VIEW_NAME;
+		} else {
+			final var request = mapper.mapToTrainerTrainingsSearchRequest(trainerRequest);
+			model.addAttribute(TRAININGS, trainingService.searchByTrainer(request));
 		}
-		final var request = mapper.mapToTrainerTrainingsSearchRequest(trainerRequest);
-		model.addAttribute(TRAININGS, trainingService.searchByTrainer(request));
 		return TRAINING_INDEX_VIEW_NAME;
 	}
 }

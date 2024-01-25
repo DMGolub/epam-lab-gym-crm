@@ -10,12 +10,9 @@ import com.epam.dmgolub.gym.repository.searchcriteria.TraineeTrainingsSearchCrit
 import com.epam.dmgolub.gym.repository.searchcriteria.TrainerTrainingsSearchCriteria;
 import com.epam.dmgolub.gym.repository.specification.TraineeTrainingSpecification;
 import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecification;
-import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,35 +47,6 @@ class TrainingServiceImplTest {
 		verify(mapper).mapToTraining(request);
 		verify(trainingRepository).saveAndFlush(training);
 		verify(mapper).mapToTrainingModel(training);
-	}
-
-	@Nested
-	class TestFindById {
-
-		@Test
-		void findById_shouldReturnTrainingModel_whenTrainingExists() {
-			final Training training = new Training();
-			final Long id = 1L;
-			training.setId(id);
-			when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
-			final TrainingModel expectedResponse = new TrainingModel();
-			when(mapper.mapToTrainingModel(training)).thenReturn(expectedResponse);
-
-			final TrainingModel response = trainingService.findById(id);
-			assertEquals(expectedResponse, response);
-			verify(trainingRepository).findById(id);
-			verify(mapper).mapToTrainingModel(training);
-		}
-
-		@Test
-		void findById_shouldThrowEntityNotFoundException_whenTrainingNotFound() {
-			final Long id = 99L;
-			when(trainingRepository.findById(id)).thenReturn(Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> trainingService.findById(id));
-			verify(trainingRepository).findById(id);
-			verifyNoInteractions(mapper);
-		}
 	}
 
 	@Test

@@ -4,7 +4,9 @@ import com.epam.dmgolub.gym.model.TraineeModel;
 
 import java.util.List;
 
-public interface TraineeService extends BaseService<Long, TraineeModel> {
+public interface TraineeService {
+
+	List<TraineeModel> findAll();
 
 	TraineeModel findByUserName(String userName);
 
@@ -12,11 +14,9 @@ public interface TraineeService extends BaseService<Long, TraineeModel> {
 
 	TraineeModel update(TraineeModel trainee);
 
-	void delete(Long id);
-
 	void delete(String userName);
 
-	void addTrainer(Long traineeId, Long trainerIds);
+	void addTrainer(String traineeUserName, String trainerUserName);
 
 	void updateTrainers(String traineeUserName, List<String> trainerUserNames);
 }

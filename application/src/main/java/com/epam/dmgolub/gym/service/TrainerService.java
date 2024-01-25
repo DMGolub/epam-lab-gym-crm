@@ -4,7 +4,9 @@ import com.epam.dmgolub.gym.model.TrainerModel;
 
 import java.util.List;
 
-public interface TrainerService extends BaseService<Long, TrainerModel> {
+public interface TrainerService {
+
+	List<TrainerModel> findAll();
 
 	TrainerModel findByUserName(String userName);
 
@@ -12,11 +14,7 @@ public interface TrainerService extends BaseService<Long, TrainerModel> {
 
 	TrainerModel update(TrainerModel trainer);
 
-	List<TrainerModel> findActiveTrainersAssignedOnTrainee(Long id);
-
 	List<TrainerModel> findActiveTrainersAssignedOnTrainee(String userName);
-
-	List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(Long id);
 
 	List<TrainerModel> findActiveTrainersNotAssignedOnTrainee(String userName);
 }

@@ -15,14 +15,10 @@
         <div class="row justify-content-md-left">
             <div class="col-md shadow-lg p-3 mb-5 bg-white rounded">
                 <table class = "table table-hover">
-                    <caption th:text="'Trainee #' + ${trainee.getId()} + ' info'">Trainee info</caption>
+                    <caption th:text="'Trainee ' + ${trainee.getUserName()} + ' info'">Trainee info</caption>
                     <tr>
                         <th>Attribute</th>
                         <th>Value</th>
-                    </tr>
-                    <tr>
-                        <td>Id: </td>
-                        <td th:text="${trainee.getId()}" id="id">VALUE</td>
                     </tr>
                     <tr>
                         <td>First name: </td>
@@ -60,19 +56,22 @@
                     </tr>
                 </table>
                 <div style="display: flex; justify-content: left;">
-                    <form th:method="PUT" th:action="@{/trainees/{id}/add-trainer(id=${trainee.getId()})}">
-                        <label for="trainerId">Select a trainer to add: </label>
-                        <select th:object="${availableTrainers}" id="trainerId" name="trainerId">
+                    <form th:method="PUT" th:action="@{/trainees/profile/add-trainer}">
+                        <input type="hidden" name="traineeUserName" th:value="${trainee.getUserName()}" />
+                        <label for="trainerUserName">Select a trainer to add: </label>
+                        <select th:object="${availableTrainers}" id="trainerUserName" name="trainerUserName">
                             <option th:if="${availableTrainers != null}" disabled="disabled" selected="selected" value="">Please select...</option>
-                            <option th:if="${availableTrainers != null}" th:each="trainer : ${availableTrainers}" th:value="${trainer.getId()}"
+                            <option th:if="${availableTrainers != null}" th:each="trainer : ${availableTrainers}" th:value="${trainer.getUserName()}"
                                     th:text="${trainer.getFirstName()} + ' ' + ${trainer.getLastName() + ' (' + trainer.getSpecialization().getName() + ')'}"></option>
                         </select>
                         <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;" th:disabled="${!trainee.isActive()}">Add trainer</button>
                     </form>
-                    <form th:method="GET" th:action="@{../trainees/{id}/add-training(id=${trainee.getId()})}">
+                    <form th:method="GET" th:action="@{../trainees/profile/add-training}">
+                        <input type="hidden" name="traineeUserName" th:value="${trainee.getUserName()}" />
                         <button type="submit" class="btn btn-outline-secondary btn-sm" style="margin-right: 3px;" th:disabled="${!trainee.isActive()}">Add training</button>
                     </form>
-                    <form th:method="GET" th:action="@{../trainees/{id}/edit(id=${trainee.getId()})}">
+                    <form th:method="GET" th:action="@{../trainees/edit}">
+                        <input type="hidden" name="userName" th:value="${trainee.getUserName()}" />
                         <button type="submit" class="btn btn-outline-secondary btn-sm">Edit profile</button>
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">Go back</button>
                     </form>
