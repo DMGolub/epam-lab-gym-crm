@@ -96,15 +96,6 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
-	public void addTrainer(final String traineeUserName, final String trainerUserName) {
-		LOGGER.debug("In addTrainer - Fetching trainer by userName={} from repository", trainerUserName);
-		final var trainer = trainerRepository.findByUserUserName(trainerUserName)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_MESSAGE + trainerUserName));
-		LOGGER.debug("In addTrainer - Fetching trainee by userName={} from repository and adding trainer", traineeUserName);
-		getTrainee(traineeUserName).getTrainers().add(trainer);
-	}
-
-	@Override
 	public void updateTrainers(final String traineeUserName, final List<String> trainerUserNames) {
 		LOGGER.debug("In updateTrainers - Fetching trainee by userName={} from repository", traineeUserName);
 		final var trainee = getTrainee(traineeUserName);

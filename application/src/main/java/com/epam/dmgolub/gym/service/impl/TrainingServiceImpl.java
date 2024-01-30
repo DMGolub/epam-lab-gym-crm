@@ -41,12 +41,6 @@ public class TrainingServiceImpl implements TrainingService {
 	}
 
 	@Override
-	public List<TrainingModel> findAll() {
-		LOGGER.debug("In findAll - Fetching all trainings from repository");
-		return mapper.mapToTrainingModelList(trainingRepository.findAll());
-	}
-
-	@Override
 	public List<TrainingModel> searchByTrainee(final TraineeTrainingsSearchRequest request) {
 		LOGGER.debug("In searchByTrainee - Received search request={}", request);
 		final var criteria = mapper.mapToTraineeTrainingsSearchCriteria(request);

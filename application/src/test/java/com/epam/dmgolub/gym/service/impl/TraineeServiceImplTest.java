@@ -204,47 +204,6 @@ class TraineeServiceImplTest {
 	}
 
 	@Nested
-	class TestAddTrainer {
-
-		@Test
-		void addTrainer_shouldAddTrainerToTrainee_whenBothExist() {
-			final String traineeUserName = "Trainee.UserName";
-			final String trainerUserName = "Trainer.UserName";
-			final var trainee = new Trainee();
-			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.of(new Trainer()));
-			when(traineeRepository.findByUserUserName(traineeUserName)).thenReturn(Optional.of(trainee));
-
-			traineeService.addTrainer(traineeUserName, trainerUserName);
-			assertEquals(1, trainee.getTrainers().size());
-			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
-			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
-		}
-
-		@Test
-		void addTrainer_shouldThrowEntityNotFoundException_whenTraineeNotFound() {
-			final String traineeUserName = "Trainee.UserName";
-			final String trainerUserName = "Trainer.UserName";
-			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.of(new Trainer()));
-			when(traineeRepository.findByUserUserName(traineeUserName)).thenReturn(Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeUserName, trainerUserName));
-			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
-			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
-		}
-
-		@Test
-		void addTrainer_shouldThrowEntityNotFoundException_whenTrainerNotFound() {
-			final String traineeUserName = "Trainee.UserName";
-			final String trainerUserName = "Trainer.UserName";
-			when(trainerRepository.findByUserUserName(trainerUserName)).thenReturn(Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> traineeService.addTrainer(traineeUserName, trainerUserName));
-			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
-			verifyNoInteractions(traineeRepository);
-		}
-	}
-
-	@Nested
 	class TestUpdateTraineeTrainerList {
 
 		@Test

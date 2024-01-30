@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface TrainingService {
 
-	List<TrainingModel> findAll();
-
 	TrainingModel save(TrainingModel training);
 
 	List<TrainingModel> searchByTrainee(TraineeTrainingsSearchRequest request);

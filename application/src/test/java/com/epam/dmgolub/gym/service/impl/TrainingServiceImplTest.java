@@ -50,18 +50,6 @@ class TrainingServiceImplTest {
 	}
 
 	@Test
-	void findAll_shouldReturnTwoTrainingModels_whenThereAreTwoTrainings() {
-		final List<Training> trainings = List.of(new Training(), new Training());
-		when(trainingRepository.findAll()).thenReturn(trainings);
-		final List<TrainingModel> response = List.of(new TrainingModel(), new TrainingModel());
-		when(mapper.mapToTrainingModelList(trainings)).thenReturn(response);
-
-		assertEquals(response, trainingService.findAll());
-		verify(trainingRepository).findAll();
-		verify(mapper).mapToTrainingModelList(trainings);
-	}
-
-	@Test
 	void searchByTrainee_shouldReturnTraineeModels_whenTrainingsExist() {
 		final var request =
 			new TraineeTrainingsSearchRequest("Trainee", null, null, null, null);

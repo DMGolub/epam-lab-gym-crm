@@ -16,7 +16,5 @@ public interface TraineeService {
 
 	void delete(String userName);
 
-	void addTrainer(String traineeUserName, String trainerUserName);
-
 	void updateTrainers(String traineeUserName, List<String> trainerUserNames);
 }
