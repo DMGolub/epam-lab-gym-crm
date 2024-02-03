@@ -91,9 +91,8 @@ public class TraineeRestController {
 	})
 	public ResponseEntity<CredentialsDTO> create(@RequestBody @Valid final TraineeCreateRequestDTO request) {
 		LOGGER.debug("In create - Received a request to create trainee={}", request);
-		final var trainee = traineeService.save(mapper.mapToTraineeModel(request));
-		final var credentials = new CredentialsDTO(trainee.getUserName(), trainee.getPassword());
-		return new ResponseEntity<>(credentials, HttpStatus.CREATED);
+		final var credentials = traineeService.save(mapper.mapToTraineeModel(request));
+		return new ResponseEntity<>(mapper.mapToCredentialsDTO(credentials), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)

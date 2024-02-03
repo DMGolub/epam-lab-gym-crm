@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerCreateRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.model.TrainingTypeModel;
 import com.epam.dmgolub.gym.service.TrainerService;
@@ -115,7 +116,7 @@ class TrainerRestControllerTest {
 	}
 
 	@Test
-	void create_shouldReturnCreated_whenTrainerCreatedSuccessfully() throws Exception {
+	void create_shouldReturnCredentials_whenTrainerCreatedSuccessfully() throws Exception {
 		final String firstName = "User";
 		final String lastName = "Name";
 		final String specialization = "/api/v1/training-types/1";
@@ -123,7 +124,8 @@ class TrainerRestControllerTest {
 		final var type = new TrainingTypeModel(1L, "Bodybuilding");
 		final var request = new TrainerModel(null, firstName, lastName, null, null, false, null, type);
 		when(mapper.mapToTrainerModel(requestDTO)).thenReturn(request);
-		when(trainerService.save(request)).thenReturn(request);
+		final var credentials = new Credentials("User.Name", "Password");
+		when(trainerService.save(request)).thenReturn(credentials);
 
 		mockMvc.perform(post(URL)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -131,6 +133,7 @@ class TrainerRestControllerTest {
 			.andExpect(status().isCreated());
 
 		verify(mapper, times(1)).mapToTrainerModel(requestDTO);
+		verify(mapper, times(1)).mapToCredentialsDTO(credentials);
 		verify(trainerService, times(1)).save(request);
 	}
 }

@@ -123,9 +123,8 @@ public class TrainerRestController {
 	})
 	public ResponseEntity<CredentialsDTO> create(@RequestBody @Valid final TrainerCreateRequestDTO request) {
 		LOGGER.debug("In create - Received a request to create trainer={}", request);
-		final var trainer = trainerService.save(mapper.mapToTrainerModel(request));
-		final var credentials = new CredentialsDTO(trainer.getUserName(), trainer.getPassword());
-		return new ResponseEntity<>(credentials, HttpStatus.CREATED);
+		final var credentials = trainerService.save(mapper.mapToTrainerModel(request));
+		return new ResponseEntity<>(mapper.mapToCredentialsDTO(credentials), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)

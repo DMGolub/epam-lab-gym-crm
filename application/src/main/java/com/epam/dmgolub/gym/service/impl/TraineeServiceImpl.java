@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
@@ -53,13 +54,16 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
-	public TraineeModel save(final TraineeModel request) {
+	public Credentials save(final TraineeModel request) {
 		LOGGER.debug("In save - Saving trainee from request {}", request);
 		final var trainee = mapper.mapToTrainee(request);
-		trainee.getUser().setUserName(userCredentialsGenerator.generateUserName(trainee.getUser()));
-		trainee.getUser().setPassword(userCredentialsGenerator.generatePassword(trainee.getUser()));
+		final var userName = userCredentialsGenerator.generateUserName(trainee.getUser());
+		final var password = userCredentialsGenerator.generatePassword(trainee.getUser());
+		trainee.getUser().setUserName(userName);
+		trainee.getUser().setPassword(userCredentialsGenerator.encodePassword(password));
 		trainee.setUser(userRepository.saveAndFlush(trainee.getUser()));
-		return mapper.mapToTraineeModel(traineeRepository.saveAndFlush(trainee));
+		traineeRepository.saveAndFlush(trainee);
+		return new Credentials(userName, password);
 	}
 
 	@Override

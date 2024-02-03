@@ -2,6 +2,7 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
@@ -41,13 +42,16 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public TrainerModel save(final TrainerModel request) {
+	public Credentials save(final TrainerModel request) {
 		LOGGER.debug("In save - Saving trainer from request {}", request);
 		final var trainer = mapper.mapToTrainer(request);
-		trainer.getUser().setUserName(userCredentialsGenerator.generateUserName(trainer.getUser()));
-		trainer.getUser().setPassword(userCredentialsGenerator.generatePassword(trainer.getUser()));
+		final var userName = userCredentialsGenerator.generateUserName(trainer.getUser());
+		final var password = userCredentialsGenerator.generatePassword(trainer.getUser());
+		trainer.getUser().setUserName(userName);
+		trainer.getUser().setPassword(userCredentialsGenerator.encodePassword(password));
 		trainer.setUser(userRepository.saveAndFlush(trainer.getUser()));
-		return mapper.mapToTrainerModel(trainerRepository.saveAndFlush(trainer));
+		trainerRepository.saveAndFlush(trainer);
+		return new Credentials(userName, password);
 	}
 
 	@Override

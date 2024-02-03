@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.controller;
 import com.epam.dmgolub.gym.dto.TraineeCreateRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,7 +81,7 @@ class TraineeRestControllerTest {
 	}
 
 	@Test
-	void create_shouldReturnCreated_whenTraineeCreatedSuccessfully() throws Exception {
+	void create_shouldReturnCredentials_whenTraineeCreatedSuccessfully() throws Exception {
 		final String firstName = "User";
 		final String lastName = "Name";
 		final SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -90,7 +91,8 @@ class TraineeRestControllerTest {
 		final var request =
 			new TraineeModel(null, firstName, lastName, null, null, false, null, date, address, new ArrayList<>());
 		when(mapper.mapToTraineeModel(requestDTO)).thenReturn(request);
-		when(traineeService.save(request)).thenReturn(request);
+		final var credentials = new Credentials("User.Name", "Password");
+		when(traineeService.save(request)).thenReturn(credentials);
 
 		mockMvc.perform(post(URL)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -98,6 +100,7 @@ class TraineeRestControllerTest {
 			.andExpect(status().isCreated());
 
 		verify(mapper, times(1)).mapToTraineeModel(requestDTO);
+		verify(mapper, times(1)).mapToCredentialsDTO(credentials);
 		verify(traineeService, times(1)).save(request);
 	}
 }

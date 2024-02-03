@@ -1,5 +1,6 @@
 package com.epam.dmgolub.gym.service;
 
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TrainerModel;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface TrainerService {
 
 	TrainerModel findByUserName(String userName);
 
-	TrainerModel save(TrainerModel trainer);
+	Credentials save(TrainerModel trainer);
 
 	TrainerModel update(TrainerModel trainer);
 

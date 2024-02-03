@@ -5,6 +5,7 @@ import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.entity.User;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
@@ -53,13 +54,12 @@ class TraineeServiceImplTest {
 		final Trainee trainee = new Trainee();
 		when(mapper.mapToTrainee(request)).thenReturn(trainee);
 		final String userName = "username";
+		final String password = "password";
 		when(generator.generateUserName(trainee.getUser())).thenReturn(userName);
-		when(generator.generatePassword(trainee.getUser())).thenReturn("password");
+		when(generator.generatePassword(trainee.getUser())).thenReturn(password);
 		when(userRepository.saveAndFlush(trainee.getUser())).thenReturn(trainee.getUser());
 		when(traineeRepository.saveAndFlush(trainee)).thenReturn(trainee);
-		final TraineeModel expected = new TraineeModel();
-		expected.setUserName(userName);
-		when(mapper.mapToTraineeModel(trainee)).thenReturn(expected);
+		final var expected = new Credentials(userName, password);
 
 		assertEquals(expected, traineeService.save(request));
 		verify(mapper, times(1)).mapToTrainee(request);
@@ -67,7 +67,6 @@ class TraineeServiceImplTest {
 		verify(generator, times(1)).generatePassword(trainee.getUser());
 		verify(userRepository, times(1)).saveAndFlush(trainee.getUser());
 		verify(traineeRepository, times(1)).saveAndFlush(trainee);
-		verify(mapper, times(1)).mapToTraineeModel(trainee);
 	}
 
 	@Test

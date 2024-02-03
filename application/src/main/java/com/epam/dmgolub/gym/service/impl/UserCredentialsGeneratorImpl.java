@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -27,9 +28,11 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 	private int passwordLength;
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
-	public UserCredentialsGeneratorImpl(final UserRepository userRepository) {
+	public UserCredentialsGeneratorImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -47,6 +50,12 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 		LOGGER.debug("In generatePassword - Generating password for {}", user);
 		char[] chars = POSSIBLE_PASSWORD_CHARACTERS.toCharArray();
 		return RandomStringUtils.random(passwordLength, 0, chars.length - 1, true, true, chars, new SecureRandom());
+	}
+
+	@Override
+	public String encodePassword(final String password) {
+		LOGGER.debug("In encodePassword - Encoding provided password");
+		return passwordEncoder.encode(password);
 	}
 
 	private List<String> findSimilarUserNames(final String userNameRegEx) {

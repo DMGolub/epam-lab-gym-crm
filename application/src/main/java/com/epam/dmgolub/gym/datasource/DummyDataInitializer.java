@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -59,19 +60,22 @@ public class DummyDataInitializer {
 	private final TrainerRepository trainerRepository;
 	private final TraineeRepository traineeRepository;
 	private final TrainingRepository trainingRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public DummyDataInitializer(
 		final UserRepository userRepository,
 		final TrainingTypeRepository trainingTypeRepository,
 		final TrainerRepository trainerRepository,
 		final TraineeRepository traineeRepository,
-		final TrainingRepository trainingRepository
+		final TrainingRepository trainingRepository,
+		final PasswordEncoder passwordEncoder
 	) {
 		this.userRepository = userRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.trainerRepository = trainerRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainingRepository = trainingRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@PostConstruct
@@ -145,7 +149,8 @@ public class DummyDataInitializer {
 	}
 
 	private void initializeAdminData() {
-		final User admin = new User(null, "admin", "admin", "admin.admin", "Password12", true);
+		final String password = passwordEncoder.encode("Password12");
+		final User admin = new User(null, "admin", "admin", "admin.admin", password, true);
 		userRepository.saveAndFlush(admin);
 	}
 
@@ -179,7 +184,7 @@ public class DummyDataInitializer {
 		user.setFirstName(values[0]);
 		user.setLastName(values[1]);
 		user.setUserName(values[2]);
-		user.setPassword(values[3]);
+		user.setPassword(passwordEncoder.encode(values[3]));
 		user.setActive(Boolean.parseBoolean(values[4]));
 	}
 }
