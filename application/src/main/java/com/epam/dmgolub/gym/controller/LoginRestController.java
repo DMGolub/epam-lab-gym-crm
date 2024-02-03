@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class LoginRestController {
 
-	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/login";
+	public static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/login";
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginRestController.class);
 
 	private final LoginService loginService;

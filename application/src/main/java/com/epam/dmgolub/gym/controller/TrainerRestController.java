@@ -37,7 +37,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class TrainerRestController {
 
-	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/trainers";
+	public static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/trainers";
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainerRestController.class);
 
 	private final TrainerService trainerService;

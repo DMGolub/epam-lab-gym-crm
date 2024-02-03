@@ -31,7 +31,8 @@ public class LoginServiceImpl implements LoginService {
 		LOGGER.debug("In isValidLoginRequest - Received a request to authenticate user={}", credentialsDTO.getUserName());
 		final String requestUrl = backendUrl + "/api/v1/login";
 		try {
-			restTemplate.postForLocation(requestUrl, credentialsDTO);
+			restTemplate.postForObject(requestUrl, credentialsDTO, String.class);
+			LOGGER.debug("In isValidLoginRequest - User={} authenticated successfully", credentialsDTO.getUserName());
 			return true;
 		} catch (final HttpClientErrorException ex) {
 			LOGGER.debug("In isValidLoginRequest - Received an exception: {}", ex.getMessage());
