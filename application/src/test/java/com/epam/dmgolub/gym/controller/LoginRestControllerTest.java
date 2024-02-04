@@ -4,7 +4,6 @@ import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.model.ChangePasswordRequest;
-import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.service.LoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -32,7 +34,11 @@ class LoginRestControllerTest {
 	@Mock
 	private LoginService loginService;
 	@Mock
+	private AuthenticationManager authenticationManager;
+	@Mock
 	private ModelToRestDtoMapper mapper;
+	@Mock
+	private Authentication authentication;
 	@InjectMocks
 	private LoginRestController loginRestController;
 	private MockMvc mockMvc;
@@ -43,46 +49,22 @@ class LoginRestControllerTest {
 		mockMvc = MockMvcBuilders.standaloneSetup(loginRestController).build();
 	}
 
-	@Nested
-	class TestLogIn {
+	@Test
+	void logIn_shouldReturnOk_whenCredentialsAreValid() throws Exception {
+		final String userName = "User.Name";
+		final String password = "Password";
+		final var credentials = new CredentialsDTO(userName, password);
+		final var token =
+			new UsernamePasswordAuthenticationToken(credentials.getUserName(), credentials.getPassword());
+		when(authenticationManager.authenticate(token)).thenReturn(authentication);
 
-		@Test
-		void logIn_shouldReturnOk_whenCredentialsAreValid() throws Exception {
-			final String userName = "User.Name";
-			final String password = "Password";
-			final var credentialsDTO = new CredentialsDTO(userName, password);
-			final var credentials = new Credentials(userName, password);
-			when(mapper.mapToCredentials(credentialsDTO)).thenReturn(credentials);
-			when(loginService.isValidLoginRequest(credentials)).thenReturn(true);
+		mockMvc.perform(post(URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(credentials)))
+			.andExpect(status().isOk());
 
-			mockMvc.perform(post(URL)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(new ObjectMapper().writeValueAsString(credentials)))
-				.andExpect(status().isOk());
-
-			verify(mapper, times(1)).mapToCredentials(credentialsDTO);
-			verify(loginService, times(1)).isValidLoginRequest(credentials);
-			verifyNoMoreInteractions(loginService);
-		}
-
-		@Test
-		void logIn_shouldReturnUnauthorized_whenCredentialsAreInvalid() throws Exception {
-			final String userName = "User.Name";
-			final String password = "Password";
-			final var credentialsDTO = new CredentialsDTO(userName, password);
-			final var credentials = new Credentials(userName, password);
-			when(mapper.mapToCredentials(credentialsDTO)).thenReturn(credentials);
-			when(loginService.isValidLoginRequest(credentials)).thenReturn(false);
-
-			mockMvc.perform(post(URL)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(new ObjectMapper().writeValueAsString(credentials)))
-				.andExpect(status().isUnauthorized());
-
-			verify(mapper, times(1)).mapToCredentials(credentialsDTO);
-			verify(loginService, times(1)).isValidLoginRequest(credentials);
-			verifyNoMoreInteractions(loginService);
-		}
+		verify(authenticationManager, times(1)).authenticate(token);
+		verifyNoMoreInteractions(authenticationManager);
 	}
 
 	@Nested

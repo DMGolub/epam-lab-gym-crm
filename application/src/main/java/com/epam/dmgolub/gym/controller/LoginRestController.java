@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,10 +36,16 @@ public class LoginRestController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginRestController.class);
 
 	private final LoginService loginService;
+	private final AuthenticationManager authenticationManager;
 	private final ModelToRestDtoMapper mapper;
 
-	public LoginRestController(final LoginService loginService, final ModelToRestDtoMapper mapper) {
+	public LoginRestController(
+		final LoginService loginService,
+		final AuthenticationManager authenticationManager,
+		final ModelToRestDtoMapper mapper
+	) {
 		this.loginService = loginService;
+		this.authenticationManager = authenticationManager;
 		this.mapper = mapper;
 	}
 
@@ -47,19 +56,15 @@ public class LoginRestController {
 		@ApiResponse(responseCode = "401", description = "User authentication failed"),
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
-	public ResponseEntity<String> logIn(@RequestBody @Valid final CredentialsDTO request) {
-		final String userName = request.getUserName();
+	public ResponseEntity<String> logIn(@RequestBody @Valid final CredentialsDTO credentials) {
+		final String userName = credentials.getUserName();
 		LOGGER.debug("In logIn - Received a request to authenticate user={}", userName);
-
-		if (loginService.isValidLoginRequest(mapper.mapToCredentials(request))) {
-			final String message = "User authenticated successfully as " + userName;
-			LOGGER.debug("In logIn - {}", message);
-			return new ResponseEntity<>(message, HttpStatus.OK);
-		} else {
-			final String message = "Failed to authenticate user=" + userName + ": wrong user name or password";
-			LOGGER.debug("In logIn - {}", message);
-			return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-		}
+		final var authentication = authenticationManager.authenticate(
+			new UsernamePasswordAuthenticationToken(userName, credentials.getPassword()));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		final String message = "User authenticated successfully as " + userName;
+		LOGGER.debug("In logIn - {}", message);
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@PutMapping(consumes = APPLICATION_JSON_VALUE)

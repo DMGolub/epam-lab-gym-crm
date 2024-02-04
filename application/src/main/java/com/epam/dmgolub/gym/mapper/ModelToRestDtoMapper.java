@@ -119,7 +119,5 @@ public abstract class ModelToRestDtoMapper {
 
 	public abstract List<TraineeResponseDTO.TrainerDTO> mapTraineeModelTrainerListToTraineeResponseDTOTrainerDTOList(List<TraineeModel.Trainer> trainer);
 
-	public abstract Credentials mapToCredentials(final CredentialsDTO credentialsDTO);
-
 	public abstract CredentialsDTO mapToCredentialsDTO(final Credentials credentials);
 }

@@ -2,7 +2,6 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.entity.User;
 import com.epam.dmgolub.gym.model.ChangePasswordRequest;
-import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.slf4j.Logger;
@@ -23,16 +22,6 @@ public class LoginServiceImpl implements LoginService {
 	public LoginServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
-	}
-
-	public boolean isValidLoginRequest(final Credentials request) {
-		LOGGER.debug("In isValidLoginRequest - Trying to authenticate user with username={}", request.getUserName());
-		final var user = getByUserName(request.getUserName());
-		if (user.isPresent()) {
-			return passwordEncoder.matches(request.getPassword(), user.get().getPassword());
-		}
-		LOGGER.debug("In isValidLoginRequest - Can not find user by userName={}", request.getUserName());
-		return false;
 	}
 
 	public boolean changePassword(final ChangePasswordRequest request) {
