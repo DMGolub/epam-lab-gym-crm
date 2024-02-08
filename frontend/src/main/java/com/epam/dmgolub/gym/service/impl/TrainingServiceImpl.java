@@ -23,10 +23,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epam.dmgolub.gym.service.utility.ServiceUtilities.getAuthHeaders;
+import static com.epam.dmgolub.gym.service.constant.Constants.API;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAININGS_LOCATION;
+import static com.epam.dmgolub.gym.service.constant.Constants.VERSION_V1;
+import static com.epam.dmgolub.gym.service.utility.ServiceUtilities.getAuthHeader;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
+
+	private static final String TRAININGS_BASE_URL = API + VERSION_V1 + TRAININGS_LOCATION;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainingServiceImpl.class);
 
@@ -54,9 +59,10 @@ public class TrainingServiceImpl implements TrainingService {
 	@Override
 	public void save(final TrainingCreateRequestDTO training, final HttpSession session) {
 		LOGGER.debug("In save - Received a request to save training={}", training);
-		final var url = backendUrl + "/api/v1/trainings";
-		final HttpEntity<TrainingCreateRequestDTO> requestEntity = new HttpEntity<>(training, getAuthHeaders(session));
-		restTemplate.exchange(url, HttpMethod.POST, requestEntity, Training.class);
+		final var requestUrl = backendUrl + TRAININGS_BASE_URL;
+		LOGGER.debug("In save - Sending POST request to {}", requestUrl);
+		final HttpEntity<TrainingCreateRequestDTO> requestEntity = new HttpEntity<>(training, getAuthHeader(session));
+		restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, Training.class);
 	}
 
 	@Override
@@ -65,10 +71,12 @@ public class TrainingServiceImpl implements TrainingService {
 		final HttpSession session
 	) {
 		LOGGER.debug("In searchByTrainee - Received a request to find trainings={}", request);
-		final var url = generateRequestUrl(request);
+		final var requestUrl = generateRequestUrl(request);
+		LOGGER.debug("In searchByTrainee - Sending GET request to {}", requestUrl);
 		final HttpEntity<TraineeTrainingsSearchRequestDTO> requestEntity =
-			new HttpEntity<>(request, getAuthHeaders(session));
-		final var trainings = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Training[].class).getBody();
+			new HttpEntity<>(request, getAuthHeader(session));
+		final var trainings =
+			restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, Training[].class).getBody();
 		final List<TrainingResponseDTO> result = new ArrayList<>();
 		if (trainings != null) {
 			for (var training : trainings) {
@@ -85,9 +93,11 @@ public class TrainingServiceImpl implements TrainingService {
 		final HttpSession session
 	) {
 		LOGGER.debug("In searchByTrainer - Received a request to find trainings={}", request);
-		final var url = generateRequestUrl(request);
-		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeaders(session));
-		final var trainings = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Training[].class).getBody();
+		final var requestUrl = generateRequestUrl(request);
+		LOGGER.debug("In searchByTrainer - Sending GET request to {}", requestUrl);
+		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeader(session));
+		final var trainings =
+			restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, Training[].class).getBody();
 		final List<TrainingResponseDTO> result = new ArrayList<>();
 		if (trainings != null) {
 			for (var training : trainings) {
@@ -103,7 +113,7 @@ public class TrainingServiceImpl implements TrainingService {
 		final var periodTo = request.getPeriodTo();
 		final var traineeUserName = request.getTraineeUserName();
 
-		return backendUrl + "/api/v1/trainings/search-by-trainer" +
+		return backendUrl + TRAININGS_BASE_URL + "/search-by-trainer" +
 			"?trainerUserName=" + request.getTrainerUserName() +
 			(periodFrom != null ? "&periodFrom=" + formatter.format(periodFrom) : "") +
 			(periodTo != null ? "&periodTo=" + formatter.format(periodTo) : "") +
@@ -116,7 +126,7 @@ public class TrainingServiceImpl implements TrainingService {
 		final var trainerUserName = request.getTrainerUserName();
 		final var trainingType = request.getType();
 
-		return backendUrl + "/api/v1/trainings/search-by-trainee" +
+		return backendUrl + TRAININGS_BASE_URL + "/search-by-trainee" +
 			"?traineeUserName=" + request.getTraineeUserName() +
 			(periodFrom != null ? "&periodFrom=" + formatter.format(periodFrom) : "") +
 			(periodTo != null ? "&periodTo=" + formatter.format(periodTo) : "") +

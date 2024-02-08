@@ -192,6 +192,22 @@ public class TraineeModel {
 		private String lastName;
 		private TrainingTypeModel specialization;
 
+		public Trainer() {
+			// Empty
+		}
+
+		public Trainer(
+			final String userName,
+			final String firstName,
+			final String lastName,
+			final TrainingTypeModel specialization
+		) {
+			this.userName = userName;
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.specialization = specialization;
+		}
+
 		public String getUserName() {
 			return userName;
 		}
@@ -228,6 +244,38 @@ public class TraineeModel {
 		public String toString() {
 			return "Trainer{userName='" + userName + '\'' + ", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' + ", specialization=" + specialization + '}';
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			final Trainer trainer = (Trainer) o;
+
+			if (!Objects.equals(userName, trainer.userName)) {
+				return false;
+			}
+			if (!Objects.equals(firstName, trainer.firstName)) {
+				return false;
+			}
+			if (!Objects.equals(lastName, trainer.lastName)) {
+				return false;
+			}
+			return Objects.equals(specialization, trainer.specialization);
+		}
+
+		@Override
+		public int hashCode() {
+			int result = userName != null ? userName.hashCode() : 0;
+			result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+			result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+			result = 31 * result + (specialization != null ? specialization.hashCode() : 0);
+			return result;
 		}
 	}
 }

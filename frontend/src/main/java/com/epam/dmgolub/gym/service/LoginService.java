@@ -5,7 +5,7 @@ import com.epam.dmgolub.gym.dto.CredentialsDTO;
 
 public interface LoginService {
 
-	boolean isValidLoginRequest(CredentialsDTO credentialsDTO);
+	String logIn(CredentialsDTO credentialsDTO);
 
 	boolean changePassword(ChangePasswordRequestDTO requestDTO);
 }

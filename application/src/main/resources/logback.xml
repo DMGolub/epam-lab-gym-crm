@@ -27,9 +27,15 @@
     <appender-ref ref="FILE" />
   </logger>
   
-  <!-- Spring logger -->
-  <logger name="org.springframework" level="WARN"></logger>
+  <!-- Spring loggers -->
+  <logger name="org.springframework" level="ERROR">
+    <appender-ref ref="STDOUT" />
+  </logger>
+  <logger name="org.springframework.security" level="ERROR">
+  </logger>
   
   <!-- Hibernate logger -->
-  <logger name="org.hibernate" level="WARN"></logger>
+  <logger name="org.hibernate" level="ERROR">
+    <appender-ref ref="STDOUT" />
+  </logger>
 </configuration>

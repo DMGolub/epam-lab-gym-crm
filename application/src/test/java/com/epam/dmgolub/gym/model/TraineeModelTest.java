@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -110,5 +111,47 @@ class TraineeModelTest {
 		assertNotEquals(responseDTO2, responseDTO7);
 		assertNotEquals(responseDTO2, responseDTO8);
 		assertNotEquals(responseDTO2, responseDTO9);
+	}
+
+	@Nested
+	class TrainerTest {
+
+		@Test
+		void toString_shouldReturnExpectedValue_whenInvoked() {
+			final var specialization = new TrainingTypeModel(1L, "Karate");
+			final var trainer =
+				new TraineeModel.Trainer("UserName", "FirstName", "LastName", specialization);
+			final String expected = "Trainer{userName='UserName', firstName='FirstName'" +
+				", lastName='LastName', specialization=" + specialization + "}";
+
+			assertEquals(expected, trainer.toString());
+		}
+
+		@Test
+		void testEqualsAndHashCode() {
+			final var specialization = new TrainingTypeModel(1L, "Karate");
+			final var specialization2 = new TrainingTypeModel(2L, "Bodybuilding");
+			final var trainer =
+				new TraineeModel.Trainer("UserName", "FirstName", "LastName", specialization);
+			final var trainer2 =
+				new TraineeModel.Trainer("UserName2", "FirstName", "LastName", specialization);
+			final var trainer3 =
+				new TraineeModel.Trainer("UserName", "FirstName3", "LastName", specialization);
+			final var trainer4 =
+				new TraineeModel.Trainer("UserName", "FirstName", "LastName4", specialization);
+			final var trainer5 =
+				new TraineeModel.Trainer("UserName", "FirstName", "LastName", specialization2);
+
+			assertEquals(trainer, trainer);
+			assertEquals(trainer.hashCode(), trainer.hashCode());
+			assertNotEquals(trainer, trainer2);
+			assertNotEquals(trainer.hashCode(), trainer2.hashCode());
+			assertNotEquals(trainer, trainer3);
+			assertNotEquals(trainer.hashCode(), trainer2.hashCode());
+			assertNotEquals(trainer, trainer4);
+			assertNotEquals(trainer.hashCode(), trainer2.hashCode());
+			assertNotEquals(trainer, trainer5);
+			assertNotEquals(trainer.hashCode(), trainer2.hashCode());
+		}
 	}
 }

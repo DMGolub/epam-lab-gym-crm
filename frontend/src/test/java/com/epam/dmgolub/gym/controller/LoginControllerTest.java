@@ -10,15 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
-import static com.epam.dmgolub.gym.controller.constant.Constants.LOGIN;
 import static com.epam.dmgolub.gym.controller.constant.Constants.LOGIN_INDEX_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_LOGIN_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_PROFILE_INDEX;
 import static com.epam.dmgolub.gym.controller.constant.Constants.SUCCESS_MESSAGE_ATTRIBUTE;
+import static com.epam.dmgolub.gym.controller.constant.Constants.USER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,28 +73,28 @@ class LoginControllerTest {
 		void logIn_shouldRedirectToProfileIndex_whenUserAuthenticatedSuccessfully() {
 			final var request = new CredentialsDTO("ValidUserName", "ValidPassword");
 			when(bindingResult.hasErrors()).thenReturn(false);
-			when(loginService.isValidLoginRequest(request)).thenReturn(true);
+			when(loginService.logIn(request)).thenReturn("generated.jwt.token");
 
 			final var result = loginController.logIn(request, bindingResult, session, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_PROFILE_INDEX, result);
 			verify(bindingResult, times(1)).hasErrors();
-			verify(loginService, times(1)).isValidLoginRequest(request);
+			verify(loginService, times(1)).logIn(request);
 			verify(redirectAttributes).addFlashAttribute(eq(SUCCESS_MESSAGE_ATTRIBUTE), any(String.class));
-			verify(session).setAttribute(eq(LOGIN), any(CredentialsDTO.class));
+			verify(session).setAttribute(eq(USER_NAME), any(String.class));
 		}
 
 		@Test
 		void logIn_shouldReturnErrorMessage_whenUserAuthenticationFailed() {
 			final var request = new CredentialsDTO("UserName", "WrongPassword");
 			when(bindingResult.hasErrors()).thenReturn(false);
-			when(loginService.isValidLoginRequest(request)).thenReturn(false);
+			when(loginService.logIn(request)).thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(401)));
 
 			final var result = loginController.logIn(request, bindingResult, session, redirectAttributes);
 
 			assertEquals(REDIRECT_TO_LOGIN_INDEX, result);
 			verify(bindingResult, times(1)).hasErrors();
-			verify(loginService, times(1)).isValidLoginRequest(request);
+			verify(loginService, times(1)).logIn(request);
 			verify(redirectAttributes).addFlashAttribute(eq(ERROR_MESSAGE_ATTRIBUTE), any(String.class));
 			verifyNoInteractions(session);
 		}

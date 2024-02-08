@@ -31,8 +31,10 @@ public class Constants {
 
 	public static final String TRAINING_TYPES = "trainingTypes";
 
-	public static final String ENTITY_NOT_FOUND_VIEW = "exception/entity_not_found_exception";
-	public static final String EXCEPTION_VIEW = "exception/exception";
+	public static final String UNAUTHENTICATED_VIEW = "error/401";
+	public static final String FORBIDDEN_VIEW = "error/403";
+	public static final String ENTITY_NOT_FOUND_VIEW = "error/404";
+	public static final String EXCEPTION_VIEW = "error/500";
 	public static final String CONTROLLER_EXCEPTION_LOG_MESSAGE = "Request: {} caused an exception: {}";
 	public static final String BINDING_RESULT_ERROR_MESSAGE = "Validation failed. Returning {} view name";
 
@@ -47,6 +49,8 @@ public class Constants {
 	public static final String USER_NAME = "userName";
 	public static final String PROFILE_INDEX_VIEW_NAME = "profile/index";
 	public static final String REDIRECT_TO_PROFILE_INDEX = "redirect:/profile/";
+
+	public static final String JWT_TOKEN = "jwtToken";
 
 	private Constants() {
 		// empty

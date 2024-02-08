@@ -1,7 +1,6 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
-import com.epam.dmgolub.gym.dto.CredentialsDTO;
 import com.epam.dmgolub.gym.service.LoginService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -50,9 +49,7 @@ class ProfileControllerTest {
 
 	@Test
 	void getProfilePage_shouldReturnProfileIndexPageName_whenInvoked() {
-		final var request = new CredentialsDTO("UserName", "Password");
-
-		assertEquals(PROFILE_INDEX_VIEW_NAME, profileController.getProfilePage(request, model));
+		assertEquals(PROFILE_INDEX_VIEW_NAME, profileController.getProfilePage("UserName", model));
 		verify(model).addAttribute(eq(CHANGE_PASSWORD_REQUEST), any(ChangePasswordRequestDTO.class));
 		verify(model).addAttribute(eq(USER_NAME), any(String.class));
 	}

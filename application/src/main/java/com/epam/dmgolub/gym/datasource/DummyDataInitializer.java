@@ -88,7 +88,6 @@ public class DummyDataInitializer {
 		initializeTrainerData();
 		initializeTraineeData();
 		initializeTrainingData();
-		initializeAdminData();
 	}
 
 	private void initializeTrainingTypeData() {
@@ -148,12 +147,6 @@ public class DummyDataInitializer {
 			final Training training = new Training(null, trainee, trainer, name, type, date, duration);
 			trainingRepository.saveAndFlush(training);
 		}
-	}
-
-	private void initializeAdminData() {
-		final String password = passwordEncoder.encode("Password12");
-		final User admin = new User(null, "admin", "admin", "admin.admin", password, true);
-		userRepository.saveAndFlush(admin);
 	}
 
 	private List<String> readLinesFromFile(final String filePath) {

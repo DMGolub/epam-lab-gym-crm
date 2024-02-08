@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.service;
 
-import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import jakarta.servlet.http.HttpSession;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TraineeService {
 
-	CredentialsDTO save(TraineeRequestDTO trainee);
+	SignUpResponseDTO save(TraineeRequestDTO trainee);
 
 	TraineeResponseDTO findByUserName(String userName, HttpSession session);
 

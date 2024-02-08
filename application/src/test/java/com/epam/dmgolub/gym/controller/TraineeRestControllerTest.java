@@ -5,6 +5,7 @@ import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
+import com.epam.dmgolub.gym.security.service.TokenService;
 import com.epam.dmgolub.gym.service.TraineeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -22,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +44,10 @@ class TraineeRestControllerTest {
 	private TraineeService traineeService;
 	@Mock
 	private ModelToRestDtoMapper mapper;
+	@Mock
+	private UserDetails userDetails;
+	@Mock
+	private TokenService tokenService;
 	@InjectMocks
 	private TraineeRestController traineeRestController;
 	private MockMvc mockMvc;
@@ -46,6 +56,11 @@ class TraineeRestControllerTest {
 	public void setup() {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(traineeRestController).build();
+		final Authentication authentication = mock(Authentication.class);
+		final SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
 	}
 
 	@Test
@@ -70,6 +85,7 @@ class TraineeRestControllerTest {
 		when(traineeService.findByUserName(userName)).thenReturn(trainee);
 		final var response = new TraineeResponseDTO();
 		when(mapper.mapToTraineeResponseDTO(trainee)).thenReturn(response);
+		when(userDetails.getUsername()).thenReturn(userName);
 
 		mockMvc.perform(get(URL + "/profile")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +107,9 @@ class TraineeRestControllerTest {
 		final var request =
 			new TraineeModel(null, firstName, lastName, null, null, false, null, date, address, new ArrayList<>());
 		when(mapper.mapToTraineeModel(requestDTO)).thenReturn(request);
-		final var credentials = new Credentials("User.Name", "Password");
+		final String userName = firstName + "." + lastName;
+		final var credentials = new Credentials(userName, "Password");
+		when(tokenService.generateToken(userName)).thenReturn("generated.jwt.token");
 		when(traineeService.save(request)).thenReturn(credentials);
 
 		mockMvc.perform(post(URL)
@@ -102,5 +120,6 @@ class TraineeRestControllerTest {
 		verify(mapper, times(1)).mapToTraineeModel(requestDTO);
 		verify(mapper, times(1)).mapToCredentialsDTO(credentials);
 		verify(traineeService, times(1)).save(request);
+		verify(tokenService, times(1)).generateToken(userName);
 	}
 }

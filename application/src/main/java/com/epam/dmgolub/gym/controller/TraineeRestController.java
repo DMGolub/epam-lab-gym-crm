@@ -1,12 +1,15 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.controller.constant.ApiVersion;
+import com.epam.dmgolub.gym.controller.utility.ControllerUtils;
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeCreateRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeUpdateRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeUpdateTrainerListRequestDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
+import com.epam.dmgolub.gym.security.service.TokenService;
 import com.epam.dmgolub.gym.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.TraineeRestController.URL;
@@ -43,10 +47,16 @@ public class TraineeRestController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TraineeRestController.class);
 
 	private final TraineeService traineeService;
+	private final TokenService tokenService;
 	private final ModelToRestDtoMapper mapper;
 
-	public TraineeRestController(final TraineeService traineeService, final ModelToRestDtoMapper mapper) {
+	public TraineeRestController(
+		final TraineeService traineeService,
+		final TokenService tokenService,
+		final ModelToRestDtoMapper mapper
+	) {
 		this.traineeService = traineeService;
+		this.tokenService = tokenService;
 		this.mapper = mapper;
 	}
 
@@ -77,6 +87,7 @@ public class TraineeRestController {
 	})
 	public ResponseEntity<TraineeResponseDTO> getByUserName(@RequestParam("userName") final String userName) {
 		LOGGER.debug("In getByUserName - Received a request to get trainee={}", userName);
+		ControllerUtils.checkIsAuthorizedUser(userName);
 		final var trainee = traineeService.findByUserName(userName);
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
 	}
@@ -89,10 +100,12 @@ public class TraineeRestController {
 				schema = @Schema(implementation = CredentialsDTO.class))}),
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
-	public ResponseEntity<CredentialsDTO> create(@RequestBody @Valid final TraineeCreateRequestDTO request) {
+	public ResponseEntity<SignUpResponseDTO> create(@RequestBody @Valid final TraineeCreateRequestDTO request) {
 		LOGGER.debug("In create - Received a request to create trainee={}", request);
 		final var credentials = traineeService.save(mapper.mapToTraineeModel(request));
-		return new ResponseEntity<>(mapper.mapToCredentialsDTO(credentials), HttpStatus.CREATED);
+		final var token = tokenService.generateToken(credentials.getUserName());
+		final var response = new SignUpResponseDTO(token, mapper.mapToCredentialsDTO(credentials));
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)
@@ -107,6 +120,7 @@ public class TraineeRestController {
 	})
 	public ResponseEntity<TraineeResponseDTO> update(@RequestBody @Valid final TraineeUpdateRequestDTO request) {
 		LOGGER.debug("In update - Received a request to update trainee={}", request);
+		ControllerUtils.checkIsAuthorizedUser(request.getUserName());
 		final var trainee = traineeService.update(mapper.mapToTraineeModel(request));
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
 	}
@@ -125,6 +139,7 @@ public class TraineeRestController {
 		@RequestBody @Valid final TraineeUpdateTrainerListRequestDTO request
 	) {
 		LOGGER.debug("In updateTrainerList - Received a request to update trainee trainer list={}", request);
+		ControllerUtils.checkIsAuthorizedUser(request.getTraineeUserName());
 		traineeService.updateTrainers(request.getTraineeUserName(), request.getTrainerUserNames());
 		final var trainers = traineeService.findByUserName(request.getTraineeUserName()).getTrainers();
 		return new ResponseEntity<>(
@@ -142,6 +157,7 @@ public class TraineeRestController {
 	@ResponseStatus(HttpStatus.OK)
 	public void delete(@RequestParam("userName") final String userName) {
 		LOGGER.debug("In delete - Received a request to delete trainee={}", userName);
+		ControllerUtils.checkIsAuthorizedUser(userName);
 		traineeService.delete(userName);
 	}
 }

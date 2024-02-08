@@ -18,6 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -26,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +47,8 @@ class TrainingRestControllerTest {
 	private TrainingService trainingService;
 	@Mock
 	private ModelToRestDtoMapper mapper;
+	@Mock
+	private UserDetails userDetails;
 	@InjectMocks
 	private TrainingRestController trainingRestController;
 	private MockMvc mockMvc;
@@ -50,6 +57,11 @@ class TrainingRestControllerTest {
 	public void setup() {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(trainingRestController).build();
+		final Authentication authentication = mock(Authentication.class);
+		final SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
 	}
 
 	@Test
@@ -60,6 +72,7 @@ class TrainingRestControllerTest {
 		when(trainingService.searchByTrainee(request)).thenReturn(trainings);
 		final var response = List.of(new TraineeTrainingResponseDTO(), new TraineeTrainingResponseDTO());
 		when(mapper.mapToTraineeTrainingResponseDTOList(trainings)).thenReturn(response);
+		when(userDetails.getUsername()).thenReturn(userName);
 
 		mockMvc.perform(get(URL + "/search-by-trainee").param("traineeUserName", userName))
 			.andExpect(status().isOk())
@@ -77,6 +90,7 @@ class TrainingRestControllerTest {
 		when(trainingService.searchByTrainer(request)).thenReturn(trainings);
 		final var response = List.of(new TrainerTrainingResponseDTO(), new TrainerTrainingResponseDTO());
 		when(mapper.mapToTrainerTrainingResponseDTOList(trainings)).thenReturn(response);
+		when(userDetails.getUsername()).thenReturn(userName);
 
 		mockMvc.perform(get(URL + "/search-by-trainer").param("trainerUserName", userName))
 			.andExpect(status().isOk())
@@ -103,6 +117,7 @@ class TrainingRestControllerTest {
 		final var request = new TrainingModel(null, trainee, trainer, "Name", type, date, duration);
 		when(mapper.mapToTrainingModel(requestDTO)).thenReturn(request);
 		when(trainingService.save(request)).thenReturn(request);
+		when(userDetails.getUsername()).thenReturn(traineeUserName);
 
 		mockMvc.perform(post(URL)
 				.contentType(MediaType.APPLICATION_JSON)

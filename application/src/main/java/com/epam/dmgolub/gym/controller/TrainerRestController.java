@@ -1,12 +1,15 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.controller.constant.ApiVersion;
+import com.epam.dmgolub.gym.controller.utility.ControllerUtils;
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerCreateRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerUpdateRequestDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
+import com.epam.dmgolub.gym.security.service.TokenService;
 import com.epam.dmgolub.gym.service.TrainerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -41,10 +44,16 @@ public class TrainerRestController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainerRestController.class);
 
 	private final TrainerService trainerService;
+	private final TokenService tokenService;
 	private final ModelToRestDtoMapper mapper;
 
-	public TrainerRestController(final TrainerService trainerService, final ModelToRestDtoMapper mapper) {
+	public TrainerRestController(
+		final TrainerService trainerService,
+		final TokenService tokenService,
+		final ModelToRestDtoMapper mapper
+	) {
 		this.trainerService = trainerService;
+		this.tokenService = tokenService;
 		this.mapper = mapper;
 	}
 
@@ -121,10 +130,12 @@ public class TrainerRestController {
 				schema = @Schema(implementation = CredentialsDTO.class))}),
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
-	public ResponseEntity<CredentialsDTO> create(@RequestBody @Valid final TrainerCreateRequestDTO request) {
+	public ResponseEntity<SignUpResponseDTO> create(@RequestBody @Valid final TrainerCreateRequestDTO request) {
 		LOGGER.debug("In create - Received a request to create trainer={}", request);
 		final var credentials = trainerService.save(mapper.mapToTrainerModel(request));
-		return new ResponseEntity<>(mapper.mapToCredentialsDTO(credentials), HttpStatus.CREATED);
+		final var token = tokenService.generateToken(credentials.getUserName());
+		final var response = new SignUpResponseDTO(token, mapper.mapToCredentialsDTO(credentials));
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/profile", consumes = APPLICATION_JSON_VALUE)
@@ -139,6 +150,7 @@ public class TrainerRestController {
 	})
 	public ResponseEntity<TrainerResponseDTO> update(@RequestBody @Valid final TrainerUpdateRequestDTO request) {
 		LOGGER.debug("In update - Received a request to update trainer={}", request);
+		ControllerUtils.checkIsAuthorizedUser(request.getUserName());
 		final var trainer = trainerService.update(mapper.mapToTrainerModel(request));
 		return new ResponseEntity<>(mapper.mapToTrainerResponseDTO(trainer), HttpStatus.OK);
 	}

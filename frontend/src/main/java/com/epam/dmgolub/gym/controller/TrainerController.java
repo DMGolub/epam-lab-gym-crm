@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.ERROR_MESSAGE_ATTRIBUTE;
+import static com.epam.dmgolub.gym.controller.constant.Constants.JWT_TOKEN;
 import static com.epam.dmgolub.gym.controller.constant.Constants.NEW_TRAINER_VIEW_NAME;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_NEW_TRAINER;
 import static com.epam.dmgolub.gym.controller.constant.Constants.REDIRECT_TO_TRAINER_INDEX;
@@ -63,18 +64,20 @@ public class TrainerController {
 	public String save(
 		@ModelAttribute(TRAINER) @Valid final TrainerRequestDTO trainer,
 		final BindingResult bindingResult,
-		final RedirectAttributes redirectAttributes
+		final RedirectAttributes redirectAttributes,
+		final HttpSession session
 	) {
 		LOGGER.debug("In save - validating new trainer");
 		if (bindingResult.hasErrors()) {
 			ControllerUtilities.logBingingResultErrors(bindingResult, LOGGER, NEW_TRAINER_VIEW_NAME);
 			return NEW_TRAINER_VIEW_NAME;
 		}
-		final var credentials = trainerService.save(trainer);
+		final var response = trainerService.save(trainer);
 		LOGGER.debug("In save - Trainer saved successfully. Redirecting to new trainer view");
 		final String successMessage = "Trainer added successfully, username: %s, password: %s";
 		redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTRIBUTE,
-			String.format(successMessage, credentials.getUserName(), credentials.getPassword()));
+			String.format(successMessage, response.getCredentials().getUserName(), response.getCredentials().getPassword()));
+		session.setAttribute(JWT_TOKEN, response.getToken());
 		return REDIRECT_TO_NEW_TRAINER;
 	}
 

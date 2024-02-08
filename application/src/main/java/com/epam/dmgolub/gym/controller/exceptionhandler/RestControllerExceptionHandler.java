@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,7 +23,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.CONTROLLER_EXCEPTION_LOG_MESSAGE;
 
-@RestControllerAdvice("com.epam.dmgolub.gym.controller.rest")
+@RestControllerAdvice("com.epam.dmgolub.gym.controller")
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RestControllerExceptionHandler.class);
@@ -63,9 +65,26 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 		return handleExceptionInternal(ex, message, headers, HttpStatus.BAD_REQUEST, request);
 	}
 
+	@ExceptionHandler({AuthenticationException.class})
+	@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+	public ResponseEntity<Object> handleAuthenticationException(
+		final AuthenticationException ex,
+		final WebRequest request
+	) {
+		LOG.error(CONTROLLER_EXCEPTION_LOG_MESSAGE, request.getSessionId(), ex.getMessage());
+		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseStatus(value = HttpStatus.FORBIDDEN)
+	public ResponseEntity<Object> handleAccessDeniedException(final AccessDeniedException ex, final WebRequest request) {
+		LOG.error(CONTROLLER_EXCEPTION_LOG_MESSAGE, request.getSessionId(), ex.getMessage());
+		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+	}
+
 	@ExceptionHandler(Exception.class)
-	@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
-	public ResponseEntity<Object> exception(final RuntimeException ex, final WebRequest request) {
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public ResponseEntity<Object> handleException(final RuntimeException ex, final WebRequest request) {
 		LOG.error(CONTROLLER_EXCEPTION_LOG_MESSAGE, request.getSessionId(), ex.getMessage());
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 	}

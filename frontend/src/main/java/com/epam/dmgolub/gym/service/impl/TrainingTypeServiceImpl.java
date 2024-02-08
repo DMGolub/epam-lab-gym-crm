@@ -14,8 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.dmgolub.gym.service.constant.Constants.API;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINING_TYPES_LOCATION;
+import static com.epam.dmgolub.gym.service.constant.Constants.VERSION_V1;
+
 @Service
 public class TrainingTypeServiceImpl implements TrainingTypeService {
+
+	private static final String TRAINING_TYPES_BASE_URL = API + VERSION_V1 + TRAINING_TYPES_LOCATION;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainingTypeServiceImpl.class);
 
@@ -30,8 +36,9 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
 	@Override
 	public List<TrainingTypeDTO> findAll() {
-		LOGGER.debug("In findAll - Fetching training types from backend");
-		final String requestUrl = backendUrl + "/api/v1/training-types";
+		LOGGER.debug("In findAll - Received a request to find training types");
+		final String requestUrl = backendUrl + TRAINING_TYPES_BASE_URL;
+		LOGGER.debug("In findAll - Sending GET request to {}", requestUrl);
 		final var trainingTypes = restTemplate.getForObject(requestUrl, TrainingTypeDTO[].class);
 		List<TrainingTypeDTO> result = new ArrayList<>();
 		if (trainingTypes != null) {
@@ -42,16 +49,18 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
 
 	@Override
 	public TrainingTypeDTO findById(final Long id) {
-		LOGGER.debug("In findByLink - Fetching training type by id={}", id);
-		final String requestUrl = backendUrl + "/api/v1/training-types/" + id;
+		LOGGER.debug("In findById - Received a request to find training type by id={}", id);
+		final String requestUrl = backendUrl + TRAINING_TYPES_BASE_URL + "/" + id;
+		LOGGER.debug("In findById - Sending GET request to {}", requestUrl);
 		return getTrainingType(requestUrl)
 			.orElseThrow(() -> new EntityNotFoundException("Can not find training type by id=" + id));
 	}
 
 	@Override
 	public TrainingTypeDTO findByLink(final String link) {
-		LOGGER.debug("In findByLink - Fetching training type by link={}", link);
+		LOGGER.debug("In findByLink - Received a request to find training type by link={}", link);
 		final String requestUrl = backendUrl + link;
+		LOGGER.debug("In findByLink - Sending GET request to {}", requestUrl);
 		return getTrainingType(requestUrl)
 			.orElseThrow(() -> new EntityNotFoundException("Can not find training type by link=" + link));
 	}

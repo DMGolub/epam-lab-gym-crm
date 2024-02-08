@@ -7,6 +7,7 @@ import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.model.TrainingTypeModel;
+import com.epam.dmgolub.gym.security.service.TokenService;
 import com.epam.dmgolub.gym.service.TrainerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,8 @@ class TrainerRestControllerTest {
 	private TrainerService trainerService;
 	@Mock
 	private ModelToRestDtoMapper mapper;
+	@Mock
+	private TokenService tokenService;
 	@InjectMocks
 	private TrainerRestController trainerRestController;
 	private MockMvc mockMvc;
@@ -124,7 +127,9 @@ class TrainerRestControllerTest {
 		final var type = new TrainingTypeModel(1L, "Bodybuilding");
 		final var request = new TrainerModel(null, firstName, lastName, null, null, false, null, type);
 		when(mapper.mapToTrainerModel(requestDTO)).thenReturn(request);
-		final var credentials = new Credentials("User.Name", "Password");
+		final String userName = firstName + "." + lastName;
+		final var credentials = new Credentials(userName, "Password");
+		when(tokenService.generateToken(userName)).thenReturn("generated.jwt.token");
 		when(trainerService.save(request)).thenReturn(credentials);
 
 		mockMvc.perform(post(URL)
@@ -135,5 +140,6 @@ class TrainerRestControllerTest {
 		verify(mapper, times(1)).mapToTrainerModel(requestDTO);
 		verify(mapper, times(1)).mapToCredentialsDTO(credentials);
 		verify(trainerService, times(1)).save(request);
+		verify(tokenService, times(1)).generateToken(userName);
 	}
 }

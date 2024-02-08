@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.service.impl;
 
-import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
@@ -22,10 +22,16 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epam.dmgolub.gym.service.utility.ServiceUtilities.getAuthHeaders;
+import static com.epam.dmgolub.gym.service.constant.Constants.API;
+import static com.epam.dmgolub.gym.service.constant.Constants.PROFILE_LOCATION;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINERS_LOCATION;
+import static com.epam.dmgolub.gym.service.constant.Constants.VERSION_V1;
+import static com.epam.dmgolub.gym.service.utility.ServiceUtilities.getAuthHeader;
 
 @Service
 public class TrainerServiceImpl implements TrainerService {
+
+	private static final String TRAINERS_BASE_URL = API + VERSION_V1 + TRAINERS_LOCATION;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrainerServiceImpl.class);
 
@@ -47,21 +53,23 @@ public class TrainerServiceImpl implements TrainerService {
 	}
 
 	@Override
-	public CredentialsDTO save(final TrainerRequestDTO trainer) {
+	public SignUpResponseDTO save(final TrainerRequestDTO trainer) {
 		LOGGER.debug("In save - Received a request to save trainer={}", trainer);
-		final String requestUrl = backendUrl + "/api/v1/trainers";
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL;
+		LOGGER.debug("In save - Sending POST request to {}", requestUrl);
 		final HttpEntity<Trainer> requestEntity = new HttpEntity<>(mapper.mapToTrainerModel(trainer));
-		final var credentials =
-			restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, CredentialsDTO.class).getBody();
-		LOGGER.debug("In save - Trainer saved successfully, returning user credentials");
-		return credentials;
+		final var signUpResponseDTO =
+			restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, SignUpResponseDTO.class).getBody();
+		LOGGER.debug("In save - Trainer saved successfully, returning user credentials and token");
+		return signUpResponseDTO;
 	}
 
 	@Override
 	public TrainerResponseDTO findByUserName(final String userName, final HttpSession session) {
-		LOGGER.debug("In findByUserName - Fetching trainer from backend by userName={}", userName);
-		final String requestUrl = backendUrl + "/api/v1/trainers/profile?userName=" + userName;
-		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeaders(session));
+		LOGGER.debug("In findByUserName - Received a request to find trainer by userName={}", userName);
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL + PROFILE_LOCATION + "?userName=" + userName;
+		LOGGER.debug("In findByUserName - Sending GET request to {}", requestUrl);
+		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeader(session));
 		final var trainer =
 			restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, Trainer.class).getBody();
 		if (trainer != null) {
@@ -73,9 +81,10 @@ public class TrainerServiceImpl implements TrainerService {
 
 	@Override
 	public List<TrainerResponseDTO> findAll(final HttpSession session) {
-		LOGGER.debug("In findAll - Fetching all trainers from backend");
-		final String requestUrl = backendUrl + "/api/v1/trainers";
-		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeaders(session));
+		LOGGER.debug("In findAll - Received a request to find all trainers");
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL;
+		LOGGER.debug("In findAll - Sending GET request to {}", requestUrl);
+		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeader(session));
 		final var trainers =
 			restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, Trainer[].class).getBody();
 		final List<TrainerResponseDTO> result = new ArrayList<>();
@@ -90,9 +99,10 @@ public class TrainerServiceImpl implements TrainerService {
 	@Override
 	public void update(final TrainerRequestDTO trainerDTO, final HttpSession session) {
 		LOGGER.debug("In save - Received a request to update trainer={}", trainerDTO);
-		final String requestUrl = backendUrl + "/api/v1/trainers/profile";
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL + PROFILE_LOCATION;
 		final var trainer = mapper.mapToTrainerModel(trainerDTO);
-		final HttpEntity<Trainer> requestEntity = new HttpEntity<>(trainer, getAuthHeaders(session));
+		LOGGER.debug("In update - Sending PUT request to {}", requestUrl);
+		final HttpEntity<Trainer> requestEntity = new HttpEntity<>(trainer, getAuthHeader(session));
 		restTemplate.exchange(requestUrl, HttpMethod.PUT, requestEntity, Trainer.class);
 	}
 
@@ -102,7 +112,8 @@ public class TrainerServiceImpl implements TrainerService {
 		final HttpSession session
 	) {
 		LOGGER.debug("In findActiveTrainersNotAssignedOnTrainee - Received a request to find by userName={}", userName);
-		final String requestUrl = backendUrl + "/api/v1/trainers/not-assigned-on?userName=" + userName;
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL + "/not-assigned-on?userName=" + userName;
+		LOGGER.debug("In findActiveTrainersNotAssignedOnTrainee - Sending GET request to {}", requestUrl);
 		return getActiveTrainers(requestUrl, session);
 	}
 
@@ -112,12 +123,13 @@ public class TrainerServiceImpl implements TrainerService {
 		final HttpSession session
 	) {
 		LOGGER.debug("In findActiveTrainersAssignedOnTrainee - Received a request to find by userName={}", userName);
-		final String requestUrl = backendUrl + "/api/v1/trainers/assigned-on?userName=" + userName;
+		final String requestUrl = backendUrl + TRAINERS_BASE_URL + "/assigned-on?userName=" + userName;
+		LOGGER.debug("In findActiveTrainersAssignedOnTrainee - Sending GET request to {}", requestUrl);
 		return getActiveTrainers(requestUrl, session);
 	}
 
 	private List<TraineeResponseDTO.TrainerDTO> getActiveTrainers(final String requestUrl, final HttpSession session) {
-		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeaders(session));
+		final HttpEntity<Void> requestEntity = new HttpEntity<>(getAuthHeader(session));
 		final var trainers =
 			restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, Trainee.Trainer[].class).getBody();
 		final List<TraineeResponseDTO.TrainerDTO> result = new ArrayList<>();

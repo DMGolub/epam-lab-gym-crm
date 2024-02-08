@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
 import com.epam.dmgolub.gym.service.TrainerService;
@@ -80,7 +81,8 @@ class TrainerControllerTest {
 		void save_shouldReturnNewTrainerPage_whenBingingResultHasErrors() {
 			when(bindingResult.hasErrors()).thenReturn(true);
 
-			final String result = trainerController.save(new TrainerRequestDTO(), bindingResult, redirectAttributes);
+			final String result =
+				trainerController.save(new TrainerRequestDTO(), bindingResult, redirectAttributes, session);
 
 			assertEquals(NEW_TRAINER_VIEW_NAME, result);
 			verifyNoInteractions(trainerService);
@@ -91,9 +93,11 @@ class TrainerControllerTest {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			final var request = new TrainerRequestDTO();
 			final var credentials = new CredentialsDTO("User.Name", "Password");
-			when(trainerService.save(request)).thenReturn(credentials);
+			final var response = new SignUpResponseDTO("generated.jwt.token", credentials);
+			when(trainerService.save(request)).thenReturn(response);
 
-			final String result = trainerController.save(request, bindingResult, redirectAttributes);
+			final String result =
+				trainerController.save(request, bindingResult, redirectAttributes, session);
 
 			assertEquals(REDIRECT_TO_NEW_TRAINER, result);
 			verify(trainerService, times(1)).save(request);

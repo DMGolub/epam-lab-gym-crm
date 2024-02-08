@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.controller;
 
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeRequestDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainingCreateRequestDTO;
@@ -99,7 +100,8 @@ class TraineeControllerTest {
 		void save_shouldReturnNewTraineePage_whenBingingResultHasErrors() {
 			when(bindingResult.hasErrors()).thenReturn(true);
 
-			final String result = traineeController.save(new TraineeRequestDTO(), bindingResult, redirectAttributes);
+			final String result =
+				traineeController.save(new TraineeRequestDTO(), bindingResult, redirectAttributes, session);
 
 			assertEquals(NEW_TRAINEE_VIEW_NAME, result);
 			verifyNoInteractions(traineeService);
@@ -110,9 +112,11 @@ class TraineeControllerTest {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			final var request = new TraineeRequestDTO();
 			final var credentials = new CredentialsDTO("User.Name", "Password");
-			when(traineeService.save(request)).thenReturn(credentials);
+			final var response = new SignUpResponseDTO("generated.jwt.token", credentials);
+			when(traineeService.save(request)).thenReturn(response);
 
-			final String result = traineeController.save(request, bindingResult, redirectAttributes);
+			final String result =
+				traineeController.save(request, bindingResult, redirectAttributes, session);
 
 			assertEquals(REDIRECT_TO_NEW_TRAINEE, result);
 			verify(traineeService, times(1)).save(request);

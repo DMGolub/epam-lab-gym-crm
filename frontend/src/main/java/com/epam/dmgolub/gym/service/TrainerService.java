@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.service;
 
-import com.epam.dmgolub.gym.dto.CredentialsDTO;
+import com.epam.dmgolub.gym.dto.SignUpResponseDTO;
 import com.epam.dmgolub.gym.dto.TraineeResponseDTO;
 import com.epam.dmgolub.gym.dto.TrainerRequestDTO;
 import com.epam.dmgolub.gym.dto.TrainerResponseDTO;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TrainerService {
 
-	CredentialsDTO save(TrainerRequestDTO trainer);
+	SignUpResponseDTO save(TrainerRequestDTO trainer);
 
 	TrainerResponseDTO findByUserName(String userName, HttpSession session);
 

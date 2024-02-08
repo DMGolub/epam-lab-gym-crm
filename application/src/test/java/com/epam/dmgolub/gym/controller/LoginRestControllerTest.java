@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
 import com.epam.dmgolub.gym.mapper.ModelToRestDtoMapper;
 import com.epam.dmgolub.gym.model.ChangePasswordRequest;
+import com.epam.dmgolub.gym.security.service.TokenService;
 import com.epam.dmgolub.gym.service.LoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,8 @@ class LoginRestControllerTest {
 	@Mock
 	private AuthenticationManager authenticationManager;
 	@Mock
+	private TokenService tokenService;
+	@Mock
 	private ModelToRestDtoMapper mapper;
 	@Mock
 	private Authentication authentication;
@@ -54,16 +57,18 @@ class LoginRestControllerTest {
 		final String userName = "User.Name";
 		final String password = "Password";
 		final var credentials = new CredentialsDTO(userName, password);
-		final var token =
+		final var usernamePasswordToken =
 			new UsernamePasswordAuthenticationToken(credentials.getUserName(), credentials.getPassword());
-		when(authenticationManager.authenticate(token)).thenReturn(authentication);
+		when(authenticationManager.authenticate(usernamePasswordToken)).thenReturn(authentication);
+		when(tokenService.generateToken(userName)).thenReturn("generated.jwt.token");
 
-		mockMvc.perform(post(URL)
+		mockMvc.perform(post(URL + "/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(credentials)))
 			.andExpect(status().isOk());
 
-		verify(authenticationManager, times(1)).authenticate(token);
+		verify(authenticationManager, times(1)).authenticate(usernamePasswordToken);
+		verify(tokenService, times(1)).generateToken(userName);
 		verifyNoMoreInteractions(authenticationManager);
 	}
 
@@ -79,7 +84,7 @@ class LoginRestControllerTest {
 			final var request = new ChangePasswordRequest(userName, oldPassword, newPassword);
 			when(mapper.mapToChangePasswordRequest(requestDTO)).thenReturn(request);
 			when(loginService.changePassword(request)).thenReturn(true);
-			mockMvc.perform(put(URL)
+			mockMvc.perform(put(URL + "/change-password")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(new ObjectMapper().writeValueAsString(requestDTO)))
 				.andExpect(status().isOk());
@@ -98,7 +103,7 @@ class LoginRestControllerTest {
 			final var request = new ChangePasswordRequest(userName, oldPassword, newPassword);
 			when(mapper.mapToChangePasswordRequest(requestDTO)).thenReturn(request);
 			when(loginService.changePassword(request)).thenReturn(false);
-			mockMvc.perform(put(URL)
+			mockMvc.perform(put(URL + "/change-password")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(new ObjectMapper().writeValueAsString(requestDTO)))
 				.andExpect(status().isInternalServerError());
