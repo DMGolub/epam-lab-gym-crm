@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -33,33 +32,6 @@ class UserServiceImplTest {
 	private EntityToModelMapper mapper;
 	@InjectMocks
 	private UserServiceImpl userService;
-
-	@Nested
-	class TestFindById {
-
-		@Test
-		void findById_shouldReturnUserModel_whenUserExists() {
-			final Long id = 1L;
-			final var user = new User();
-			final var userModel = new UserModel();
-			when(userRepository.findById(id)).thenReturn(Optional.of(user));
-			when(mapper.mapToUserModel(user)).thenReturn(userModel);
-
-			assertEquals(userModel, userService.findById(id));
-			verify(userRepository, times(1)).findById(id);
-			verify(mapper, times(1)).mapToUserModel(user);
-		}
-
-		@Test
-		void findById_shouldThrowEntityNotFoundException_whenUserNotFound() {
-			final Long id = 99L;
-			when(userRepository.findById(id)).thenReturn(Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> userService.findById(id));
-			verify(userRepository, times(1)).findById(id);
-			verifyNoInteractions(mapper);
-		}
-	}
 
 	@Nested
 	class TestFindAll {

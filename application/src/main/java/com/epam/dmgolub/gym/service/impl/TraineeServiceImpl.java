@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
@@ -20,10 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_ID_MESSAGE;
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE;
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_ID_MESSAGE;
-import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_MESSAGE;
+import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_MESSAGE;
 
 @Service
 @Transactional
@@ -55,20 +54,16 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
-	public TraineeModel save(final TraineeModel request) {
+	public Credentials save(final TraineeModel request) {
 		LOGGER.debug("In save - Saving trainee from request {}", request);
 		final var trainee = mapper.mapToTrainee(request);
-		trainee.getUser().setUserName(userCredentialsGenerator.generateUserName(trainee.getUser()));
-		trainee.getUser().setPassword(userCredentialsGenerator.generatePassword(trainee.getUser()));
+		final var userName = userCredentialsGenerator.generateUserName(trainee.getUser());
+		final var password = userCredentialsGenerator.generatePassword(trainee.getUser());
+		trainee.getUser().setUserName(userName);
+		trainee.getUser().setPassword(userCredentialsGenerator.encodePassword(password));
 		trainee.setUser(userRepository.saveAndFlush(trainee.getUser()));
-		return mapper.mapToTraineeModel(traineeRepository.saveAndFlush(trainee));
-	}
-
-	@Override
-	public TraineeModel findById(final Long id) {
-		LOGGER.debug("In findById - Fetching trainee by id={} from repository", id);
-		final var trainee = getTrainee(id);
-		return mapper.mapToTraineeModel(trainee);
+		traineeRepository.saveAndFlush(trainee);
+		return new Credentials(userName, password);
 	}
 
 	@Override
@@ -97,32 +92,11 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	@Override
-	public void delete(final Long id) {
-		LOGGER.debug("In delete - Fetching trainings before removing trainee by id={}", id);
-		getTrainee(id);
-		final List<Training> trainings = trainingRepository.findAll().stream()
-			.filter(t -> id.equals(t.getTrainee().getId()))
-			.toList();
-		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In delete - Removed {} trainings, removing trainee by id", trainings.size());
-		traineeRepository.deleteById(id);
-	}
-
-	@Override
 	public void delete(final String userName) {
 		LOGGER.debug("In delete - Fetching trainings before removing trainee by id={}", userName);
 		getTrainee(userName);
 		removeTrainings(userName);
 		traineeRepository.deleteByUserUserName(userName);
-	}
-
-	@Override
-	public void addTrainer(final Long traineeId, final Long trainerId) {
-		LOGGER.debug("In addTrainer - Fetching trainer by id={} from repository", trainerId);
-		final var trainer = trainerRepository.findById(trainerId)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_ID_MESSAGE + trainerId));
-		LOGGER.debug("In addTrainer - Fetching trainee by id={} from repository and adding trainer", traineeId);
-		getTrainee(traineeId).getTrainers().add(trainer);
 	}
 
 	@Override
@@ -152,19 +126,14 @@ public class TraineeServiceImpl implements TraineeService {
 			.toList();
 	}
 
-	private Trainee getTrainee(final Long id) {
-		return traineeRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_BY_ID_MESSAGE + id));
-	}
-
 	private Trainee getTrainee(final String userName) {
 		return traineeRepository.findByUserUserName(userName)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
+			.orElseThrow(() -> new EntityNotFoundException(TRAINEE_NOT_FOUND_MESSAGE + userName));
 	}
 
 	private Trainer getTrainer(final String userName) {
 		return trainerRepository.findByUserUserName(userName)
-			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_BY_USERNAME_MESSAGE + userName));
+			.orElseThrow(() -> new EntityNotFoundException(TRAINER_NOT_FOUND_MESSAGE + userName));
 	}
 
 	private void removeTrainings(final String traineeUserName) {

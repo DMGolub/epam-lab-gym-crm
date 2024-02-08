@@ -6,7 +6,7 @@ import com.epam.dmgolub.gym.model.TrainingModel;
 
 import java.util.List;
 
-public interface TrainingService extends BaseService<Long, TrainingModel> {
+public interface TrainingService {
 
 	TrainingModel save(TrainingModel training);
 

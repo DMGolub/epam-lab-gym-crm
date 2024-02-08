@@ -1,22 +1,21 @@
 package com.epam.dmgolub.gym.service;
 
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
 
 import java.util.List;
 
-public interface TraineeService extends BaseService<Long, TraineeModel> {
+public interface TraineeService {
+
+	List<TraineeModel> findAll();
 
 	TraineeModel findByUserName(String userName);
 
-	TraineeModel save(TraineeModel request);
+	Credentials save(TraineeModel request);
 
 	TraineeModel update(TraineeModel trainee);
 
-	void delete(Long id);
-
 	void delete(String userName);
-
-	void addTrainer(Long traineeId, Long trainerIds);
 
 	void updateTrainers(String traineeUserName, List<String> trainerUserNames);
 }

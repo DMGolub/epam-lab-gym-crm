@@ -1,6 +1,7 @@
 package com.epam.dmgolub.gym.model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,5 +107,39 @@ class TrainerModelTest {
 
 		assertEquals(responseDTO2.hashCode(), responseDTO2.hashCode());
 		assertNotEquals(trainer.hashCode(), responseDTO2.hashCode());
+	}
+
+	@Nested
+	class TraineeTest {
+
+		@Test
+		void toString_shouldReturnExpectedValue_whenInvoked() {
+			final var trainee =
+				new TrainerModel.Trainee("userName", "firstName", "lastName");
+			final String expected = "Trainee{userName='userName', firstName='firstName', lastName='lastName'}";
+
+			assertEquals(expected, trainee.toString());
+		}
+
+		@Test
+		void testEqualsAndHashCode() {
+			final var trainee =
+				new TrainerModel.Trainee("userName", "firstName", "lastName");
+			final var trainee2 =
+				new TrainerModel.Trainee("userName2", "firstName", "lastName");
+			final var trainee3 =
+				new TrainerModel.Trainee("userName", "firstName3", "lastName");
+			final var trainee4 =
+				new TrainerModel.Trainee("userName", "firstName", "lastName4");
+
+			assertEquals(trainee, trainee);
+			assertEquals(trainee.hashCode(), trainee.hashCode());
+			assertNotEquals(trainee, trainee2);
+			assertNotEquals(trainee.hashCode(), trainee2.hashCode());
+			assertNotEquals(trainee, trainee3);
+			assertNotEquals(trainee.hashCode(), trainee3.hashCode());
+			assertNotEquals(trainee, trainee4);
+			assertNotEquals(trainee.hashCode(), trainee4.hashCode());
+		}
 	}
 }

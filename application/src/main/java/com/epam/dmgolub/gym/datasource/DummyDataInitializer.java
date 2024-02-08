@@ -1,5 +1,6 @@
 package com.epam.dmgolub.gym.datasource;
 
+import com.epam.dmgolub.gym.datasource.exception.DataInitializationException;
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.entity.Training;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -34,6 +36,9 @@ import java.util.Objects;
 @ConditionalOnProperty(name = "dummy.data.initialization", havingValue = "true")
 public class DummyDataInitializer {
 
+	private static final String TRAINEE_FAILURE_MESSAGE = "Failed to initialize trainee with id=";
+	private static final String TRAINER_FAILURE_MESSAGE = "Failed to initialize trainer with id=";
+	private static final String TRAINING_TYPE_FAILURE_MESSAGE = "Failed to initialize training type with id=";
 	private static final String VALUE_DELIMITER = ";";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyDataInitializer.class);
@@ -59,19 +64,22 @@ public class DummyDataInitializer {
 	private final TrainerRepository trainerRepository;
 	private final TraineeRepository traineeRepository;
 	private final TrainingRepository trainingRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public DummyDataInitializer(
 		final UserRepository userRepository,
 		final TrainingTypeRepository trainingTypeRepository,
 		final TrainerRepository trainerRepository,
 		final TraineeRepository traineeRepository,
-		final TrainingRepository trainingRepository
+		final TrainingRepository trainingRepository,
+		final PasswordEncoder passwordEncoder
 	) {
 		this.userRepository = userRepository;
 		this.trainingTypeRepository = trainingTypeRepository;
 		this.trainerRepository = trainerRepository;
 		this.traineeRepository = traineeRepository;
 		this.trainingRepository = trainingRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@PostConstruct
@@ -80,7 +88,6 @@ public class DummyDataInitializer {
 		initializeTrainerData();
 		initializeTraineeData();
 		initializeTrainingData();
-		initializeAdminData();
 	}
 
 	private void initializeTrainingTypeData() {
@@ -96,7 +103,7 @@ public class DummyDataInitializer {
 			final String[] values = line.split(VALUE_DELIMITER);
 			final Trainer trainer = new Trainer();
 			setUserProperties(trainer.getUser(), values);
-			trainer.setSpecialization(trainingTypeRepository.findById(Long.valueOf(values[5])).get());
+			trainer.setSpecialization(getTrainingTypeById(Long.valueOf(values[5])));
 			trainer.setUser(userRepository.saveAndFlush(trainer.getUser()));
 			trainerRepository.saveAndFlush(trainer);
 		}
@@ -120,10 +127,8 @@ public class DummyDataInitializer {
 		final List<String> lines = readLinesFromFile(trainersToTraineesFilePath);
 		for (String line : lines) {
 			final String[] values = line.split(VALUE_DELIMITER);
-			final long traineeId = Long.parseLong(values[0]);
-			final long trainerId = Long.parseLong(values[1]);
-			final Trainee trainee = traineeRepository.findById(traineeId).get();
-			final Trainer trainer = trainerRepository.findById(trainerId).get();
+			final Trainee trainee = getTraineeById(Long.parseLong(values[0]));
+			final Trainer trainer = getTrainerById(Long.parseLong(values[1]));
 			trainee.getTrainers().add(trainer);
 			traineeRepository.saveAndFlush(trainee);
 		}
@@ -133,20 +138,15 @@ public class DummyDataInitializer {
 		final List<String> lines = readLinesFromFile(trainingDataFilePath);
 		for (String line : lines) {
 			final String[] values = line.split(VALUE_DELIMITER);
-			final var trainee = traineeRepository.findById(Long.valueOf(values[0])).get();
-			final var trainer = trainerRepository.findById(Long.valueOf(values[1])).get();
+			final var trainee = getTraineeById(Long.valueOf(values[0]));
+			final var trainer = getTrainerById(Long.valueOf(values[1]));
 			final String name = values[2];
-			final var type = trainingTypeRepository.findById(Long.valueOf(values[3])).get();
+			final var type = getTrainingTypeById(Long.valueOf(values[3]));
 			final Date date = parseDate(values[4]);
 			final int duration = Integer.parseInt(values[5]);
 			final Training training = new Training(null, trainee, trainer, name, type, date, duration);
 			trainingRepository.saveAndFlush(training);
 		}
-	}
-
-	private void initializeAdminData() {
-		final User admin = new User(null, "admin", "admin", "admin.admin", "Password12", true);
-		userRepository.saveAndFlush(admin);
 	}
 
 	private List<String> readLinesFromFile(final String filePath) {
@@ -179,7 +179,22 @@ public class DummyDataInitializer {
 		user.setFirstName(values[0]);
 		user.setLastName(values[1]);
 		user.setUserName(values[2]);
-		user.setPassword(values[3]);
+		user.setPassword(passwordEncoder.encode(values[3]));
 		user.setActive(Boolean.parseBoolean(values[4]));
+	}
+
+	private Trainee getTraineeById(final Long id) {
+		return traineeRepository.findById(id)
+			.orElseThrow(() -> new DataInitializationException(TRAINEE_FAILURE_MESSAGE + id));
+	}
+
+	private Trainer getTrainerById(final Long id) {
+		return trainerRepository.findById(id)
+			.orElseThrow(() -> new DataInitializationException(TRAINER_FAILURE_MESSAGE + id));
+	}
+
+	private TrainingType getTrainingTypeById(final Long id) {
+		return trainingTypeRepository.findById(id)
+			.orElseThrow(() -> new DataInitializationException(TRAINING_TYPE_FAILURE_MESSAGE + id));
 	}
 }

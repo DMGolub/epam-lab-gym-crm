@@ -2,6 +2,7 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.entity.Trainer;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
+import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TrainerModel;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
@@ -41,13 +42,12 @@ class TrainerServiceImplTest {
 		final Trainer trainer = new Trainer();
 		when(mapper.mapToTrainer(request)).thenReturn(trainer);
 		final String userName = "username";
+		final String password = "password";
 		when(generator.generateUserName(trainer.getUser())).thenReturn(userName);
-		when(generator.generatePassword(trainer.getUser())).thenReturn("password");
+		when(generator.generatePassword(trainer.getUser())).thenReturn(password);
 		when(userRepository.saveAndFlush(trainer.getUser())).thenReturn(trainer.getUser());
 		when(trainerRepository.saveAndFlush(trainer)).thenReturn(trainer);
-		final TrainerModel expected = new TrainerModel();
-		expected.setUserName(userName);
-		when(mapper.mapToTrainerModel(trainer)).thenReturn(expected);
+		final var expected = new Credentials(userName, password);
 
 		assertEquals(expected, trainerService.save(request));
 		verify(mapper, times(1)).mapToTrainer(request);
@@ -55,34 +55,6 @@ class TrainerServiceImplTest {
 		verify(generator, times(1)).generatePassword(trainer.getUser());
 		verify(userRepository, times(1)).saveAndFlush(trainer.getUser());
 		verify(trainerRepository, times(1)).saveAndFlush(trainer);
-		verify(mapper, times(1)).mapToTrainerModel(trainer);
-	}
-
-	@Nested
-	class TestFindById {
-
-		@Test
-		void findById_shouldReturnTrainerModel_whenTrainerExists() {
-			final Long id = 1L;
-			final Trainer trainer = new Trainer();
-			when(trainerRepository.findById(id)).thenReturn(java.util.Optional.of(trainer));
-			final TrainerModel trainerModel = new TrainerModel();
-			when(mapper.mapToTrainerModel(trainer)).thenReturn(trainerModel);
-
-			assertEquals(trainerModel, trainerService.findById(id));
-			verify(trainerRepository, times(1)).findById(id);
-			verify(mapper, times(1)).mapToTrainerModel(trainer);
-		}
-
-		@Test
-		void findById_shouldThrowEntityNotFoundException_whenTrainerNotFound() {
-			final Long id = 1L;
-			when(trainerRepository.findById(id)).thenReturn(java.util.Optional.empty());
-
-			assertThrows(EntityNotFoundException.class, () -> trainerService.findById(id));
-			verify(trainerRepository, times(1)).findById(id);
-			verifyNoInteractions(mapper);
-		}
 	}
 
 	@Test
@@ -179,36 +151,6 @@ class TrainerServiceImplTest {
 	class TestFindActiveTrainersAssignedToTrainee {
 
 		@Test
-		void findActiveTrainersAssignedToTraineeById_shouldReturnTrainerModelList_whenThereAreActiveTrainers() {
-			final Long traineeId = 1L;
-			final var trainers = List.of(new Trainer(), new Trainer());
-			when(trainerRepository.findActiveTrainersAssignedOnTrainee(traineeId)).thenReturn(trainers);
-			final var expected = List.of(new TrainerModel(), new TrainerModel());
-			when(mapper.mapToTrainerModelList(trainers)).thenReturn(expected);
-
-			final var result = trainerService.findActiveTrainersAssignedOnTrainee(traineeId);
-
-			assertEquals(expected, result);
-			verify(trainerRepository, times(1)).findActiveTrainersAssignedOnTrainee(traineeId);
-			verify(mapper, times(1)).mapToTrainerModelList(trainers);
-		}
-
-		@Test
-		void findActiveTrainersAssignedToTraineeById_shouldReturnEmptyList_whenThereAreNoTrainers() {
-			final Long traineeId = 1L;
-			final var trainers = new ArrayList<Trainer>();
-			when(trainerRepository.findActiveTrainersAssignedOnTrainee(traineeId)).thenReturn(trainers);
-			final var expected = new ArrayList<TrainerModel>();
-			when(mapper.mapToTrainerModelList(trainers)).thenReturn(expected);
-
-			final var result = trainerService.findActiveTrainersAssignedOnTrainee(traineeId);
-
-			assertEquals(expected, result);
-			verify(trainerRepository, times(1)).findActiveTrainersAssignedOnTrainee(traineeId);
-			verify(mapper, times(1)).mapToTrainerModelList(trainers);
-		}
-
-		@Test
 		void findActiveTrainersAssignedToTraineeByUserName_shouldReturnTrainerModelList_whenThereAreActiveTrainers() {
 			final String traineeUserName = "User.Name";
 			final var trainers = List.of(new Trainer(), new Trainer());
@@ -241,36 +183,6 @@ class TrainerServiceImplTest {
 
 	@Nested
 	class TestFindActiveTrainersNotAssignedToTrainee {
-
-		@Test
-		void findActiveTrainersNotAssignedToTraineeById_shouldReturnTrainerModelList_whenThereAreActiveTrainers() {
-			final Long traineeId = 1L;
-			final var trainers = List.of(new Trainer(), new Trainer());
-			when(trainerRepository.findActiveTrainersNotAssignedOnTrainee(traineeId)).thenReturn(trainers);
-			final var expected = List.of(new TrainerModel(), new TrainerModel());
-			when(mapper.mapToTrainerModelList(trainers)).thenReturn(expected);
-
-			final var result = trainerService.findActiveTrainersNotAssignedOnTrainee(traineeId);
-
-			assertEquals(expected, result);
-			verify(trainerRepository, times(1)).findActiveTrainersNotAssignedOnTrainee(traineeId);
-			verify(mapper, times(1)).mapToTrainerModelList(trainers);
-		}
-
-		@Test
-		void findActiveTrainersNotAssignedToTraineeById_shouldReturnEmptyList_whenThereAreNoTrainers() {
-			final Long traineeId = 1L;
-			final var trainers = new ArrayList<Trainer>();
-			when(trainerRepository.findActiveTrainersNotAssignedOnTrainee(traineeId)).thenReturn(trainers);
-			final var expected = new ArrayList<TrainerModel>();
-			when(mapper.mapToTrainerModelList(trainers)).thenReturn(expected);
-
-			final var result = trainerService.findActiveTrainersNotAssignedOnTrainee(traineeId);
-
-			assertEquals(expected, result);
-			verify(trainerRepository, times(1)).findActiveTrainersNotAssignedOnTrainee(traineeId);
-			verify(mapper, times(1)).mapToTrainerModelList(trainers);
-		}
 
 		@Test
 		void findActiveTrainersNotAssignedToTraineeByUserName_shouldReturnTrainerModelList_whenThereAreActiveTrainers() {
