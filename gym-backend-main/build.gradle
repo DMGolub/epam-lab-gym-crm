@@ -43,11 +43,8 @@ dependencies {
     implementation "com.google.guava:guava:$googleGuavaVersion"
 
     // JJWT
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
     implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
     runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
 
     // Tests
