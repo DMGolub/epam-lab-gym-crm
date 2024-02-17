@@ -14,6 +14,7 @@ import com.epam.dmgolub.gym.service.TraineeService;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static com.epam.dmgolub.gym.service.constant.Constants.TRAINEE_NOT_FOUND_MESSAGE;
 import static com.epam.dmgolub.gym.service.constant.Constants.TRAINER_NOT_FOUND_MESSAGE;
 
@@ -55,7 +57,7 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public Credentials save(final TraineeModel request) {
-		LOGGER.debug("In save - Saving trainee from request {}", request);
+		LOGGER.debug("[{}] In save - Saving trainee from request {}", MDC.get(TRANSACTION_ID), request);
 		final var trainee = mapper.mapToTrainee(request);
 		final var userName = userCredentialsGenerator.generateUserName(trainee.getUser());
 		final var password = userCredentialsGenerator.generatePassword(trainee.getUser());
@@ -68,20 +70,21 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public List<TraineeModel> findAll() {
-		LOGGER.debug("In findAll - Fetching all trainees from repository");
+		LOGGER.debug("[{}] In findAll - Fetching all trainees from repository", MDC.get(TRANSACTION_ID));
 		return mapper.mapToTraineeModelList(traineeRepository.findAll());
 	}
 
 	@Override
 	public TraineeModel findByUserName(final String userName) {
-		LOGGER.debug("In findByUserName - Fetching trainee by userName={} from repository", userName);
+		LOGGER.debug("[{}] In findByUserName - Fetching trainee by userName={} from repository",
+			MDC.get(TRANSACTION_ID), userName);
 		final var trainee = getTrainee(userName);
 		return mapper.mapToTraineeModel(trainee);
 	}
 
 	@Override
 	public TraineeModel update(final TraineeModel request) {
-		LOGGER.debug("In update - Updating trainee from request {}", request);
+		LOGGER.debug("[{}] In update - Updating trainee from request {}", MDC.get(TRANSACTION_ID), request);
 		final var trainee = getTrainee(request.getUserName());
 		trainee.getUser().setFirstName(request.getFirstName());
 		trainee.getUser().setLastName(request.getLastName());
@@ -93,7 +96,8 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public void delete(final String userName) {
-		LOGGER.debug("In delete - Fetching trainings before removing trainee by id={}", userName);
+		LOGGER.debug("[{}] In delete - Fetching trainings before removing trainee by id={}",
+			MDC.get(TRANSACTION_ID), userName);
 		getTrainee(userName);
 		removeTrainings(userName);
 		traineeRepository.deleteByUserUserName(userName);
@@ -101,16 +105,17 @@ public class TraineeServiceImpl implements TraineeService {
 
 	@Override
 	public void updateTrainers(final String traineeUserName, final List<String> trainerUserNames) {
-		LOGGER.debug("In updateTrainers - Fetching trainee by userName={} from repository", traineeUserName);
+		LOGGER.debug("[{}] In updateTrainers - Fetching trainee by userName={} from repository",
+			MDC.get(TRANSACTION_ID), traineeUserName);
 		final var trainee = getTrainee(traineeUserName);
-		LOGGER.debug("In updateTrainers - Determining trainers to remove and add");
+		LOGGER.debug("[{}] In updateTrainers - Determining trainers to remove and add", MDC.get(TRANSACTION_ID));
 		final var trainersToAdd = determineTrainersToAdd(trainee.getTrainers(), trainerUserNames);
 		final var trainersToRemove = determineTrainersToRemove(trainee.getTrainers(), trainerUserNames);
 		trainersToAdd.forEach(trainer -> trainee.getTrainers().add(trainer));
 		trainersToRemove.forEach(trainer -> removeTrainings(traineeUserName, trainer.getUser().getUserName()));
 		trainee.getTrainers().removeAll(trainersToRemove);
-		LOGGER.debug("In updateTrainers - Removed {} trainers, assigned {} trainers to trainee={}",
-			trainersToRemove.size(), trainersToAdd.size(), traineeUserName);
+		LOGGER.debug("[{}] In updateTrainers - Removed {} trainers, assigned {} trainers to trainee={}",
+			MDC.get(TRANSACTION_ID), trainersToRemove.size(), trainersToAdd.size(), traineeUserName);
 		traineeRepository.saveAndFlush(trainee);
 	}
 
@@ -141,8 +146,8 @@ public class TraineeServiceImpl implements TraineeService {
 			.filter(t -> traineeUserName.equals(t.getTrainee().getUser().getUserName()))
 			.toList();
 		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In removeTrainings - Removed {} trainings associated to trainee={}",
-			trainings.size(), traineeUserName);
+		LOGGER.debug("[{}] In removeTrainings - Removed {} trainings associated to trainee={}",
+			MDC.get(TRANSACTION_ID), trainings.size(), traineeUserName);
 	}
 
 	private void removeTrainings(final String traineeUserName, final String trainerUserName) {
@@ -153,7 +158,7 @@ public class TraineeServiceImpl implements TraineeService {
 			.filter(isAssociatedToTraineeAndTrainer)
 			.toList();
 		trainingRepository.deleteAll(trainings);
-		LOGGER.debug("In removeTrainings - Removed {} trainings associated to trainee={} and trainer={}",
-			trainings.size(), traineeUserName, trainerUserName);
+		LOGGER.debug("[{}] In removeTrainings - Removed {} trainings associated to trainee={} and trainer={}",
+			MDC.get(TRANSACTION_ID), trainings.size(), traineeUserName, trainerUserName);
 	}
 }

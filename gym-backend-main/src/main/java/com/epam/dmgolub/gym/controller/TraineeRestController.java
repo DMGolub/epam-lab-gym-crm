@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.TraineeRestController.URL;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -70,7 +72,7 @@ public class TraineeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TraineeResponseDTO>> getAll() {
-		LOGGER.debug("In getAll - Received a request to get all trainees");
+		LOGGER.debug("[{}] In getAll - Received a request to get all trainees", MDC.get(TRANSACTION_ID));
 		final var trainees = traineeService.findAll();
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTOList(trainees), HttpStatus.OK);
 	}
@@ -86,7 +88,7 @@ public class TraineeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TraineeResponseDTO> getByUserName(@RequestParam("userName") final String userName) {
-		LOGGER.debug("In getByUserName - Received a request to get trainee={}", userName);
+		LOGGER.debug("[{}] In getByUserName - Received a request to get trainee={}", MDC.get(TRANSACTION_ID), userName);
 		ControllerUtils.checkIsAuthorizedUser(userName);
 		final var trainee = traineeService.findByUserName(userName);
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
@@ -101,7 +103,7 @@ public class TraineeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<SignUpResponseDTO> create(@RequestBody @Valid final TraineeCreateRequestDTO request) {
-		LOGGER.debug("In create - Received a request to create trainee={}", request);
+		LOGGER.debug("[{}] In create - Received a request to create trainee={}", MDC.get(TRANSACTION_ID), request);
 		final var credentials = traineeService.save(mapper.mapToTraineeModel(request));
 		final var token = tokenService.generateToken(credentials.getUserName());
 		final var response = new SignUpResponseDTO(token, mapper.mapToCredentialsDTO(credentials));
@@ -119,7 +121,7 @@ public class TraineeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TraineeResponseDTO> update(@RequestBody @Valid final TraineeUpdateRequestDTO request) {
-		LOGGER.debug("In update - Received a request to update trainee={}", request);
+		LOGGER.debug("[{}] In update - Received a request to update trainee={}", MDC.get(TRANSACTION_ID), request);
 		ControllerUtils.checkIsAuthorizedUser(request.getUserName());
 		final var trainee = traineeService.update(mapper.mapToTraineeModel(request));
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTO(trainee), HttpStatus.OK);
@@ -138,7 +140,8 @@ public class TraineeRestController {
 	public ResponseEntity<List<TraineeResponseDTO.TrainerDTO>> updateTrainerList(
 		@RequestBody @Valid final TraineeUpdateTrainerListRequestDTO request
 	) {
-		LOGGER.debug("In updateTrainerList - Received a request to update trainee trainer list={}", request);
+		LOGGER.debug("[{}] In updateTrainerList - Received a request to update trainee trainer list={}",
+			MDC.get(TRANSACTION_ID), request);
 		ControllerUtils.checkIsAuthorizedUser(request.getTraineeUserName());
 		traineeService.updateTrainers(request.getTraineeUserName(), request.getTrainerUserNames());
 		final var trainers = traineeService.findByUserName(request.getTraineeUserName()).getTrainers();
@@ -156,7 +159,7 @@ public class TraineeRestController {
 	})
 	@ResponseStatus(HttpStatus.OK)
 	public void delete(@RequestParam("userName") final String userName) {
-		LOGGER.debug("In delete - Received a request to delete trainee={}", userName);
+		LOGGER.debug("[{}] In delete - Received a request to delete trainee={}", MDC.get(TRANSACTION_ID), userName);
 		ControllerUtils.checkIsAuthorizedUser(userName);
 		traineeService.delete(userName);
 	}

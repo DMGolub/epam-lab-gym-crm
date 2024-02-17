@@ -39,7 +39,7 @@ class TrainingCreateRequestDTOTest {
 
 	@Test
 	void dateGetter_shouldReturnTheSameValue_whenItIsSetBySetter() {
-		Date date = new Date();
+		final Date date = new Date();
 		requestDTO.setDate(date);
 		assertEquals(date, requestDTO.getDate());
 	}

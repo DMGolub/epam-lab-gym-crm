@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
+
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
@@ -22,9 +24,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
 		@NonNull final HttpServletResponse response,
 		@NonNull final Object handler
 	) {
-		LOGGER.debug("In preHandle - Received a request: {} {}", request.getMethod(), request.getRequestURL());
 		final String transactionId = UUID.randomUUID().toString();
-		MDC.put("transactionId", transactionId);
+		MDC.put(TRANSACTION_ID, transactionId);
+		LOGGER.debug("[{}] In preHandle - Received a request: {} {}",
+			transactionId, request.getMethod(), request.getRequestURL());
 		return true;
 	}
 
@@ -35,7 +38,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 		@NonNull final Object handler,
 		final Exception ex
 	) {
-		LOGGER.debug("In afterCompletion - Completed request: {} {}, status: {}",
-			request.getMethod(), request.getRequestURL(), response.getStatus());
+		LOGGER.debug("[{}] In afterCompletion - Completed request: {} {}, status: {}",
+			MDC.get(TRANSACTION_ID), request.getMethod(), request.getRequestURL(), response.getStatus());
 	}
 }

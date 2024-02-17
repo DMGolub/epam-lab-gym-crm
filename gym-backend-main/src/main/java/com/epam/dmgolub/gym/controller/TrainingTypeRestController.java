@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.TrainingTypeRestController.URL;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -53,7 +55,7 @@ public class TrainingTypeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TrainingTypeDTO>> getAll() {
-		LOGGER.debug("In getAll - Received a request to get all training types");
+		LOGGER.debug("[{}] In getAll - Received a request to get all training types", MDC.get(TRANSACTION_ID));
 		final var types = trainingTypeService.findAll();
 		return new ResponseEntity<>(mapper.mapToTrainingTypeDTOList(types), HttpStatus.OK);
 	}
@@ -69,7 +71,7 @@ public class TrainingTypeRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TrainingTypeDTO> getById(@PathVariable("id") final Long id) {
-		LOGGER.debug("In getById - Received a request to get training type by id={}", id);
+		LOGGER.debug("[{}] In getById - Received a request to get training type by id={}", MDC.get(TRANSACTION_ID), id);
 		final var training = trainingTypeService.findById(id);
 		return new ResponseEntity<>(mapper.mapToTrainingTypeDTO(training), HttpStatus.OK);
 	}

@@ -5,6 +5,7 @@ import com.epam.dmgolub.gym.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.epam.dmgolub.gym.controller.UserRestController.URL;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -41,7 +43,8 @@ public class UserRestController {
 	})
 	@ResponseStatus(HttpStatus.OK)
 	public void changeActivityStatus(@RequestParam("userName") final String userName) {
-		LOGGER.debug("In changeActivityStatus - Received a request to change status for user={}", userName);
+		LOGGER.debug("[{}] In changeActivityStatus - Received a request to change status for user={}",
+			MDC.get(TRANSACTION_ID), userName);
 		userService.changeActivityStatus(userName);
 	}
 }

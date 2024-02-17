@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.entity.User;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 
 @Service
 public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
@@ -37,7 +40,7 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 
 	@Override
 	public String generateUserName(final User user) {
-		LOGGER.debug("In generateUserName - Generating user name for {}", user);
+		LOGGER.debug("[{}] In generateUserName - Generating user name for {}", MDC.get(TRANSACTION_ID), user);
 		final String userNameRegEx = getUserNameRegEx(user);
 		final var similarUserNames = findSimilarUserNames(userNameRegEx);
 		final Optional<Long> suffixMaxValue = calculateUserNameSuffixMaxValue(userNameRegEx, similarUserNames);
@@ -47,7 +50,7 @@ public class UserCredentialsGeneratorImpl implements UserCredentialsGenerator {
 
 	@Override
 	public String generatePassword(final User user) {
-		LOGGER.debug("In generatePassword - Generating password for {}", user);
+		LOGGER.debug("[{}] In generatePassword - Generating password for {}", MDC.get(TRANSACTION_ID), user);
 		char[] chars = POSSIBLE_PASSWORD_CHARACTERS.toCharArray();
 		return RandomStringUtils.random(passwordLength, 0, chars.length - 1, true, true, chars, new SecureRandom());
 	}

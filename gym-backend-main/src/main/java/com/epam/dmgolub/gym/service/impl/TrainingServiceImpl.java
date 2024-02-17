@@ -10,11 +10,14 @@ import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecificatio
 import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.service.TrainingService;
 import jakarta.transaction.Transactional;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 
 @Service
 @Transactional
@@ -35,26 +38,26 @@ public class TrainingServiceImpl implements TrainingService {
 
 	@Override
 	public TrainingModel save(final TrainingModel request) {
-		LOGGER.debug("In save - Saving training from request {}", request);
+		LOGGER.debug("[{}] In save - Saving training from request {}", MDC.get(TRANSACTION_ID), request);
 		final Training training = mapper.mapToTraining(request);
 		return mapper.mapToTrainingModel(trainingRepository.saveAndFlush(training));
 	}
 
 	@Override
 	public List<TrainingModel> searchByTrainee(final TraineeTrainingsSearchRequest request) {
-		LOGGER.debug("In searchByTrainee - Received search request={}", request);
+		LOGGER.debug("[{}] In searchByTrainee - Received search request={}", MDC.get(TRANSACTION_ID), request);
 		final var criteria = mapper.mapToTraineeTrainingsSearchCriteria(request);
 		final List<Training> trainings = trainingRepository.findAll(new TraineeTrainingSpecification(criteria));
-		LOGGER.debug("In searchByTrainee - found {} trainings", trainings.size());
+		LOGGER.debug("[{}] In searchByTrainee - found {} trainings", MDC.get(TRANSACTION_ID), trainings.size());
 		return mapper.mapToTrainingModelList(trainings);
 	}
 
 	@Override
 	public List<TrainingModel> searchByTrainer(final TrainerTrainingsSearchRequest request) {
-		LOGGER.debug("In searchByTrainer - Received search request={}", request);
+		LOGGER.debug("[{}] In searchByTrainer - Received search request={}", MDC.get(TRANSACTION_ID), request);
 		final var criteria = mapper.mapToTrainerTrainingsSearchCriteria(request);
 		final List<Training> trainings = trainingRepository.findAll(new TrainerTrainingSpecification(criteria));
-		LOGGER.debug("In searchByTrainer - found {} trainings", trainings.size());
+		LOGGER.debug("[{}] In searchByTrainer - found {} trainings", MDC.get(TRANSACTION_ID), trainings.size());
 		return mapper.mapToTrainingModelList(trainings);
 	}
 }

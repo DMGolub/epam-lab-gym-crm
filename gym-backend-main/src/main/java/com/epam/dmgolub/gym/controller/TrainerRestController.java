@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.TrainerRestController.URL;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -67,7 +69,7 @@ public class TrainerRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<List<TrainerResponseDTO>> getAll() {
-		LOGGER.debug("In getAll - Received a request to get all trainers");
+		LOGGER.debug("[{}] In getAll - Received a request to get all trainers", MDC.get(TRANSACTION_ID));
 		final var trainers = trainerService.findAll();
 		return new ResponseEntity<>(mapper.mapToTrainerResponseDTOList(trainers), HttpStatus.OK);
 	}
@@ -84,7 +86,8 @@ public class TrainerRestController {
 	public ResponseEntity<List<TraineeResponseDTO.TrainerDTO>> getNotAssignedOnTrainee(
 		@RequestParam("userName") final String userName
 	) {
-		LOGGER.debug("In getNotAssignedOnTrainee - Received a request to get all trainers not assigned on {}", userName);
+		LOGGER.debug("[{}] In getNotAssignedOnTrainee - Received a request to get all trainers not assigned on {}",
+			MDC.get(TRANSACTION_ID), userName);
 		final var trainers = trainerService.findActiveTrainersNotAssignedOnTrainee(userName);
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTOTrainerDTOList(trainers), HttpStatus.OK);
 	}
@@ -101,7 +104,8 @@ public class TrainerRestController {
 	public ResponseEntity<List<TraineeResponseDTO.TrainerDTO>> getAssignedOnTrainee(
 		@RequestParam("userName") final String userName
 	) {
-		LOGGER.debug("In getAssignedOnTrainee - Received a request to get all trainers assigned on {}", userName);
+		LOGGER.debug("[{}] In getAssignedOnTrainee - Received a request to get all trainers assigned on {}",
+			MDC.get(TRANSACTION_ID), userName);
 		final var trainers = trainerService.findActiveTrainersAssignedOnTrainee(userName);
 		return new ResponseEntity<>(mapper.mapToTraineeResponseDTOTrainerDTOList(trainers), HttpStatus.OK);
 	}
@@ -117,7 +121,7 @@ public class TrainerRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TrainerResponseDTO> getByUserName(@RequestParam("userName") final String userName) {
-		LOGGER.debug("In getByUserName - Received a request to get trainer={}", userName);
+		LOGGER.debug("[{}] In getByUserName - Received a request to get trainer={}", MDC.get(TRANSACTION_ID), userName);
 		final var trainer = trainerService.findByUserName(userName);
 		return new ResponseEntity<>(mapper.mapToTrainerResponseDTO(trainer), HttpStatus.OK);
 	}
@@ -131,7 +135,7 @@ public class TrainerRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<SignUpResponseDTO> create(@RequestBody @Valid final TrainerCreateRequestDTO request) {
-		LOGGER.debug("In create - Received a request to create trainer={}", request);
+		LOGGER.debug("[{}] In create - Received a request to create trainer={}", MDC.get(TRANSACTION_ID), request);
 		final var credentials = trainerService.save(mapper.mapToTrainerModel(request));
 		final var token = tokenService.generateToken(credentials.getUserName());
 		final var response = new SignUpResponseDTO(token, mapper.mapToCredentialsDTO(credentials));
@@ -149,7 +153,7 @@ public class TrainerRestController {
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
 	public ResponseEntity<TrainerResponseDTO> update(@RequestBody @Valid final TrainerUpdateRequestDTO request) {
-		LOGGER.debug("In update - Received a request to update trainer={}", request);
+		LOGGER.debug("[{}] In update - Received a request to update trainer={}", MDC.get(TRANSACTION_ID), request);
 		ControllerUtils.checkIsAuthorizedUser(request.getUserName());
 		final var trainer = trainerService.update(mapper.mapToTrainerModel(request));
 		return new ResponseEntity<>(mapper.mapToTrainerResponseDTO(trainer), HttpStatus.OK);

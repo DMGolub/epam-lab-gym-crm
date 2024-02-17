@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.TrainingRestController.URL;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
+import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -76,7 +78,8 @@ public class TrainingRestController {
 		@RequestParam(required = false) final String trainerUserName,
 		@RequestParam(required = false) final Long trainingTypeId
 	) {
-		LOGGER.debug("In searchByTrainee - Received a request to get trainings for trainee={}", traineeUserName);
+		LOGGER.debug("[{}] In searchByTrainee - Received a request to get trainings for trainee={}",
+			MDC.get(TRANSACTION_ID), traineeUserName);
 		ControllerUtils.checkIsAuthorizedUser(traineeUserName);
 		final var trainings = trainingService.searchByTrainee(new TraineeTrainingsSearchRequest(
 			traineeUserName,
@@ -103,7 +106,8 @@ public class TrainingRestController {
 		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final Date periodTo,
 		@RequestParam(required = false) final String traineeUserName
 	) {
-		LOGGER.debug("In searchByTrainer - Received a request to get trainings for trainer={}", trainerUserName);
+		LOGGER.debug("[{}] In searchByTrainer - Received a request to get trainings for trainer={}",
+			MDC.get(TRANSACTION_ID), trainerUserName);
 		ControllerUtils.checkIsAuthorizedUser(trainerUserName);
 		final var request = new TrainerTrainingsSearchRequest(trainerUserName, periodFrom, periodTo, traineeUserName);
 		final var trainings = trainingService.searchByTrainer(request);
@@ -120,7 +124,7 @@ public class TrainingRestController {
 	})
 	@ResponseStatus(HttpStatus.OK)
 	public void create(@RequestBody @Valid final TrainingCreateRequestDTO request) {
-		LOGGER.debug("In create - Received a request to create training={}", request);
+		LOGGER.debug("[{}] In create - Received a request to create training={}", MDC.get(TRANSACTION_ID), request);
 		ControllerUtils.checkIsAuthorizedUser(request.getTraineeUserName());
 		trainingService.save(mapper.mapToTrainingModel(request));
 	}
