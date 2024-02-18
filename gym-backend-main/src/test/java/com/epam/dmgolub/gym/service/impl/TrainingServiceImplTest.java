@@ -13,6 +13,7 @@ import com.epam.dmgolub.gym.repository.specification.TrainerTrainingSpecificatio
 
 import java.util.List;
 
+import com.epam.dmgolub.gym.service.WorkloadUpdateService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,8 @@ class TrainingServiceImplTest {
 
 	@Mock
 	private TrainingRepository trainingRepository;
+	@Mock
+	private WorkloadUpdateService workloadUpdateService;
 	@Mock
 	private EntityToModelMapper mapper;
 	@InjectMocks
@@ -47,6 +50,7 @@ class TrainingServiceImplTest {
 		verify(mapper).mapToTraining(request);
 		verify(trainingRepository).saveAndFlush(training);
 		verify(mapper).mapToTrainingModel(training);
+		verify(workloadUpdateService).add(expected);
 	}
 
 	@Test

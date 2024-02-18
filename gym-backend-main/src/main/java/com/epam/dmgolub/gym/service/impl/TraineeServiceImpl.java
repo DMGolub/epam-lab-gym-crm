@@ -2,15 +2,15 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
-import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
 import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
+import com.epam.dmgolub.gym.model.TrainingModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
-import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
 import com.epam.dmgolub.gym.service.TraineeService;
+import com.epam.dmgolub.gym.service.TrainingService;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,23 +34,23 @@ public class TraineeServiceImpl implements TraineeService {
 
 	private final UserRepository userRepository;
 	private final TraineeRepository traineeRepository;
-	private final TrainingRepository trainingRepository;
 	private final TrainerRepository trainerRepository;
+	private final TrainingService trainingService;
 	private final EntityToModelMapper mapper;
 	private final UserCredentialsGenerator userCredentialsGenerator;
 
 	public TraineeServiceImpl(
 		final UserRepository userRepository,
 		final TraineeRepository traineeRepository,
-		final TrainingRepository trainingRepository,
 		final TrainerRepository trainerRepository,
+		final TrainingService trainingService,
 		final EntityToModelMapper mapper,
 		final UserCredentialsGenerator userCredentialsGenerator
 	) {
 		this.userRepository = userRepository;
 		this.traineeRepository = traineeRepository;
-		this.trainingRepository = trainingRepository;
 		this.trainerRepository = trainerRepository;
+		this.trainingService = trainingService;
 		this.mapper = mapper;
 		this.userCredentialsGenerator = userCredentialsGenerator;
 	}
@@ -142,22 +142,22 @@ public class TraineeServiceImpl implements TraineeService {
 	}
 
 	private void removeTrainings(final String traineeUserName) {
-		final List<Training> trainings = trainingRepository.findAll().stream()
-			.filter(t -> traineeUserName.equals(t.getTrainee().getUser().getUserName()))
+		final var trainings = trainingService.findAll().stream()
+			.filter(t -> traineeUserName.equals(t.getTrainee().getUserName()))
 			.toList();
-		trainingRepository.deleteAll(trainings);
+		trainings.forEach(trainingService::delete);
 		LOGGER.debug("[{}] In removeTrainings - Removed {} trainings associated to trainee={}",
 			MDC.get(TRANSACTION_ID), trainings.size(), traineeUserName);
 	}
 
 	private void removeTrainings(final String traineeUserName, final String trainerUserName) {
-		final Predicate<Training> isAssociatedToTraineeAndTrainer = training ->
-			traineeUserName.equals(training.getTrainee().getUser().getUserName()) &&
-			trainerUserName.equals(training.getTrainer().getUser().getUserName());
-		final List<Training> trainings = trainingRepository.findAll().stream()
+		final Predicate<TrainingModel> isAssociatedToTraineeAndTrainer = training ->
+			traineeUserName.equals(training.getTrainee().getUserName()) &&
+			trainerUserName.equals(training.getTrainer().getUserName());
+		final var trainings = trainingService.findAll().stream()
 			.filter(isAssociatedToTraineeAndTrainer)
 			.toList();
-		trainingRepository.deleteAll(trainings);
+		trainings.forEach(trainingService::delete);
 		LOGGER.debug("[{}] In removeTrainings - Removed {} trainings associated to trainee={} and trainer={}",
 			MDC.get(TRANSACTION_ID), trainings.size(), traineeUserName, trainerUserName);
 	}

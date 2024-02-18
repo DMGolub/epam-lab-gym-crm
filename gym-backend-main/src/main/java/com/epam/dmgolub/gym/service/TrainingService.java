@@ -13,4 +13,8 @@ public interface TrainingService {
 	List<TrainingModel> searchByTrainee(TraineeTrainingsSearchRequest request);
 
 	List<TrainingModel> searchByTrainer(TrainerTrainingsSearchRequest request);
+
+	List<TrainingModel> findAll();
+
+	void delete(TrainingModel training);
 }

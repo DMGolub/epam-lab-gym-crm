@@ -2,15 +2,15 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.entity.Trainee;
 import com.epam.dmgolub.gym.entity.Trainer;
-import com.epam.dmgolub.gym.entity.Training;
 import com.epam.dmgolub.gym.entity.User;
 import com.epam.dmgolub.gym.mapper.EntityToModelMapper;
 import com.epam.dmgolub.gym.model.Credentials;
 import com.epam.dmgolub.gym.model.TraineeModel;
+import com.epam.dmgolub.gym.model.TrainingModel;
 import com.epam.dmgolub.gym.repository.TraineeRepository;
 import com.epam.dmgolub.gym.repository.TrainerRepository;
-import com.epam.dmgolub.gym.repository.TrainingRepository;
 import com.epam.dmgolub.gym.repository.UserRepository;
+import com.epam.dmgolub.gym.service.TrainingService;
 import com.epam.dmgolub.gym.service.exception.EntityNotFoundException;
 import com.epam.dmgolub.gym.service.UserCredentialsGenerator;
 
@@ -40,7 +40,7 @@ class TraineeServiceImplTest {
 	@Mock
 	private TrainerRepository trainerRepository;
 	@Mock
-	private TrainingRepository trainingRepository;
+	private TrainingService trainingService;
 	@Mock
 	private EntityToModelMapper mapper;
 	@Mock
@@ -172,23 +172,23 @@ class TraineeServiceImplTest {
 		@Test
 		void deleteByUserName_shouldRemoveAllTraineeTrainings_whenTraineeHasTrainings() {
 			final String userName = "UserName";
-			final Trainee trainee = new Trainee();
-			trainee.getUser().setUserName(userName);
-			final Trainee trainee2 = new Trainee();
-			trainee2.getUser().setUserName("AnotherName");
-			final Training training1 = new Training(1L, trainee, null, "name", null, null, 30);
-			final Training training2 = new Training(2L, trainee, null, "another name", null, null, 60);
-			final Training training3 = new Training(3L, trainee2, null, "yet another name", null, null, 45);
-			final List<Training> allTrainings = List.of(training1, training2, training3);
-			when(traineeRepository.findByUserUserName(userName)).thenReturn(Optional.of(trainee));
-			when(trainingRepository.findAll()).thenReturn(allTrainings);
-			final List<Training> expectedTrainingsToDelete = List.of(training1, training2);
+			final var trainee = new TraineeModel();
+			trainee.setUserName(userName);
+			final var trainee2 = new TraineeModel();
+			trainee2.setUserName("AnotherName");
+			final var training1 = new TrainingModel(1L, trainee, null, "name", null, null, 30);
+			final var training2 = new TrainingModel(2L, trainee, null, "another name", null, null, 60);
+			final var training3 = new TrainingModel(3L, trainee2, null, "yet another name", null, null, 45);
+			final List<TrainingModel> allTrainings = List.of(training1, training2, training3);
+			when(traineeRepository.findByUserUserName(userName)).thenReturn(Optional.of(new Trainee()));
+			when(trainingService.findAll()).thenReturn(allTrainings);
 
 			traineeService.delete(userName);
 
-			verify(trainingRepository, times(1)).findAll();
-			verify(trainingRepository, times(1)).deleteAll(expectedTrainingsToDelete);
-			verifyNoMoreInteractions(trainingRepository);
+			verify(trainingService, times(1)).findAll();
+			verify(trainingService, times(1)).delete(training1);
+			verify(trainingService, times(1)).delete(training2);
+			verifyNoMoreInteractions(trainingService);
 			verify(traineeRepository, times(1)).deleteByUserUserName(userName);
 			verifyNoInteractions(mapper);
 		}
@@ -223,7 +223,7 @@ class TraineeServiceImplTest {
 			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
 			verify(traineeRepository, times(1)).saveAndFlush(trainee);
 			verifyNoInteractions(trainerRepository);
-			verifyNoInteractions(trainingRepository);
+			verifyNoInteractions(trainingService);
 		}
 
 		@Test
@@ -238,14 +238,14 @@ class TraineeServiceImplTest {
 			final var trainer2 = createTrainer(2L, trainerUserName2);
 			setTrainers(updatedTrainee, trainer2);
 			when(trainerRepository.findByUserUserName(trainerUserName2)).thenReturn(Optional.of(trainer2));
-			when(trainingRepository.findAll()).thenReturn(new ArrayList<>());
+			when(trainingService.findAll()).thenReturn(new ArrayList<>());
 
 			traineeService.updateTrainers(traineeUserName, List.of(trainerUserName2));
 
 			assertEquals(List.of(trainer2), trainee.getTrainers());
 			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
 			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName2);
-			verify(trainingRepository, times(1)).findAll();
+			verify(trainingService, times(1)).findAll();
 			verify(traineeRepository, times(1)).saveAndFlush(updatedTrainee);
 		}
 
@@ -259,7 +259,7 @@ class TraineeServiceImplTest {
 			verify(traineeRepository, times(1)).findByUserUserName(traineeUserName);
 			verifyNoMoreInteractions(traineeRepository);
 			verifyNoInteractions(trainerRepository);
-			verifyNoInteractions(trainingRepository);
+			verifyNoInteractions(trainingService);
 		}
 
 		@Test
@@ -276,7 +276,7 @@ class TraineeServiceImplTest {
 			verify(trainerRepository, times(1)).findByUserUserName(trainerUserName);
 			verifyNoMoreInteractions(traineeRepository);
 			verifyNoMoreInteractions(trainerRepository);
-			verifyNoInteractions(trainingRepository);
+			verifyNoInteractions(trainingService);
 		}
 
 
