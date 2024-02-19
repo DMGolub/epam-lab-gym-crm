@@ -13,7 +13,7 @@ public class FrontendApplication {
 	public static void main(final String[] args) {
 		try {
 			SpringApplication.run(FrontendApplication.class, args);
-			LOGGER.debug("Frontend application run successfully");
+			LOGGER.debug("Application run successfully");
 		} catch (final Exception e) {
 			LOGGER.error(e.getMessage());
 		}
