@@ -8,28 +8,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 import static com.epam.dmgolub.gym.service.constant.Constants.ADD_WORKLOAD_ACTION_TYPE;
 import static com.epam.dmgolub.gym.service.constant.Constants.DELETE_WORKLOAD_ACTION_TYPE;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
+
 
 @Service
 public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestWorkloadUpdateServiceImpl.class);
 
-	private final RestTemplate restTemplate;
+	private final WebClient webClient;
 	private final CircuitBreaker circuitBreaker;
 
 	@Value("${trainer-workload-service.url}")
 	private String trainerWorkloadServiceUrl;
 
-	public RestWorkloadUpdateServiceImpl(final RestTemplate restTemplate, final CircuitBreaker circuitBreaker) {
-		this.restTemplate = restTemplate;
+	public RestWorkloadUpdateServiceImpl(final WebClient webClient, final CircuitBreaker circuitBreaker) {
+		this.webClient = webClient;
 		this.circuitBreaker = circuitBreaker;
 	}
 
@@ -62,17 +63,23 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 	}
 
 	private String performRequest(final TrainerWorkloadUpdateRequestDTO requestDTO) {
-		final var requestUrl = trainerWorkloadServiceUrl + "/api/v1/trainer-workload/update";
-		final var requestEntity = new HttpEntity<>(requestDTO);
-		LOGGER.debug("[{}] In performRequest - Sending request to {}", MDC.get(TRANSACTION_ID), requestUrl);
+		final var requestUri = trainerWorkloadServiceUrl + "/api/v1/trainer-workload/update";
+		LOGGER.debug("[{}] In performRequest - Sending request to {}", MDC.get(TRANSACTION_ID), requestUri);
 		return circuitBreaker.run(
-			() -> restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, String.class).getBody(),
+			() -> webClient.post().uri(requestUri)
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(requestDTO)
+				.attributes(clientRegistrationId("messaging-client-model"))
+				.retrieve()
+				.bodyToMono(String.class)
+				.block(),
 			this::requestFallback
 		);
 	}
 
-	private String requestFallback(final Throwable throwable) {
-		final String message = "Could not send request due to " + throwable.getMessage();
+	private String requestFallback(final Throwable cause) {
+		final var message =
+			String.format("Could not send request due to %s with message: %s", cause.getClass(), cause.getMessage());
 		LOGGER.error("In performRequest - {}", message);
 		return message;
 	}

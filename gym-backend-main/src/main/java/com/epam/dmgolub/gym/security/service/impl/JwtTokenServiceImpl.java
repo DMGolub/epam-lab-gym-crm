@@ -31,7 +31,9 @@ public class JwtTokenServiceImpl implements TokenService {
 	@Value("${authentication.jwt.secret-key}")
 	private String secretKey;
 
-	public JwtTokenServiceImpl(@Value("${authentication.jwt.token.expiration-time}") final long tokenExpirationTimeMillis) {
+	public JwtTokenServiceImpl(
+		@Value("${authentication.jwt.token.expiration-time-in-millis}") final long tokenExpirationTimeMillis
+	) {
 		this.tokenExpirationTimeMillis = tokenExpirationTimeMillis;
 		deniedTokens = CacheBuilder.newBuilder().expireAfterWrite(tokenExpirationTimeMillis, MILLISECONDS).build(
 			new CacheLoader<>() {
@@ -46,7 +48,7 @@ public class JwtTokenServiceImpl implements TokenService {
 
 	@Override
 	public String generateToken(final String userName) {
-		LOGGER.debug("In generateToken - generating token for userName={}", userName);
+		LOGGER.debug("In generateToken - Generating token for userName={}", userName);
 		final Map<String, Object> claims = new HashMap<>();
 		return Jwts.builder()
 			.setClaims(claims)

@@ -16,6 +16,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -70,7 +75,8 @@ public class WebSecurityConfig  {
 			.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 			.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.logout(AbstractHttpConfigurer::disable)
-			.httpBasic(withDefaults());
+			.httpBasic(withDefaults())
+			.oauth2Client(withDefaults());
 		return http.build();
 	}
 
@@ -81,5 +87,22 @@ public class WebSecurityConfig  {
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/api/v*/**", configuration);
 		return source;
+	}
+
+	@Bean
+	OAuth2AuthorizedClientManager authorizedClientManager(
+		final ClientRegistrationRepository clientRegistrationRepository,
+		final OAuth2AuthorizedClientService authorizedClientService
+	) {
+		final var authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder
+			.builder()
+			.clientCredentials()
+			.build();
+		final var authorizedClientManager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+			clientRegistrationRepository,
+			authorizedClientService
+		);
+		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+		return authorizedClientManager;
 	}
 }

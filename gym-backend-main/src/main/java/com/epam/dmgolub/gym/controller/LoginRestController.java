@@ -1,6 +1,5 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.controller.constant.ApiVersion;
 import com.epam.dmgolub.gym.controller.exception.PasswordChangeFailedException;
 import com.epam.dmgolub.gym.dto.ChangePasswordRequestDTO;
 import com.epam.dmgolub.gym.dto.CredentialsDTO;
@@ -31,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import static com.epam.dmgolub.gym.controller.LoginRestController.URL;
+import static com.epam.dmgolub.gym.controller.constant.ApiVersion.VERSION_1;
 import static com.epam.dmgolub.gym.controller.constant.Constants.BASE_API_URL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -38,7 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class LoginRestController {
 
-	public static final String URL = BASE_API_URL + ApiVersion.VERSION_1;
+	public static final String URL = BASE_API_URL + VERSION_1;
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoginRestController.class);
 
 	private final LoginService loginService;
