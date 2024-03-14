@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "$springBootVersion"
+    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+    id 'jacoco'
+}
+
+group = 'com.epam.dmgolub.gym'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Spring Cloud
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+    implementation "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaClientVersion"
+    implementation "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j:$resilience4jVersion"
+
+    // Databases
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Logging
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"
+
+    // Mapstruct
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    implementation "org.mapstruct:mapstruct:$mapstructVersion"
+
+    // Apache commons
+    implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"
+
+    // Swagger
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiStarterWebmvcUiVersion"
+    implementation "io.swagger.core.v3:swagger-annotations:$swaggerAnnotationsVersion"
+
+    // Messaging
+    implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
+
+    // Prometheus
+    implementation "io.micrometer:micrometer-registry-prometheus:$prometheusVersion"
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // Google Guava
+    implementation "com.google.guava:guava:$googleGuavaVersion"
+
+    // JJWT
+    implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Testcontainers
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
+    testImplementation "org.testcontainers:postgresql:$testcontainersVersion"
+}
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/*Test*', '**/mapper/*', '**/*Config*', '**/*ServletInitializer*', '**/*Exception*'])
+        })
+    }
+}
+
+build.dependsOn jacocoTestReport

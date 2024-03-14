@@ -1,5 +1,8 @@
 rootProject.name = 'epam-lab-gym-crm'
 
-include 'application'
-include 'frontend'
+include 'gym-backend-main'
+include 'gym-backend-trainer-workload'
+include 'gym-frontend'
+include 'eureka-server'
+include 'authorization-server'
 

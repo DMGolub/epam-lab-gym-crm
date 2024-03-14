@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "$springBootVersion"
+    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+    id 'jacoco'
+}
+
+group = 'com.epam.dmgolub.gym'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaClientVersion"
+
+    // Logging
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"
+
+    // Mapstruct
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    implementation "org.mapstruct:mapstruct:$mapstructVersion"
+
+    // Swagger
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiStarterWebmvcUiVersion"
+    implementation "io.swagger.core.v3:swagger-annotations:$swaggerAnnotationsVersion"
+
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/*Test*', '**/mapper/*', '**/*Config*', '**/*Exception*'])
+        })
+    }
+}
+
+build.dependsOn jacocoTestReport
