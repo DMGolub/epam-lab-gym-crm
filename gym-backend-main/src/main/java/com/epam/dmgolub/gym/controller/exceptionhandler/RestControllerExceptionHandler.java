@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.epam.dmgolub.gym.controller.constant.Constants.CONTROLLER_EXCEPTION_LOG_MESSAGE;
 
-@RestControllerAdvice("com.epam.dmgolub.gym.controller")
+@RestControllerAdvice
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RestControllerExceptionHandler.class);
@@ -82,10 +82,12 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
 	}
 
-	@ExceptionHandler(Exception.class)
+	@ExceptionHandler(RuntimeException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<Object> handleException(final RuntimeException ex, final WebRequest request) {
-		LOG.error(CONTROLLER_EXCEPTION_LOG_MESSAGE, request.getSessionId(), ex.getMessage());
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+		final var message = String.format("Failed to process request due to %s with message: %s",
+			ex.getClass().getSimpleName(), ex.getMessage());
+		LOG.error(CONTROLLER_EXCEPTION_LOG_MESSAGE, request.getSessionId(), message);
+		return handleExceptionInternal(ex, message, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 	}
 }

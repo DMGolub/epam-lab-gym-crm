@@ -28,6 +28,8 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 
 	@Value("${trainer-workload-service.url}")
 	private String trainerWorkloadServiceUrl;
+	@Value("${spring.security.oauth2.client.registration.messaging-client-model.client-name}")
+	private String clientRegistrationId;
 
 	public RestWorkloadUpdateServiceImpl(final WebClient webClient, final CircuitBreaker circuitBreaker) {
 		this.webClient = webClient;
@@ -69,18 +71,17 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 			() -> webClient.post().uri(requestUri)
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(requestDTO)
-				.attributes(clientRegistrationId("messaging-client-model"))
+				.attributes(clientRegistrationId(clientRegistrationId))
 				.retrieve()
 				.bodyToMono(String.class)
 				.block(),
-			this::requestFallback
+			cause -> requestFallback(cause, requestDTO)
 		);
 	}
 
-	private String requestFallback(final Throwable cause) {
-		final var message =
-			String.format("Could not send request due to %s with message: %s", cause.getClass(), cause.getMessage());
-		LOGGER.error("In performRequest - {}", message);
-		return message;
+	private String requestFallback(final Throwable cause, final TrainerWorkloadUpdateRequestDTO requestDTO) {
+		LOGGER.error("In performRequest - Workload should be updated manually with the following: {}", requestDTO);
+		return String.format("Could not complete request due to %s with message: %s",
+			cause.getClass().getSimpleName(), cause.getMessage());
 	}
 }
