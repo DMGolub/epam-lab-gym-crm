@@ -4,7 +4,7 @@ import com.epam.dmgolub.gym.model.WorkloadUpdateRequest;
 
 public interface WorkloadService {
 
-	void addTraining(WorkloadUpdateRequest training);
+	void addWorkload(WorkloadUpdateRequest training);
 
-	boolean deleteTraining(WorkloadUpdateRequest training);
+	boolean deleteWorkload(WorkloadUpdateRequest training);
 }

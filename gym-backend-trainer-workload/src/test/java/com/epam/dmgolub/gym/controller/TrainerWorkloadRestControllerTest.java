@@ -60,7 +60,7 @@ class TrainerWorkloadRestControllerTest {
 			.andExpect(status().isOk());
 
 		verify(mapper).mapToWorkloadUpdateRequest(requestDTO);
-		verify(workloadService).addTraining(request);
+		verify(workloadService).addWorkload(request);
 		verifyNoMoreInteractions(workloadService);
 	}
 
@@ -77,7 +77,7 @@ class TrainerWorkloadRestControllerTest {
 			.andExpect(status().isOk());
 
 		verify(mapper).mapToWorkloadUpdateRequest(requestDTO);
-		verify(workloadService).deleteTraining(request);
+		verify(workloadService).deleteWorkload(request);
 		verifyNoMoreInteractions(workloadService);
 	}
 }

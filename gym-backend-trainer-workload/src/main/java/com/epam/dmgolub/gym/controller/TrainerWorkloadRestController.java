@@ -49,14 +49,11 @@ public class TrainerWorkloadRestController {
 		String message;
 		var status = HttpStatus.OK;
 		if ("add".equalsIgnoreCase(trainingRequest.getActionType())) {
-			workloadService.addTraining(mapper.mapToWorkloadUpdateRequest(trainingRequest));
+			workloadService.addWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
 			message = "Training duration added successfully";
 		} else if ("delete".equalsIgnoreCase(trainingRequest.getActionType())) {
-			if (workloadService.deleteTraining(mapper.mapToWorkloadUpdateRequest(trainingRequest))) {
-				message = "Training duration deleted successfully";
-			} else {
-				message = "Could not delete training";
-			}
+			final var isDeleted = workloadService.deleteWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
+			message = isDeleted ? "Training duration deleted successfully" : "Could not delete training";
 		} else {
 			message = "Invalid action type: " + trainingRequest.getActionType();
 			status = HttpStatus.BAD_REQUEST;
