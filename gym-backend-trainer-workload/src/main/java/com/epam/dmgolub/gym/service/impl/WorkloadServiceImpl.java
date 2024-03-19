@@ -17,13 +17,13 @@ import java.util.Optional;
 import static com.epam.dmgolub.gym.interceptor.constant.Constants.TRANSACTION_ID;
 
 @Service
-public class RestWorkloadServiceImpl implements WorkloadService {
+public class WorkloadServiceImpl implements WorkloadService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RestWorkloadServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkloadServiceImpl.class);
 
 	private final WorkloadRepository workloadRepository;
 
-	public RestWorkloadServiceImpl(final WorkloadRepository workloadRepository) {
+	public WorkloadServiceImpl(final WorkloadRepository workloadRepository) {
 		this.workloadRepository = workloadRepository;
 	}
 
@@ -31,7 +31,7 @@ public class RestWorkloadServiceImpl implements WorkloadService {
 	public void addWorkload(final WorkloadUpdateRequest trainingWorkload) {
 		LOGGER.debug("[{}] In addWorkload - Trying to add training: {}", MDC.get(TRANSACTION_ID), trainingWorkload);
 
-		final var totalTrainerWorkload = findOrCreateTotalWorkloadRecord(trainingWorkload);
+		final var totalTrainerWorkload = findOrCreateTotalTrainerWorkload(trainingWorkload);
 		summarize(totalTrainerWorkload, trainingWorkload);
 		updateWorkloadTrainerAttributes(totalTrainerWorkload, trainingWorkload);
 		workloadRepository.saveOfUpdate(totalTrainerWorkload);
@@ -54,10 +54,13 @@ public class RestWorkloadServiceImpl implements WorkloadService {
 			return false;
 		}
 
-		return subtract(totalTrainerWorkload, trainingWorkload);
+		final var isDeleted = subtract(totalTrainerWorkload, trainingWorkload);
+		updateWorkloadTrainerAttributes(totalTrainerWorkload, trainingWorkload);
+		workloadRepository.saveOfUpdate(totalTrainerWorkload);
+		return isDeleted;
 	}
 
-	private TrainerWorkload findOrCreateTotalWorkloadRecord(final WorkloadUpdateRequest request) {
+	private TrainerWorkload findOrCreateTotalTrainerWorkload(final WorkloadUpdateRequest request) {
 		final String trainerUserName = request.getTrainerUserName();
 		var workload = workloadRepository.findByTrainerUserName(trainerUserName);
 		if (workload == null) {
@@ -138,8 +141,6 @@ public class RestWorkloadServiceImpl implements WorkloadService {
 
 		if (month.get().getTrainingSummaryDuration() >= trainingWorkload.getDuration()) {
 			addDuration(month.get(), -trainingWorkload.getDuration());
-			updateWorkloadTrainerAttributes(totalTrainerWorkload, trainingWorkload);
-			workloadRepository.saveOfUpdate(totalTrainerWorkload);
 			LOGGER.debug("[{}] In subtract - Duration subtracted from total workload", MDC.get(TRANSACTION_ID));
 			return true;
 		}

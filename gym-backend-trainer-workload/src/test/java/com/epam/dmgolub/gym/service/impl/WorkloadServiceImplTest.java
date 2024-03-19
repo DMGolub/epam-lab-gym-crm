@@ -17,13 +17,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class RestWorkloadServiceImplTest {
+class WorkloadServiceImplTest {
 
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private final String userName = "FirstName.LastName";
@@ -33,7 +34,7 @@ class RestWorkloadServiceImplTest {
 	@Mock
 	private WorkloadRepository workloadRepository;
 	@InjectMocks
-	private RestWorkloadServiceImpl workloadService;
+	private WorkloadServiceImpl workloadService;
 
 	@Nested
 	class TestAddTraining {
@@ -143,7 +144,7 @@ class RestWorkloadServiceImplTest {
 		}
 
 		@Test
-		void delete_shouldNotModifyWorkload_whenExistingWorkloadDoesNotContainRequestedYear() throws Exception {
+		void delete_shouldNotModifyWorkloadDuration_whenExistingWorkloadDoesNotContainRequestedYear() throws Exception {
 			final var date = dateFormat.parse("2030-04-05");
 			final var duration = 90;
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
@@ -154,11 +155,11 @@ class RestWorkloadServiceImplTest {
 
 			assertFalse(result);
 			verify(workloadRepository).findByTrainerUserName(userName);
-			verifyNoMoreInteractions(workloadRepository);
+			verify(workloadRepository, times(1)).saveOfUpdate(workload);
 		}
 
 		@Test
-		void delete_shouldNotModifyWorkload_whenExistingWorkloadDoesNotContainRequestedMonth() throws Exception {
+		void delete_shouldNotModifyWorkloadDuration_whenExistingWorkloadDoesNotContainRequestedMonth() throws Exception {
 			final var date = dateFormat.parse("2030-04-05");
 			final var duration = 90;
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
@@ -170,11 +171,11 @@ class RestWorkloadServiceImplTest {
 
 			assertFalse(result);
 			verify(workloadRepository).findByTrainerUserName(userName);
-			verifyNoMoreInteractions(workloadRepository);
+			verify(workloadRepository, times(1)).saveOfUpdate(workload);
 		}
 
 		@Test
-		void delete_shouldNotModifyWorkload_whenExistingWorkloadIsNotEnough() throws Exception {
+		void delete_shouldNotModifyWorkloadDuration_whenExistingWorkloadIsNotEnough() throws Exception {
 			final var date = dateFormat.parse("2030-04-05");
 			final var duration = 90;
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
@@ -187,7 +188,7 @@ class RestWorkloadServiceImplTest {
 
 			assertFalse(result);
 			verify(workloadRepository).findByTrainerUserName(userName);
-			verifyNoMoreInteractions(workloadRepository);
+			verify(workloadRepository, times(1)).saveOfUpdate(workload);
 		}
 
 		@Test
