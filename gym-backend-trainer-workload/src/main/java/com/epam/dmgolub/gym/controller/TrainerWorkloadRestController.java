@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.dto.WorkloadUpdateRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainerWorkloadUpdateRequestDTO;
 import com.epam.dmgolub.gym.mapper.DtoToModelMapper;
 import com.epam.dmgolub.gym.service.WorkloadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,18 +44,19 @@ public class TrainerWorkloadRestController {
 		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})
-	public ResponseEntity<String> update(@RequestBody final WorkloadUpdateRequestDTO trainingRequest) {
+	public ResponseEntity<String> update(@RequestBody final TrainerWorkloadUpdateRequestDTO trainingRequest) {
 		LOGGER.debug("[{}] In handleTrainingAction - Received a request: {}", MDC.get(TRANSACTION_ID), trainingRequest);
 		String message;
 		var status = HttpStatus.OK;
-		if ("add".equalsIgnoreCase(trainingRequest.getActionType())) {
+		final var action = trainingRequest.getActionType();
+		if ("add".equalsIgnoreCase(action)) {
 			workloadService.addWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
 			message = "Training duration added successfully";
-		} else if ("delete".equalsIgnoreCase(trainingRequest.getActionType())) {
+		} else if ("delete".equalsIgnoreCase(action)) {
 			final var isDeleted = workloadService.deleteWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
 			message = isDeleted ? "Training duration deleted successfully" : "Could not delete training";
 		} else {
-			message = "Invalid action type: " + trainingRequest.getActionType();
+			message = "Invalid action type: " + action;
 			status = HttpStatus.BAD_REQUEST;
 		}
 		LOGGER.debug("[{}] In handleTrainingAction - {}", MDC.get(TRANSACTION_ID), message);

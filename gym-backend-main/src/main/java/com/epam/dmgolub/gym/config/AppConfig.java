@@ -17,6 +17,9 @@ import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalance
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -55,7 +58,6 @@ public class AppConfig implements WebMvcConfigurer {
 			.addPathPatterns(apiPattern);
 	}
 
-
 	@Bean
 	WebClient webClient(
 		final OAuth2AuthorizedClientManager authorizedClientManager,
@@ -87,5 +89,13 @@ public class AppConfig implements WebMvcConfigurer {
 			.timeLimiterConfig(timeLimiterConfig)
 			.circuitBreakerConfig(circuitBreakerConfig)
 			.build());
+	}
+
+	@Bean
+	public MessageConverter jacksonJmsMessageConverter() {
+		final var converter = new MappingJackson2MessageConverter();
+		converter.setTargetType(MessageType.TEXT);
+		converter.setTypeIdPropertyName("_type");
+		return converter;
 	}
 }

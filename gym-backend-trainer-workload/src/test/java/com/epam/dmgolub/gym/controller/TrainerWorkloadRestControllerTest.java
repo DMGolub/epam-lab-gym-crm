@@ -1,6 +1,6 @@
 package com.epam.dmgolub.gym.controller;
 
-import com.epam.dmgolub.gym.dto.WorkloadUpdateRequestDTO;
+import com.epam.dmgolub.gym.dto.TrainerWorkloadUpdateRequestDTO;
 import com.epam.dmgolub.gym.mapper.DtoToModelMapper;
 import com.epam.dmgolub.gym.model.WorkloadUpdateRequest;
 import com.epam.dmgolub.gym.service.WorkloadService;
@@ -51,7 +51,7 @@ class TrainerWorkloadRestControllerTest {
 	void update_shouldInvokeAddTraining_whenActionTypeIsAdd() throws Exception {
 		final var date = dateFormat.parse("2025-04-05");
 		final var requestDTO =
-			new WorkloadUpdateRequestDTO(userName, firstName, lastName, isActive, date, duration, "ADD");
+			new TrainerWorkloadUpdateRequestDTO(userName, firstName, lastName, isActive, date, duration, "ADD");
 		final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
 		when(mapper.mapToWorkloadUpdateRequest(requestDTO)).thenReturn(request);
 
@@ -65,10 +65,10 @@ class TrainerWorkloadRestControllerTest {
 	}
 
 	@Test
-	void update_shouldInvokeDeleteTraining_whenActionTypeIsAdd() throws Exception {
+	void update_shouldInvokeDeleteTraining_whenActionTypeIsDelete() throws Exception {
 		final var date = dateFormat.parse("2025-04-05");
 		final var requestDTO =
-			new WorkloadUpdateRequestDTO(userName, firstName, lastName, isActive, date, duration, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO(userName, firstName, lastName, isActive, date, duration, "DELETE");
 		final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
 		when(mapper.mapToWorkloadUpdateRequest(requestDTO)).thenReturn(request);
 
