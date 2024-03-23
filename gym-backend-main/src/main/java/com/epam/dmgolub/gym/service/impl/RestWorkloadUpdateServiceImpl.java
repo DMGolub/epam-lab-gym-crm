@@ -2,10 +2,10 @@ package com.epam.dmgolub.gym.service.impl;
 
 import com.epam.dmgolub.gym.model.TrainingModel;
 import com.epam.dmgolub.gym.dto.TrainerWorkloadUpdateRequestDTO;
-import com.epam.dmgolub.gym.service.WorkloadUpdateService;
 import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.http.MediaType;
@@ -17,9 +17,9 @@ import static com.epam.dmgolub.gym.service.constant.Constants.ADD_WORKLOAD_ACTIO
 import static com.epam.dmgolub.gym.service.constant.Constants.DELETE_WORKLOAD_ACTION_TYPE;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
-
 @Service
-public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
+@Qualifier("rest")
+public class RestWorkloadUpdateServiceImpl extends AbstractWorkloadUpdateService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestWorkloadUpdateServiceImpl.class);
 
@@ -40,7 +40,7 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 	public void add(final TrainingModel training) {
 		LOGGER.debug("[{}] In add - Received request to add training to workload {}",
 			MDC.get(TRANSACTION_ID), training);
-		final var response = performRequest(createRequestDTO(training , ADD_WORKLOAD_ACTION_TYPE));
+		final var response = performRequest(createRequestDTO(training, ADD_WORKLOAD_ACTION_TYPE));
 		LOGGER.debug("[{}] In add - Received response from workload service: {}", MDC.get(TRANSACTION_ID), response);
 	}
 
@@ -48,20 +48,8 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 	public void delete(final TrainingModel training) {
 		LOGGER.debug("[{}] In delete - Received request to delete training from workload {}",
 			MDC.get(TRANSACTION_ID), training);
-		final var response = performRequest(createRequestDTO(training , DELETE_WORKLOAD_ACTION_TYPE));
+		final var response = performRequest(createRequestDTO(training, DELETE_WORKLOAD_ACTION_TYPE));
 		LOGGER.debug("[{}] In delete - Received response from workload service: {}", MDC.get(TRANSACTION_ID), response);
-	}
-
-	private TrainerWorkloadUpdateRequestDTO createRequestDTO(final TrainingModel training, final String actionType) {
-		return new TrainerWorkloadUpdateRequestDTO(
-			training.getTrainer().getUserName(),
-			training.getTrainer().getFirstName(),
-			training.getTrainer().getLastName(),
-			training.getTrainer().isActive(),
-			training.getDate(),
-			training.getDuration(),
-			actionType
-		);
 	}
 
 	private String performRequest(final TrainerWorkloadUpdateRequestDTO requestDTO) {
@@ -80,7 +68,8 @@ public class RestWorkloadUpdateServiceImpl implements WorkloadUpdateService {
 	}
 
 	private String requestFallback(final Throwable cause, final TrainerWorkloadUpdateRequestDTO requestDTO) {
-		LOGGER.error("In performRequest - Workload should be updated manually with the following: {}", requestDTO);
+		LOGGER.error("[{}] In performRequest - Workload should be updated manually with the following: {}",
+			MDC.get(TRANSACTION_ID), requestDTO);
 		return String.format("Could not complete request due to %s with message: %s",
 			cause.getClass().getSimpleName(), cause.getMessage());
 	}

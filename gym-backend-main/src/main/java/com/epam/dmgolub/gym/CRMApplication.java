@@ -6,8 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication
 @EnableDiscoveryClient
+@SpringBootApplication
 public class CRMApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CRMApplication.class);

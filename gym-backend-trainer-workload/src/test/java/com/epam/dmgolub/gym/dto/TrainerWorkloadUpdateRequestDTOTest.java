@@ -9,13 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class WorkloadUpdateRequestDTOTest {
+class TrainerWorkloadUpdateRequestDTOTest {
 
-	private WorkloadUpdateRequestDTO requestDTO;
+	private TrainerWorkloadUpdateRequestDTO requestDTO;
 
 	@BeforeEach
 	public void setUp() {
-		requestDTO = new WorkloadUpdateRequestDTO();
+		requestDTO = new TrainerWorkloadUpdateRequestDTO();
 	}
 
 	@Test
@@ -68,7 +68,7 @@ class WorkloadUpdateRequestDTOTest {
 
 	@Test
 	void toString_shouldReturnExpectedValue_whenInvoked() {
-		requestDTO = new WorkloadUpdateRequestDTO(
+		requestDTO = new TrainerWorkloadUpdateRequestDTO(
 			"User.Name",
 			"FirstName",
 			"LastName",
@@ -85,23 +85,23 @@ class WorkloadUpdateRequestDTOTest {
 	@Test
 	void testEqualsAndHashCode() {
 		requestDTO =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "DELETE");
 		final var requestDTO2 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "DELETE");
 		final var requestDTO3 =
-			new WorkloadUpdateRequestDTO("User.Name2", "FirstName", "LastName", true, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name2", "FirstName", "LastName", true, null, 60, "DELETE");
 		final var requestDTO4 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName2", "LastName", true, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName2", "LastName", true, null, 60, "DELETE");
 		final var requestDTO5 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName2", true, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName2", true, null, 60, "DELETE");
 		final var requestDTO6 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", false, null, 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", false, null, 60, "DELETE");
 		final var requestDTO7 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, new Date(), 60, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, new Date(), 60, "DELETE");
 		final var requestDTO8 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 90, "DELETE");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 90, "DELETE");
 		final var requestDTO9 =
-			new WorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "ADD");
+			new TrainerWorkloadUpdateRequestDTO("User.Name", "FirstName", "LastName", true, null, 60, "ADD");
 
 		assertEquals(requestDTO, requestDTO2);
 		assertEquals(requestDTO.hashCode(), requestDTO2.hashCode());

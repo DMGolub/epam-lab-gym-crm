@@ -1,26 +1,36 @@
 package com.epam.dmgolub.gym.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.Objects;
 
-public class WorkloadUpdateRequestDTO {
+public class TrainerWorkloadUpdateRequestDTO {
 
+	@NotBlank
 	private String trainerUserName;
+	@NotBlank
 	private String trainerFirstName;
+	@NotBlank
 	private String trainerLastName;
+	@NotNull
 	private Boolean isActive;
+	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private Date date;
+	@Positive
 	private int duration;
+	@NotBlank
 	private String actionType;
 
-	public WorkloadUpdateRequestDTO() {
+	public TrainerWorkloadUpdateRequestDTO() {
 		// Empty
 	}
 
-	public WorkloadUpdateRequestDTO(
+	public TrainerWorkloadUpdateRequestDTO(
 		final String trainerUserName,
 		final String trainerFirstName,
 		final String trainerLastName,
@@ -115,7 +125,7 @@ public class WorkloadUpdateRequestDTO {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		final WorkloadUpdateRequestDTO that = (WorkloadUpdateRequestDTO) o;
+		final TrainerWorkloadUpdateRequestDTO that = (TrainerWorkloadUpdateRequestDTO) o;
 		if (duration != that.duration) {
 			return false;
 		}
