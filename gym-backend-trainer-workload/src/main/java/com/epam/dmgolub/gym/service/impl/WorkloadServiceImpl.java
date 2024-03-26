@@ -4,6 +4,7 @@ import com.epam.dmgolub.gym.entity.TrainerWorkload;
 import com.epam.dmgolub.gym.model.WorkloadUpdateRequest;
 import com.epam.dmgolub.gym.repository.WorkloadRepository;
 import com.epam.dmgolub.gym.service.WorkloadService;
+import com.epam.dmgolub.gym.service.exception.WorkloadServiceException;
 import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,42 +35,40 @@ public class WorkloadServiceImpl implements WorkloadService {
 		final var totalTrainerWorkload = findOrCreateTotalTrainerWorkload(trainingWorkload);
 		summarize(totalTrainerWorkload, trainingWorkload);
 		updateWorkloadTrainerAttributes(totalTrainerWorkload, trainingWorkload);
-		workloadRepository.saveOfUpdate(totalTrainerWorkload);
+		workloadRepository.save(totalTrainerWorkload);
 
 		LOGGER.debug("[{}] In addWorkload - Training duration added to workload successfully", MDC.get(TRANSACTION_ID));
 	}
 
 	@Override
-	public boolean deleteWorkload(final WorkloadUpdateRequest trainingWorkload) {
+	public void deleteWorkload(final WorkloadUpdateRequest trainingWorkload) {
 		LOGGER.debug("[{}] In deleteWorkload - Trying to delete training: {}", MDC.get(TRANSACTION_ID), trainingWorkload);
 
-		if (hasPastDate(trainingWorkload)) {
-			LOGGER.debug("[{}] In deleteWorkload - Can't delete workload due to past date", MDC.get(TRANSACTION_ID));
-			return false;
-		}
+		validateTrainingDate(trainingWorkload, "Can't delete workload due to past date");
 
-		final var totalTrainerWorkload = workloadRepository.findByTrainerUserName(trainingWorkload.getTrainerUserName());
-		if (totalTrainerWorkload == null) {
-			LOGGER.debug("[{}] In deleteWorkload - Can't delete workload: trainer not found", MDC.get(TRANSACTION_ID));
-			return false;
-		}
+		final var trainerUserName = trainingWorkload.getTrainerUserName();
+		final var totalTrainerWorkload = workloadRepository
+			.findById(trainerUserName)
+			.orElseThrow(() -> {
+				final String message = "Can't delete workload: trainer not found by userName=" + trainerUserName;
+				LOGGER.debug("[{}] In deleteWorkload - {}", MDC.get(TRANSACTION_ID), message);
+				return new WorkloadServiceException(message);
+			});
 
-		final var isDeleted = subtract(totalTrainerWorkload, trainingWorkload);
+		subtract(totalTrainerWorkload, trainingWorkload);
 		updateWorkloadTrainerAttributes(totalTrainerWorkload, trainingWorkload);
-		workloadRepository.saveOfUpdate(totalTrainerWorkload);
-		return isDeleted;
+		workloadRepository.save(totalTrainerWorkload);
 	}
 
 	private TrainerWorkload findOrCreateTotalTrainerWorkload(final WorkloadUpdateRequest request) {
 		final String trainerUserName = request.getTrainerUserName();
-		var workload = workloadRepository.findByTrainerUserName(trainerUserName);
-		if (workload == null) {
+		return workloadRepository.findById(trainerUserName).orElseGet(() -> {
 			LOGGER.debug("[{}] In getTrainerWorkload - Created new workload due to not found by userName={}",
 				MDC.get(TRANSACTION_ID), trainerUserName);
-			workload = new TrainerWorkload();
+			final var workload = new TrainerWorkload();
 			workload.setTrainerUserName(request.getTrainerUserName());
-		}
-		return workload;
+			return workload;
+		});
 	}
 
 	private void updateWorkloadTrainerAttributes(
@@ -121,30 +120,37 @@ public class WorkloadServiceImpl implements WorkloadService {
 		}
 	}
 
-	private boolean hasPastDate(final WorkloadUpdateRequest request) {
-		return request.getDate().before(new Date());
+	private void validateTrainingDate(final WorkloadUpdateRequest request, final String message) {
+		if (request.getDate().before(new Date())) {
+			LOGGER.debug("[{}] In validateTrainingDate - {}", MDC.get(TRANSACTION_ID), message);
+			throw new WorkloadServiceException(message);
+		}
 	}
 
-	private boolean subtract(final TrainerWorkload totalTrainerWorkload, final WorkloadUpdateRequest trainingWorkload) {
-		final var workloadYear = findYear(totalTrainerWorkload.getYears(), getYear(trainingWorkload.getDate()));
+	private void subtract(final TrainerWorkload totalTrainerWorkload, final WorkloadUpdateRequest trainingWorkload) {
+		final String logMessageTemplate = "[{}] In subtract - {}";
 
+		final var workloadYear = findYear(totalTrainerWorkload.getYears(), getYear(trainingWorkload.getDate()));
 		if (workloadYear.isEmpty()) {
-			LOGGER.debug("[{}] In subtract - Can't subtract workload: year not found", MDC.get(TRANSACTION_ID));
-			return false;
+			final String message = "Can't subtract workload: year not found";
+			LOGGER.debug(logMessageTemplate, MDC.get(TRANSACTION_ID), message);
+			throw new WorkloadServiceException(message);
 		}
 
 		final var month = findMonth(workloadYear.get().getMonths(), getMonth(trainingWorkload.getDate()));
 		if (month.isEmpty()) {
-			LOGGER.debug("[{}] In subtract - Can't subtract workload: month not found", MDC.get(TRANSACTION_ID));
-			return false;
+			final String message = "Can't subtract workload: month not found";
+			LOGGER.debug(logMessageTemplate, MDC.get(TRANSACTION_ID), message);
+			throw new WorkloadServiceException(message);
 		}
 
-		if (month.get().getTrainingSummaryDuration() >= trainingWorkload.getDuration()) {
-			addDuration(month.get(), -trainingWorkload.getDuration());
-			LOGGER.debug("[{}] In subtract - Duration subtracted from total workload", MDC.get(TRANSACTION_ID));
-			return true;
+		if (month.get().getTrainingSummaryDuration() < trainingWorkload.getDuration()) {
+			final String message = "Can't subtract workload: duration exceeds total workload";
+			LOGGER.debug(logMessageTemplate, MDC.get(TRANSACTION_ID), message);
+			throw new WorkloadServiceException(message);
 		}
-		LOGGER.debug("[{}] In subtract - Can't subtract workload: duration exceeds total workload", MDC.get(TRANSACTION_ID));
-		return false;
+
+		addDuration(month.get(), -trainingWorkload.getDuration());
+		LOGGER.debug(logMessageTemplate, MDC.get(TRANSACTION_ID), "Duration subtracted from total workload");
 	}
 }

@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.controller;
 import com.epam.dmgolub.gym.dto.TrainerWorkloadUpdateRequestDTO;
 import com.epam.dmgolub.gym.mapper.DtoToModelMapper;
 import com.epam.dmgolub.gym.service.WorkloadService;
+import com.epam.dmgolub.gym.service.exception.WorkloadServiceException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,8 +54,12 @@ public class TrainerWorkloadRestController {
 			workloadService.addWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
 			message = "Training duration added successfully";
 		} else if ("delete".equalsIgnoreCase(action)) {
-			final var isDeleted = workloadService.deleteWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
-			message = isDeleted ? "Training duration deleted successfully" : "Could not delete training";
+			try {
+				workloadService.deleteWorkload(mapper.mapToWorkloadUpdateRequest(trainingRequest));
+				message = "Training duration deleted successfully";
+			} catch (final WorkloadServiceException e) {
+				message = e.getMessage();
+			}
 		} else {
 			message = "Invalid action type: " + action;
 			status = HttpStatus.BAD_REQUEST;

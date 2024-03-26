@@ -3,6 +3,7 @@ package com.epam.dmgolub.gym.service.impl;
 import com.epam.dmgolub.gym.entity.TrainerWorkload;
 import com.epam.dmgolub.gym.model.WorkloadUpdateRequest;
 import com.epam.dmgolub.gym.repository.WorkloadRepository;
+import com.epam.dmgolub.gym.service.exception.WorkloadServiceException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +15,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -44,15 +44,15 @@ class WorkloadServiceImplTest {
 			final var date = dateFormat.parse("2024-04-05");
 			final var duration = 90;
 			final var training = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(null);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.empty());
 			final var expectedYears =
 				List.of(new TrainerWorkload.Year(2024, List.of(new TrainerWorkload.Month(4, duration))));
 			final var expected = new TrainerWorkload(userName, firstName, lastName, isActive, expectedYears);
 
 			workloadService.addWorkload(training);
 
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository).saveOfUpdate(expected);
+			verify(workloadRepository).findById(userName);
+			verify(workloadRepository).save(expected);
 		}
 
 		@Test
@@ -64,15 +64,15 @@ class WorkloadServiceImplTest {
 			final var existingYears = new ArrayList<TrainerWorkload.Year>();
 			existingYears.add(existingYear);
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 			final var expectedYears =
 				List.of(existingYear, new TrainerWorkload.Year(2024, List.of(new TrainerWorkload.Month(4, duration))));
 			final var expected = new TrainerWorkload(userName, firstName, lastName, isActive, expectedYears);
 
 			workloadService.addWorkload(request);
 
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository).saveOfUpdate(expected);
+			verify(workloadRepository).findById(userName);
+			verify(workloadRepository).save(expected);
 		}
 
 		@Test
@@ -85,15 +85,15 @@ class WorkloadServiceImplTest {
 			existingMonths.add(existingMonth);
 			final var existingYears = List.of(new TrainerWorkload.Year(2024, existingMonths));
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 			final var expectedYears =
 				List.of(new TrainerWorkload.Year(2024, List.of(existingMonth, new TrainerWorkload.Month(4, 90))));
 			final var expected = new TrainerWorkload(userName, firstName, lastName, isActive, expectedYears);
 
 			workloadService.addWorkload(training);
 
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository).saveOfUpdate(expected);
+			verify(workloadRepository).findById(userName);
+			verify(workloadRepository).save(expected);
 		}
 
 		@Test
@@ -104,15 +104,15 @@ class WorkloadServiceImplTest {
 			final var existingYears =
 				List.of(new TrainerWorkload.Year(2024, List.of(new TrainerWorkload.Month(4, 100))));
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 			final var expectedYears =
 				List.of(new TrainerWorkload.Year(2024, List.of(new TrainerWorkload.Month(4, 190))));
 			final var expected = new TrainerWorkload(userName, firstName, lastName, isActive, expectedYears);
 
 			workloadService.addWorkload(training);
 
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository).saveOfUpdate(expected);
+			verify(workloadRepository).findById(userName);
+			verify(workloadRepository).save(expected);
 		}
 	}
 
@@ -124,9 +124,7 @@ class WorkloadServiceImplTest {
 			final var date = dateFormat.parse("2000-04-05");
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, 90);
 
-			final boolean result = workloadService.deleteWorkload(request);
-
-			assertFalse(result);
+			assertThrows(WorkloadServiceException.class, () -> workloadService.deleteWorkload(request));
 			verifyNoInteractions(workloadRepository);
 		}
 
@@ -134,12 +132,10 @@ class WorkloadServiceImplTest {
 		void delete_shouldNotModifyWorkload_whenTrainerWorkloadNotFoundByUserName() throws Exception {
 			final var date = dateFormat.parse("2030-04-05");
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, 90);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(null);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.empty());
 
-			final boolean result = workloadService.deleteWorkload(request);
-
-			assertFalse(result);
-			verify(workloadRepository).findByTrainerUserName(userName);
+			assertThrows(WorkloadServiceException.class, () -> workloadService.deleteWorkload(request));
+			verify(workloadRepository).findById(userName);
 			verifyNoMoreInteractions(workloadRepository);
 		}
 
@@ -149,13 +145,10 @@ class WorkloadServiceImplTest {
 			final var duration = 90;
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, new ArrayList<>());
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 
-			final boolean result = workloadService.deleteWorkload(request);
-
-			assertFalse(result);
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository, times(1)).saveOfUpdate(workload);
+			assertThrows(WorkloadServiceException.class, () -> workloadService.deleteWorkload(request));
+			verify(workloadRepository).findById(userName);
 		}
 
 		@Test
@@ -165,13 +158,10 @@ class WorkloadServiceImplTest {
 			final var request = new WorkloadUpdateRequest(userName, firstName, lastName, isActive, date, duration);
 			final var existingYears = List.of(new TrainerWorkload.Year(2030, new ArrayList<>()));
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 
-			final boolean result = workloadService.deleteWorkload(request);
-
-			assertFalse(result);
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository, times(1)).saveOfUpdate(workload);
+			assertThrows(WorkloadServiceException.class, () -> workloadService.deleteWorkload(request));
+			verify(workloadRepository).findById(userName);
 		}
 
 		@Test
@@ -182,13 +172,10 @@ class WorkloadServiceImplTest {
 			final var existingYears =
 				List.of(new TrainerWorkload.Year(2030, List.of(new TrainerWorkload.Month(4, 30))));
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 
-			final boolean result = workloadService.deleteWorkload(request);
-
-			assertFalse(result);
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository, times(1)).saveOfUpdate(workload);
+			assertThrows(WorkloadServiceException.class, () -> workloadService.deleteWorkload(request));
+			verify(workloadRepository).findById(userName);
 		}
 
 		@Test
@@ -199,16 +186,15 @@ class WorkloadServiceImplTest {
 			final var existingMonths = List.of(new TrainerWorkload.Month(4, 200));
 			final var existingYears = List.of(new TrainerWorkload.Year(2030, existingMonths));
 			final var workload = new TrainerWorkload(userName, firstName, lastName, isActive, existingYears);
-			when(workloadRepository.findByTrainerUserName(userName)).thenReturn(workload);
+			when(workloadRepository.findById(userName)).thenReturn(Optional.of(workload));
 			final var expectedYears =
 				List.of(new TrainerWorkload.Year(2030, List.of(new TrainerWorkload.Month(4, 110))));
 			final var expected = new TrainerWorkload(userName, firstName, lastName, isActive, expectedYears);
 
-			final boolean result = workloadService.deleteWorkload(request);
+			workloadService.deleteWorkload(request);
 
-			assertTrue(result);
-			verify(workloadRepository).findByTrainerUserName(userName);
-			verify(workloadRepository).saveOfUpdate(expected);
+			verify(workloadRepository).findById(userName);
+			verify(workloadRepository).save(expected);
 		}
 	}
 }
