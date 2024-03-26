@@ -6,5 +6,5 @@ public interface WorkloadService {
 
 	void addWorkload(WorkloadUpdateRequest training);
 
-	boolean deleteWorkload(WorkloadUpdateRequest training);
+	void deleteWorkload(WorkloadUpdateRequest training);
 }

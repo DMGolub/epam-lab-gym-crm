@@ -1,11 +1,20 @@
 package com.epam.dmgolub.gym.entity;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Document(collection = "workload")
+@CompoundIndex(def = "{'trainerFirstName': 1, 'trainerLastName': 1}")
 public class TrainerWorkload {
 
+	@Id
+	@Indexed
 	private String trainerUserName;
 	private String trainerFirstName;
 	private String trainerLastName;
