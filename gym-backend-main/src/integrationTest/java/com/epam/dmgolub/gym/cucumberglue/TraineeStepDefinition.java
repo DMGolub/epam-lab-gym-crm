@@ -11,7 +11,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 
@@ -197,12 +196,6 @@ public class TraineeStepDefinition extends AbstractStepDefinition {
 	public void unauthenticatedWantsToDeleteAnyTraineeProfile() {
 		final var requestUrl = LOCALHOST_URL + port + TraineeRestController.URL + PROFILE_WITH_USERNAME + "Any.Name";
 		lastResponse = restTemplate.exchange(requestUrl, HttpMethod.DELETE, null, String.class);
-	}
-
-	private HttpHeaders getAuthHeaders(final String userName, final String password) {
-		final var headers = new HttpHeaders();
-		headers.setBasicAuth(userName, password);
-		return headers;
 	}
 
 	private void updateTraineeProfile(

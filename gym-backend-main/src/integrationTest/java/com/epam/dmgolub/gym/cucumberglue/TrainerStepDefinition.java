@@ -11,7 +11,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 
@@ -177,12 +176,6 @@ public class TrainerStepDefinition extends AbstractStepDefinition {
 	public void unauthenticatedUserWantsToFindTrainersAssignedOnTrainee(final String userName) {
 		final var requestUrl = LOCALHOST_URL + port + TrainerRestController.URL + ASSIGNED_ON_WITH_USERNAME + userName;
 		lastResponse = restTemplate.exchange(requestUrl, HttpMethod.GET, null, List.class);
-	}
-
-	private HttpHeaders getAuthHeaders(final String userName, final String password) {
-		final var headers = new HttpHeaders();
-		headers.setBasicAuth(userName, password);
-		return headers;
 	}
 
 	private void updateTrainerProfile(
