@@ -1,5 +1,5 @@
 Feature: Testing trainee REST API
-  Users should be able to submit GET and POST requests to a web service (temp)
+  Users should be able to submit GET, PUT, POST and DELETE requests to the Trainee web service endpoint
 
   Scenario: Adding new valid trainee (positive)
     When user submits valid new trainee data with firstName 'New' and lastName 'Trainee'

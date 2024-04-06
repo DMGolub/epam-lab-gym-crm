@@ -50,6 +50,16 @@ public class TraineeStepDefinition extends AbstractStepDefinition {
 		assertEquals(HttpStatusCode.valueOf(statusCode), lastResponse.getStatusCode());
 	}
 
+	@And("the user receives new trainee credentials with userName {string}")
+	public void userReceivesNewTraineeCredentials(final String userName) {
+		final var traineeUserName = ((SignUpResponseDTO) Objects.requireNonNull(lastResponse.getBody()))
+			.getCredentials().getUserName();
+		final var password = Objects.requireNonNull((SignUpResponseDTO) lastResponse.getBody())
+			.getCredentials().getPassword();
+		assertEquals(userName, traineeUserName);
+		assertFalse(password.isBlank());
+	}
+
 	@When("user submits invalid new trainee data with firstName {string} and lastName {string}")
 	public void unauthenticatedSubmitsInvalidNewTraineeData(final String firstName, final String lastName) throws ParseException {
 		final var requestUrl = LOCALHOST_URL + port + TraineeRestController.URL;
@@ -62,16 +72,6 @@ public class TraineeStepDefinition extends AbstractStepDefinition {
 	@And("no data is returned")
 	public void noDataIsReturned() {
 		assertNull(lastResponse.getBody());
-	}
-
-	@And("the user receives new trainee credentials with userName {string}")
-	public void userReceivesNewTraineeCredentials(final String userName) {
-		final var traineeUserName = ((SignUpResponseDTO) Objects.requireNonNull(lastResponse.getBody()))
-			.getCredentials().getUserName();
-		final var password = Objects.requireNonNull((SignUpResponseDTO) lastResponse.getBody())
-			.getCredentials().getPassword();
-		assertEquals(userName, traineeUserName);
-		assertFalse(password.isBlank());
 	}
 
 	@When("trainee {string} with password {string} wants to update own profile with firstName {string} and lastName {string}")
@@ -111,14 +111,20 @@ public class TraineeStepDefinition extends AbstractStepDefinition {
 	}
 
 	@When("trainee {string} with password {string} wants to find own profile by userName")
-	public void authenticatedTraineeWantsToFindOwnProfileByUserName(final String userName, final String password) {
+	public void authenticatedTraineeWantsToFindOwnProfile(final String userName, final String password) {
 		final var requestUrl = LOCALHOST_URL + port + TraineeRestController.URL + PROFILE_WITH_USERNAME + userName;
 		final var request = new HttpEntity<>(getAuthHeaders(userName, password));
 		lastResponse = restTemplate.exchange(requestUrl, HttpMethod.GET, request, TraineeResponseDTO.class);
 	}
 
+	@Then("the {string} trainee data is returned")
+	public void theRequestedTraineeDataIsReturned(final String requestUserName) {
+		final var traineeUserName = Objects.requireNonNull((TraineeResponseDTO) lastResponse.getBody()).getUserName();
+		assertEquals(requestUserName, traineeUserName);
+	}
+
 	@When("trainee {string} with password {string} wants to find another trainee by userName {string}")
-	public void authenticatedTraineeWantsToFindAnotherTraineeProfileByUserName(
+	public void authenticatedTraineeWantsToFindAnotherTraineeProfile(
 		final String userName,
 		final String password,
 		final String requestedUserName
@@ -132,12 +138,6 @@ public class TraineeStepDefinition extends AbstractStepDefinition {
 	public void unauthenticatedWantsToFindTraineeByUserName(final String userName) {
 		final var requestUrl = LOCALHOST_URL + port + TraineeRestController.URL + PROFILE_WITH_USERNAME + userName;
 		lastResponse = restTemplate.exchange(requestUrl, HttpMethod.GET, null, TraineeResponseDTO.class);
-	}
-
-	@Then("the {string} trainee data is returned")
-	public void theRequestedTraineeDataIsReturned(final String requestUserName) {
-		final var traineeUserName = Objects.requireNonNull((TraineeResponseDTO) lastResponse.getBody()).getUserName();
-		assertEquals(requestUserName, traineeUserName);
 	}
 
 	@Then("trainee {string} with password {string} wants to update own trainer list")
