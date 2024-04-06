@@ -1,5 +1,5 @@
 Feature: Testing trainer REST API
-  Users should be able to submit GET, PUT, POST and DELETE requests to the Trainer web service endpoint
+  Users should be able to submit GET, PUT and POST requests to the Trainer web service endpoint
 
   Scenario: Adding new valid trainer (positive)
     When user submits valid new trainer data with firstName 'New' and lastName 'Trainer'
