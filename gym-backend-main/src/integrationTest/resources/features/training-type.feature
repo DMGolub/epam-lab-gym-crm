@@ -1,5 +1,5 @@
 Feature: Testing training type REST API
-  Users should be able to submit GET requests to the Training type web service endpoint
+  Users should be able to submit GET requests to the Training type web service endpoints
 
   @Endpoint-training-types
   Scenario: Getting all training types (positive)

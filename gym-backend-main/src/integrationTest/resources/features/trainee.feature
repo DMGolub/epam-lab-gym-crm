@@ -1,5 +1,5 @@
 Feature: Testing trainee REST API
-  Users should be able to submit GET, PUT, POST and DELETE requests to the Trainee web service endpoint
+  Users should be able to submit GET, PUT, POST and DELETE requests to the Trainee web service endpoints
 
   @Endpoint-trainees
   Scenario: Adding new valid trainee (positive)

@@ -1,5 +1,5 @@
 Feature: Testing training REST API
-  Users should be able to submit GET and POST requests to the Training web service endpoint
+  Users should be able to submit GET and POST requests to the Training web service endpoints
 
   @Endpoint-trainings-search-by-trainee
   Scenario: Getting all trainings by trainee (positive)
