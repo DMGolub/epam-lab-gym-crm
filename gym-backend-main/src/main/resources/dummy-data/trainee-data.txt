@@ -14,3 +14,5 @@ Evelyn;Clark;Evelyn.Clark;hDs5NQWjTe;true;8-May-1963;9649 Farrell Keys Road
 Sophia;Walker;Sophia.Walker;bSVA5mGOtI;true;24-Oct-1992;2494 Kuhn Terrace Street
 Steven;Wright;Steven.Wright;fO8sBTqIo0;true;11-Apr-1988;9348 Oren Lock Lane
 Michelle;Adams;Michelle.Adams;hZgWnFogEK;true;30-Mar-1984;2727 January Lodge Way
+Kevin;Baker;Kevin.Baker;evI9iEgmPM;true;1-Sep-1995;7952 Nolan Bypass
+Deborah;Mitchell;Deborah.Mitchell;hlcFAIXBAH;true;14-Dec-1974;1440 Yundt Centers Avenue

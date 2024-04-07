@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = URL, produces = APPLICATION_JSON_VALUE)
 public class UserRestController {
 
-	static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/users";
+	public static final String URL = BASE_API_URL + ApiVersion.VERSION_1 + "/users";
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserRestController.class);
 
 	private final UserService userService;

@@ -1,4 +1,4 @@
-Feature: Testing trainee REST API
+Feature: Testing login REST API
   Users should be able to submit POST and PUT requests to the Login web service endpoints
 
   @Endpoint-login
