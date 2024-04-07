@@ -98,6 +98,7 @@ tasks.register('integrationTest', Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     shouldRunAfter test
+    systemProperty 'cucumber.filter.tags', project.findProperty('cucumberTags') ?: ''
 }
 
 jacoco {
