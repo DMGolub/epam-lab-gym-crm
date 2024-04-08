@@ -70,8 +70,10 @@ dependencies {
     implementation "io.cucumber:cucumber-spring:$cucumberVersion"
 
     // Testcontainers
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
     testImplementation "org.testcontainers:postgresql:$testcontainersVersion"
+    testImplementation "org.testcontainers:activemq:$testcontainersVersion"
 }
 
 sourceSets {

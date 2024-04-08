@@ -18,12 +18,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @CucumberContextConfiguration
 public class SpringIntegrationTest {
 
+	private static final String MONGO_DB_IMAGE = "mongo:6.0.10";
 	private static final int MONGO_DB_PORT = 27017;
-	private static final String MONGO_IMAGE = "mongo:6.0.10";
 
 	@Container
 	@ServiceConnection
-	static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
+	static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse(MONGO_DB_IMAGE))
 			.withExposedPorts(MONGO_DB_PORT);
 
 	static {
