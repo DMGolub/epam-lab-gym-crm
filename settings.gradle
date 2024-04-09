@@ -5,4 +5,5 @@ include 'gym-backend-trainer-workload'
 include 'gym-frontend'
 include 'eureka-server'
 include 'authorization-server'
+include 'integration-test'
 

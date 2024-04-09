@@ -42,6 +42,7 @@ public class TrainerWorkloadRestController {
 	@Operation(summary = "Handle ADD/DELETE training operation")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Successfully completed the operation"),
+		@ApiResponse(responseCode = "400", description = "Invalid action type"),
 		@ApiResponse(responseCode = "401", description = "You are not authorized to access the resource"),
 		@ApiResponse(responseCode = "500", description = "Application failed to process the request")
 	})

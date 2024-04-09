@@ -16,7 +16,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-
     // Spring Cloud
     implementation "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaClientVersion"
 
@@ -34,6 +33,47 @@ dependencies {
 
     // Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+    testImplementation "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    testImplementation "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+
+    // TestContainers
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
+    testImplementation "org.testcontainers:mongodb:$testcontainersVersion"
+
+    // Cucumber
+    implementation "io.cucumber:cucumber-core:$cucumberVersion"
+    implementation "io.cucumber:cucumber-java:$cucumberVersion"
+    testImplementation "io.cucumber:cucumber-junit:$cucumberVersion"
+    implementation "io.cucumber:cucumber-spring:$cucumberVersion"
+}
+
+sourceSets {
+    integrationTest {
+        java.srcDir ("src/integrationTest/java")
+        resources.srcDir ("src/integrationTest/resources")
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+processIntegrationTestResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests'
+    outputs.upToDateWhen { false }
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
+    systemProperty 'cucumber.filter.tags', project.findProperty('cucumberTags') ?: ''
 }
 
 jacoco {
