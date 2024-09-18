@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "$springBootVersion"
+    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+    id 'jacoco'
+}
+
+group = 'com.epam.dmgolub.gym'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-activemq'
+    implementation 'org.springframework.boot:spring-boot-starter-json'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // Spring Cloud
+    implementation "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaClientVersion"
+
+    // Logging
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"
+
+    // Mapstruct
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    implementation "org.mapstruct:mapstruct:$mapstructVersion"
+
+    // Swagger
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openapiStarterWebmvcUiVersion"
+    implementation "io.swagger.core.v3:swagger-annotations:$swaggerAnnotationsVersion"
+
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+    testImplementation "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    testImplementation "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+
+    // TestContainers
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainersVersion"
+    testImplementation "org.testcontainers:mongodb:$testcontainersVersion"
+
+    // Cucumber
+    implementation "io.cucumber:cucumber-core:$cucumberVersion"
+    implementation "io.cucumber:cucumber-java:$cucumberVersion"
+    testImplementation "io.cucumber:cucumber-junit:$cucumberVersion"
+    implementation "io.cucumber:cucumber-spring:$cucumberVersion"
+}
+
+sourceSets {
+    integrationTest {
+        java.srcDir ("src/integrationTest/java")
+        resources.srcDir ("src/integrationTest/resources")
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+processIntegrationTestResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests'
+    outputs.upToDateWhen { false }
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
+    systemProperty 'cucumber.filter.tags', project.findProperty('cucumberTags') ?: ''
+}
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['**/*Test*', '**/mapper/*', '**/*Config*', '**/*Exception*'])
+        })
+    }
+}
+
+build.dependsOn jacocoTestReport
